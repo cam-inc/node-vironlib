@@ -1,0 +1,33 @@
+{
+  "name": "node-dmclib",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Generic library for DMC",
+  "keywords": [
+    "dmc",
+    "library",
+    "node.js"
+  ],
+  "scripts": {
+    "test": "mocha --reporter spec --ui bdd --timeout 3000 --recursive test",
+    "help": "cat package.json | jq \".scripts\""
+  },
+  "author": "",
+  "license": "",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "express-jwt": "^5.3.0",
+    "googleapis": "^20.1.0",
+    "jsonwebtoken": "^7.4.2",
+    "mout": "^1.0.0",
+    "sequelize": "^4.4.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.2.0",
+    "mocha": "^3.5.0"
+  },
+  "publishConfig": {
+    "registry": "https://camobile.jfrog.io/camobile/api/npm/camplat/"
+  }
+}
