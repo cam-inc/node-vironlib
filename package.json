@@ -1,7 +1,6 @@
 {
   "name": "node-dmclib",
   "version": "0.0.1",
-  "private": true,
   "description": "Generic library for DMC",
   "keywords": [
     "dmc",
