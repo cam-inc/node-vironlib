@@ -138,7 +138,7 @@ const registerSignOut = () => {
 const registerGoogleSignIn = configGoogleOAuth => {
   return (req, res) => {
     // Googleの認証画面にリダイレクト
-    const authUrl = helperGoogle.genAuthUrl(configGoogleOAuth);
+    const authUrl = helperGoogle.genAuthUrl(configGoogleOAuth, req.get('referer'));
     return res.redirect(authUrl); // 301
   };
 };

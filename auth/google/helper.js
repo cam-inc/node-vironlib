@@ -10,11 +10,11 @@ const getClient = options => {
   );
 };
 
-const genAuthUrl = options => {
+const genAuthUrl = (options, referer) => {
   const client = getClient(options);
   return client.generateAuthUrl({
     scope: options.scope || [],
-    state: options.state_url,
+    state: options.state_url || referer,
   });
 };
 
