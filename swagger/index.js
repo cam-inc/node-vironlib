@@ -1,4 +1,9 @@
-module.exports = {
-  controller: require('./controller'),
-  helper: require('./helper'),
+const controller = require('./controller');
+const helper = require('./helper');
+
+module.exports = () => {
+  return {
+    controller: controller(),
+    helper: helper,
+  };
 };

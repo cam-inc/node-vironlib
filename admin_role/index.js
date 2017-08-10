@@ -1,32 +1,54 @@
+const controller = require('./controller');
+const helper = require('./helper');
+const middleware = require('./middleware');
+
 /**
  * AdminRole init
- * @param {Sequelize.Model} AdminRoles
- * @param {string} defaultRole
+ * @param {Object} options
+ * @param {Sequelize.Model} options.AdminRoles
+ * @param {string} options.default_role
  */
-const init = (AdminRoles, defaultRole) => {
-  return Promise.resolve()
-    .then(() => {
-      return AdminRoles.count({where: {role_id: defaultRole}});
-    })
-    .then(count => {
-      if (count >= 1) {
-        // あれば何もしない
-        return;
-      }
+const init = options => {
+  const AdminRoles = options.AdminRoles;
+  const defaultRole = options.default_role;
 
-      const m = {
-        role_id: defaultRole,
-        method: 'GET',
-        resource: '*',
-      };
-      return AdminRoles.create(m);
-    })
-  ;
+  return () => {
+    return Promise.resolve()
+      .then(() => {
+        return AdminRoles.count({where: {role_id: defaultRole}});
+      })
+      .then(count => {
+        if (count >= 1) {
+          // あれば何もしない
+          return;
+        }
+
+        const m = {
+          role_id: defaultRole,
+          method: 'GET',
+          resource: '*',
+        };
+        return AdminRoles.create(m);
+      })
+    ;
+  };
 };
 
-module.exports = {
-  init: init,
-  controller: require('./controller'),
-  helper: require('./helper'),
-  middleware: require('./middleware'),
+module.exports = options => {
+  if (!options.AdminRoles) {
+    return console.warn('[DMCLIB] admin_role options.AdminRoles required.');
+  }
+  if (!options.store) {
+    return console.warn('[DMCLIB] admin_role options.store required.');
+  }
+  if (!options.default_role) {
+    return console.warn('[DMCLIB] admin_role options.default_role required.');
+  }
+
+  return {
+    init: init(options),
+    controller: controller(options),
+    helper: helper,
+    middleware: () => middleware(options),
+  };
 };

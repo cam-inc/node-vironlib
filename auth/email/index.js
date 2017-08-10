@@ -1,3 +1,5 @@
-module.exports = {
-  helper: require('./helper'),
+module.exports = () => {
+  return {
+    helper: require('./helper'),
+  };
 };

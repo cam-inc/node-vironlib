@@ -9,7 +9,7 @@ const sign = (claims, options) => {
   return new Promise(resolve => {
     const token = jwt.sign(
       Object.assign({
-        exp: Math.floor((Date.now() + options.token_expire) / 1000), // Tokenの有効期限
+        exp: Math.floor((Date.now() + (options.token_expire || 24*60*60*1000)) / 1000), // Tokenの有効期限
         iat: Math.floor(Date.now() / 1000), // Tokenを発行した日時
         nbf: 0, // Tokenが有効になる日時
         // claimsでoverride

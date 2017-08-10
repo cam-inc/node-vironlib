@@ -1,13 +1,14 @@
-const constant = require('./constant');
+const constants = require('./constants');
 
 /**
+ * レスポンスヘッダ−にpagination情報を付加する
  * @param {Response} res
  * @param {number} limit
  * @param {number} offset
  * @param {number} count
  */
 const setResHeader = (res, limit, offset, count) => {
-  limit = Number(limit || constant.DEFAULT_PAGER_LIMIT);
+  limit = Number(limit || constants.DEFAULT_PAGER_LIMIT);
   offset = Number(offset || 0);
 
   const totalPages = Math.ceil(count / limit);

@@ -4,7 +4,7 @@ const errors = require('../../errors');
 
 const getToken = options => {
   return req => {
-    const jwtHeader = req.get(options.header_key);
+    const jwtHeader = req.get(options.header_key || 'Authorization');
     if (jwtHeader) {
       const parts = jwtHeader.split(' ');
       if (parts.length === 2) {
@@ -24,7 +24,7 @@ module.exports = options => {
   return (req, res, next) => {
     jwt({
       secret: new Buffer(options.rsa_public_key),
-      credentialsRequired: options.credentials_required,
+      credentialsRequired: options.credentials_required !== false,
       requestProperty: 'auth',
       algorithms: [options.algorithm],
       getToken: getToken(options),

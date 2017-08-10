@@ -1,14 +1,14 @@
 const isEmpty = require('mout/lang/isEmpty');
 const isFinite = require('mout/lang/isFinite');
 
-const constant = require('../../constant');
+const constants = require('../../constants');
 
 /**
  * find
  * @param {Sequelize.Model} model
  * @param {Object} query - {name: "a"}
  * @param {Object} options
- * @param {Array} optoins.fields - ['id', 'name', 'age']
+ * @param {Array} options.attributes - ['id', 'name', 'age']
  * @param {Number} options.limit - 100
  * @param {Number} options.offset - 10
  * @param {Array} options.order - [['id', 'ASC'], ['name', 'DESC']]
@@ -19,7 +19,8 @@ const find = (model, query, options={}) => {
     opts.where = query;
   }
   if (!isFinite(options.limit)) {
-    opts.limit = constant.DEFAULT_PAGER_LIMIT;
+    // TODO: サービス側から上書きできない
+    opts.limit = constants.DEFAULT_PAGER_LIMIT;
   }
   if (!isFinite(options.offset)) {
     opts.offset = 0;

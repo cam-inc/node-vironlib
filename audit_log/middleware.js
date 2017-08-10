@@ -6,10 +6,13 @@ const getSourceIp = req => {
 /**
  * Middleware : Write Audit Log
  *
- * @param AuditLogs Sequelize.model
+ * @param {Object} options
+ * @param {Sequelize.model} options.AuditLogs
  * @returns {function(*, *, *)}
  */
-module.exports = AuditLogs => {
+module.exports = options => {
+  const AuditLogs = options.AuditLogs;
+
   return (req, res, next) => {
     // 監査ログ出力を除外するリクエスト
     if (req.path === '/ping' || req.method === 'OPTIONS') {
