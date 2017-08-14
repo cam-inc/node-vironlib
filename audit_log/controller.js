@@ -13,8 +13,8 @@ const registerList = (options, pager) => {
 
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    const limit = Number(req.query.limit || pager.defaultLimit);
+    const offset = Number(req.query.offset || 0);
     return Promise.resolve()
       .then(() => {
         return AuditLogs.count();
@@ -38,6 +38,6 @@ const registerList = (options, pager) => {
 
 module.exports = (options, pager) => {
   return {
-    registerList: registerList(options, pager),
+    list: registerList(options, pager),
   };
 };

@@ -15,8 +15,8 @@ const registerList = (options, pager) => {
 
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-    const limit = req.query.limit;
-    const offset = req.query.offset;
+    const limit = Number(req.query.limit || pager.defaultLimit);
+    const offset = Number(req.query.offset || 0);
     return Promise.resolve()
       .then(() => {
         return AdminUsers.count('AdminUsers');

@@ -1,8 +1,8 @@
 const reduce = require('mout/object/reduce');
 
-const helperGoogle = require('./google').helper;
-const helperJwt = require('./jwt').helper;
-const helperEMail = require('./email').helper;
+const helperGoogle = require('./google/helper');
+const helperJwt = require('./jwt/helper');
+const helperEMail = require('./email/helper');
 
 const errors = require('../errors');
 

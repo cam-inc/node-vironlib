@@ -12,26 +12,24 @@ const init = options => {
   const AdminRoles = options.AdminRoles;
   const defaultRole = options.default_role;
 
-  return () => {
-    return Promise.resolve()
-      .then(() => {
-        return AdminRoles.count({where: {role_id: defaultRole}});
-      })
-      .then(count => {
-        if (count >= 1) {
-          // あれば何もしない
-          return;
-        }
+  return Promise.resolve()
+    .then(() => {
+      return AdminRoles.count({where: {role_id: defaultRole}});
+    })
+    .then(count => {
+      if (count >= 1) {
+        // あれば何もしない
+        return;
+      }
 
-        const m = {
-          role_id: defaultRole,
-          method: 'GET',
-          resource: '*',
-        };
-        return AdminRoles.create(m);
-      })
-    ;
-  };
+      const m = {
+        role_id: defaultRole,
+        method: 'GET',
+        resource: '*',
+      };
+      return AdminRoles.create(m);
+    })
+  ;
 };
 
 module.exports = (options, pager) => {
@@ -45,8 +43,9 @@ module.exports = (options, pager) => {
     return console.warn('[DMCLIB] admin_role options.default_role required.');
   }
 
+  init(options);
+
   return {
-    init: init(options),
     controller: controller(options, pager),
     helper: helper,
     middleware: () => middleware(options),

@@ -29,8 +29,8 @@ const registerList = (options, pager) => {
   const AdminRoles = options.AdminRoles;
 
   return (req, res) => {
-    const limit = req.query.limit || pager.defaultLimit;
-    const offset = req.query.offset || 0;
+    const limit = Number(req.query.limit || pager.defaultLimit);
+    const offset = Number(req.query.offset || 0);
 
     return AdminRoles.findAll()
       .then(list => {
