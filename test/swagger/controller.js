@@ -5,9 +5,9 @@ const swagger = dmclib.swagger;
 
 describe('swagger/controller', () => {
 
-  describe('registerShow', () => {
+  describe('show', () => {
 
-    const show = swagger.controller.registerShow();
+    const show = swagger.controller.show;
 
     it('swagger.jsonが取得できる', () => {
       const swagger = {

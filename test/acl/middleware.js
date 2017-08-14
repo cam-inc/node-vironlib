@@ -5,11 +5,7 @@ const acl = dmclib.acl;
 
 describe('acl/middleware', () => {
 
-  const middleware = acl.middleware({
-    allow_origin: 'http://localhost:3000',
-    allow_headers: 'Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
-    expose_headers: 'X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
-  });
+  const middleware = acl.middleware();
 
   it('レスポンスヘッダにACLの情報が付加される', done => {
     const req = test.genRequest();
@@ -17,7 +13,7 @@ describe('acl/middleware', () => {
 
     middleware(req, res, () => {
       assert(res.get('Access-Control-Allow-Origin') === 'http://localhost:3000');
-      assert(res.get('Access-Control-Allow-Credentials') === 'true');
+      assert(res.get('Access-Control-Allow-Credentials') === true);
       assert(res.get('Access-Control-Allow-Methods') === 'GET, PUT, POST, DELETE, HEAD, OPTIONS');
       assert(res.get('Access-Control-Allow-Headers') === 'Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page');
       assert(res.get('Access-Control-Expose-Headers') === 'X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page');

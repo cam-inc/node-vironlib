@@ -8,34 +8,32 @@ const helperEMail = require('../auth/email/helper');
  * @param {Object} options
  * @param {Sequelize.model} options.AdminUsers
  * @param {Object} pager
- * @returns {function()}
+ * @returns {function(*, *, *)}
  */
 const registerList = (options, pager) => {
   const AdminUsers = options.AdminUsers;
 
-  return () => {
-    return (req, res) => {
-      const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-      const limit = req.query.limit;
-      const offset = req.query.offset;
-      return Promise.resolve()
-        .then(() => {
-          return AdminUsers.count('AdminUsers');
-        })
-        .then(count => {
-          pager.setResHeader(res, limit, offset, count);
-          const options = {
-            attributes,
-            limit,
-            offset,
-          };
-          return AdminUsers.findAll(options);
-        })
-        .then(list => {
-          res.json(list);
-        })
-      ;
-    };
+  return (req, res) => {
+    const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
+    const limit = req.query.limit;
+    const offset = req.query.offset;
+    return Promise.resolve()
+      .then(() => {
+        return AdminUsers.count('AdminUsers');
+      })
+      .then(count => {
+        pager.setResHeader(res, limit, offset, count);
+        const options = {
+          attributes,
+          limit,
+          offset,
+        };
+        return AdminUsers.findAll(options);
+      })
+      .then(list => {
+        res.json(list);
+      })
+    ;
   };
 };
 
@@ -47,33 +45,31 @@ const registerList = (options, pager) => {
  * @param {Object} options
  * @param {Sequelize.model} options.AdminUsers
  * @param {String} options.default_role;
- * @returns {function()}
+ * @returns {function(*, *, *)}
  */
 const registerCreate = options => {
   const AdminUsers = options.AdminUsers;
   const defaultRole = options.default_role;
 
-  return () => {
-    return (req, res) => {
-      return Promise.resolve()
-        .then(() => {
-          // パスワードをハッシュ化
-          const salt = helperEMail.genSalt();
-          return helperEMail.genHash(req.body.password, salt)
-            .then(hashedPassword => {
-              return {password: hashedPassword, salt};
-            });
-        })
-        .then(data => {
-          data.email = req.body.email;
-          data.role_id = defaultRole;
-          return AdminUsers.create(data);
-        })
-        .then(data => {
-          res.json(data);
-        })
-      ;
-    };
+  return (req, res) => {
+    return Promise.resolve()
+      .then(() => {
+        // パスワードをハッシュ化
+        const salt = helperEMail.genSalt();
+        return helperEMail.genHash(req.body.password, salt)
+          .then(hashedPassword => {
+            return {password: hashedPassword, salt};
+          });
+      })
+      .then(data => {
+        data.email = req.body.email;
+        data.role_id = defaultRole;
+        return AdminUsers.create(data);
+      })
+      .then(data => {
+        res.json(data);
+      })
+    ;
   };
 };
 
@@ -84,21 +80,19 @@ const registerCreate = options => {
  *
  * @param {Object} options
  * @param {Sequelize.model} options.AdminUsers
- * @returns {function()}
+ * @returns {function(*, *, *)}
  */
 const registerGet = options => {
   const AdminUsers = options.AdminUsers;
 
-  return () => {
-    return (req, res) => {
-      const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-      const id = req.swagger.params.id.value;
-      return AdminUsers.findById(id, {attributes})
-        .then(data => {
-          res.json(data);
-        })
-      ;
-    };
+  return (req, res) => {
+    const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
+    const id = req.swagger.params.id.value;
+    return AdminUsers.findById(id, {attributes})
+      .then(data => {
+        res.json(data);
+      })
+    ;
   };
 };
 
@@ -109,20 +103,18 @@ const registerGet = options => {
  *
  * @param {Object} options
  * @param {Sequelize.model} options.AdminUsers
- * @returns {function()}
+ * @returns {function(*, *, *)}
  */
 const registerRemove = options => {
   const AdminUsers = options.AdminUsers;
 
-  return () => {
-    return (req, res) => {
-      const id = req.swagger.params.id.value;
-      return AdminUsers.destroy({where: {id}, force: true})
-        .then(() => {
-          res.status(204).end();
-        })
-      ;
-    };
+  return (req, res) => {
+    const id = req.swagger.params.id.value;
+    return AdminUsers.destroy({where: {id}, force: true})
+      .then(() => {
+        res.status(204).end();
+      })
+    ;
   };
 };
 
@@ -133,47 +125,45 @@ const registerRemove = options => {
  *
  * @param {Object} options
  * @param {Sequelize.model} options.AdminUsers
- * @returns {function()}
+ * @returns {function(*, *, *)}
  */
 const registerUpdate = options => {
   const AdminUsers = options.AdminUsers;
 
-  return () => {
-    return (req, res) => {
-      return Promise.resolve()
-        .then(() => {
-          const password = req.body.password;
-          if (!password) {
-            return {};
-          }
+  return (req, res) => {
+    return Promise.resolve()
+      .then(() => {
+        const password = req.body.password;
+        if (!password) {
+          return {};
+        }
 
-          // パスワードをハッシュ化
-          const salt = helperEMail.genSalt();
-          return helperEMail.genHash(req.body.password, salt)
-            .then(hashedPassword => {
-              return {password: hashedPassword, salt};
-            })
-          ;
-        })
-        .then(data => {
-          data.role_id = req.body.role_id;
-          const id = req.swagger.params.id.value;
-          return AdminUsers.update(data, {where: {id}});
-        })
-        .then(data => {
-          res.json(data);
-        })
-      ;
-    };
+        // パスワードをハッシュ化
+        const salt = helperEMail.genSalt();
+        return helperEMail.genHash(req.body.password, salt)
+          .then(hashedPassword => {
+            return {password: hashedPassword, salt};
+          })
+        ;
+      })
+      .then(data => {
+        data.role_id = req.body.role_id;
+        const id = req.swagger.params.id.value;
+        return AdminUsers.update(data, {where: {id}});
+      })
+      .then(data => {
+        res.json(data);
+      })
+    ;
   };
 };
 
 module.exports = (options, pager) => {
   return {
-    registerList: registerList(options, pager),
-    registerCreate: registerCreate(options),
-    registerGet: registerGet(options),
-    registerRemove: registerRemove(options),
-    registerUpdate: registerUpdate(options),
+    list: registerList(options, pager),
+    create: registerCreate(options),
+    get: registerGet(options),
+    remove: registerRemove(options),
+    update: registerUpdate(options),
   };
 };

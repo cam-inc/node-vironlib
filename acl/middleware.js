@@ -14,11 +14,11 @@ module.exports = options => {
   }, options);
 
   return (req, res, next) => {
-    res.header('Access-Control-Allow-Origin', opts.allow_origin || req.get('origin'));
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, HEAD, OPTIONS');
-    res.header('Access-Control-Allow-Headers', opts.allow_headers);
-    res.header('Access-Control-Expose-Headers', opts.expose_headers);
+    res.setHeader('Access-Control-Allow-Origin', opts.allow_origin || req.get('origin'));
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, HEAD, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', opts.allow_headers);
+    res.setHeader('Access-Control-Expose-Headers', opts.expose_headers);
     next();
   };
 };
