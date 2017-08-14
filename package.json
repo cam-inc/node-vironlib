@@ -8,8 +8,7 @@
     "node.js"
   ],
   "scripts": {
-    "test": "mocha --reporter spec --ui bdd --timeout 3000 --recursive test",
-    "help": "cat package.json | jq \".scripts\""
+    "test": "mocha --reporter spec --ui bdd --timeout 3000 --recursive test"
   },
   "author": "",
   "license": "",
