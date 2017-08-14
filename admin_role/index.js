@@ -34,7 +34,7 @@ const init = options => {
   };
 };
 
-module.exports = options => {
+module.exports = (options, pager) => {
   if (!options.AdminRoles) {
     return console.warn('[DMCLIB] admin_role options.AdminRoles required.');
   }
@@ -47,7 +47,7 @@ module.exports = options => {
 
   return {
     init: init(options),
-    controller: controller(options),
+    controller: controller(options, pager),
     helper: helper,
     middleware: () => middleware(options),
   };

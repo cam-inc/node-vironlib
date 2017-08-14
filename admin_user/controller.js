@@ -1,5 +1,3 @@
-const pager = require('../pager');
-
 const helperEMail = require('../auth/email/helper');
 
 /**
@@ -9,9 +7,10 @@ const helperEMail = require('../auth/email/helper');
  *
  * @param {Object} options
  * @param {Sequelize.model} options.AdminUsers
+ * @param {Object} pager
  * @returns {function()}
  */
-const registerList = options => {
+const registerList = (options, pager) => {
   const AdminUsers = options.AdminUsers;
 
   return () => {
@@ -169,9 +168,9 @@ const registerUpdate = options => {
   };
 };
 
-module.exports = options => {
+module.exports = (options, pager) => {
   return {
-    registerList: registerList(options),
+    registerList: registerList(options, pager),
     registerCreate: registerCreate(options),
     registerGet: registerGet(options),
     registerRemove: registerRemove(options),

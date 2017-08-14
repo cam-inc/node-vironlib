@@ -1,6 +1,6 @@
 const controller = require('./controller');
 
-module.exports = options => {
+module.exports = (options, pager) => {
   if (!options.AdminUsers) {
     return console.warn('[DMCLIB] admin_user options.AdminUsers required.');
   }
@@ -9,6 +9,6 @@ module.exports = options => {
   }
 
   return {
-    controller: controller(options),
+    controller: controller(options, pager),
   };
 };

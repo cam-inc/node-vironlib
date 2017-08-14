@@ -1,5 +1,3 @@
-const pager = require('../pager');
-
 /**
  * Controller : List Audit Log
  * HTTP Method : GET
@@ -7,9 +5,10 @@ const pager = require('../pager');
  *
  * @param {Object} options
  * @param {Sequelize.model} options.AuditLogs
+ * @param {Object} pager
  * @returns {function()}
  */
-const registerList = options => {
+const registerList = (options, pager) => {
   const AuditLogs = options.AuditLogs;
 
   return () => {
@@ -39,8 +38,8 @@ const registerList = options => {
   };
 };
 
-module.exports = options => {
+module.exports = (options, pager) => {
   return {
-    registerList: registerList(options),
+    registerList: registerList(options, pager),
   };
 };

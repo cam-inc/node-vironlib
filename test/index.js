@@ -73,6 +73,9 @@ const options = {
       rsa_public_key: 'xxxxxxxxxxxx',
     },
   },
+  pager: {
+    limit: 50,
+  },
 };
 
 beforeEach(() => {

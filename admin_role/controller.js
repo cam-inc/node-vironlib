@@ -22,13 +22,17 @@ const genAdminRole = (roleId, paths) => {
  *
  * @param {Object} options
  * @param {Sequelize.model} options.AdminRoles
+ * @param {Object} pager
  * @returns {function()}
  */
-const registerList = options => {
+const registerList = (options, pager) => {
   const AdminRoles = options.AdminRoles;
 
   return () => {
     return (req, res) => {
+      const limit = req.query.limit || pager.defaultLimit;
+      const offset = req.query.offset || 0;
+
       return AdminRoles.findAll()
         .then(list => {
           const data = reduce(reduce(list, (ret, role) => {
@@ -40,7 +44,11 @@ const registerList = options => {
             return ret;
           }, []);
 
-          res.json(data);
+          const count = data.length;
+          const _data = data.slice(offset, offset + limit);
+          pager.setResHeader(res, limit, offset, count);
+
+          res.json(_data);
         })
       ;
     };
@@ -190,9 +198,9 @@ const registerUpdate = options => {
   };
 };
 
-module.exports = options => {
+module.exports = (options, pager) => {
   return {
-    registerList: registerList(options),
+    registerList: registerList(options, pager),
     registerCreate: registerCreate(options),
     registerGet: registerGet(options),
     registerRemove: registerRemove(options),
