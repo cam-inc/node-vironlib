@@ -1,5 +1,6 @@
 const reduce = require('mout/object/reduce');
 
+const logger = require('../logger');
 const helperGoogle = require('./google/helper');
 const helperJwt = require('./jwt/helper');
 const helperEMail = require('./email/helper');
@@ -144,9 +145,9 @@ const registerSignOut = () => {
 const registerGoogleSignIn = options => {
   const googleOAuth = options.google_oauth;
   if (!googleOAuth) {
-    console.log('[DMCLIB] auth /googlesignin skip.');
+    logger.info('[DMCLIB] auth /googlesignin skip.');
     return (req, res) => {
-      console.error('[DMCLIB] auth /googlesignin is not registered.');
+      logger.error('[DMCLIB] auth /googlesignin is not registered.');
       res.json(errors.frontend.NotFound());
     };
   }
@@ -178,9 +179,9 @@ const registerGoogleOAuth2Callback = options => {
   const superRole = options.super_role;
 
   if (!googleOAuth) {
-    console.log('[DMCLIB] auth /googleoauth2callback skip.');
+    logger.info('[DMCLIB] auth /googleoauth2callback skip.');
     return (req, res) => {
-      console.error('[DMCLIB] auth /googleoauth2callback is not registered.');
+      logger.error('[DMCLIB] auth /googleoauth2callback is not registered.');
       res.json(errors.frontend.NotFound());
     };
   }
@@ -242,7 +243,7 @@ const registerGoogleOAuth2Callback = options => {
         res.redirect(`${redirectUrl}?token=${authToken}`);
       })
       .catch(err => {
-        console.error(err);
+        logger.error(err);
         res.redirect(redirectUrl);
       })
     ;

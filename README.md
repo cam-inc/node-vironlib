@@ -73,6 +73,7 @@ const dmclib = new DmcLib({
   pager: {
     limit: 100,
   },
+  logger: {{Logger}}
 });
 ```
 

@@ -1,4 +1,5 @@
 const util = require('util');
+const logger = require('./logger');
 
 module.exports = () => {
   /**
@@ -37,7 +38,7 @@ module.exports = () => {
       }
     }
 
-    console.error(util.inspect(debug));
+    logger.error(util.inspect(debug));
     delete context.error; // これをしないとjsonで返せない
     next(null, JSON.stringify(debug));
   };

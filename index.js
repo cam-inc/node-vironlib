@@ -3,6 +3,7 @@
  */
 class DmcLib {
   constructor(options) {
+    this.logger = require('./logger')(options.logger);
     this.pager = require('./pager')(options.pager);
 
     this.acl = require('./acl')(options.acl || {});

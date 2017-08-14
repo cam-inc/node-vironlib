@@ -32,15 +32,15 @@ const init = options => {
   ;
 };
 
-module.exports = (options, pager) => {
+module.exports = (options, pager, logger) => {
   if (!options.admin_roles) {
-    return console.warn('[DMCLIB] admin_role options.admin_roles required.');
+    return logger.warn('[DMCLIB] admin_role options.admin_roles required.');
   }
   if (!options.store) {
-    return console.warn('[DMCLIB] admin_role options.store required.');
+    return logger.warn('[DMCLIB] admin_role options.store required.');
   }
   if (!options.default_role) {
-    return console.warn('[DMCLIB] admin_role options.default_role required.');
+    return logger.warn('[DMCLIB] admin_role options.default_role required.');
   }
 
   init(options);

@@ -1,5 +1,7 @@
 const reduce = require('mout/object/reduce');
 
+const logger = require('../logger');
+
 const genAdminRole = (roleId, paths) => {
   return reduce(paths, (ret, obj) => {
     if (!obj.allow) {
@@ -85,7 +87,7 @@ const registerCreate = options => {
             return t.commit();
           })
           .catch(err => {
-            console.error(err);
+            logger.error(err);
             return t.rollback();
           })
         ;
@@ -176,7 +178,7 @@ const registerUpdate = options => {
             return t.commit();
           })
           .catch(err => {
-            console.error(err);
+            logger.error(err);
             return t.rollback();
           })
         ;
