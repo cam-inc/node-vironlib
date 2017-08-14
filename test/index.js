@@ -1,58 +1,71 @@
-const http = require('http');
+const events = require('events');
+
+const httpMock = require('node-mocks-http');
 const SequelizeMock = require('sequelize-mock');
 
 const DmcLib = require('../');
 
 const store = new SequelizeMock();
 
-const AdminUsers = store.define('admin_users', {
-  // write mock data
-});
-const AdminRoles = store.define('admin_roles', {
-  // write mock data
-});
-const AuditLogs = store.define('audit_logs', {
-  // write mock data
-});
+const defineModel = name => {
+  const m = store.define(name);
 
-const genRequest = swagger => {
-  const req = new http.IncomingMessage();
-  req.swagger = swagger;
-  req.get = key => {
-    return req.headers[key.toLowerCase()];
+  m.create = obj => {
+    m.__values__.push(new m.Instance(obj));
+    return obj;
   };
+  m.$queryInterface.$useHandler((query, queryOptions) => {
+    switch (query) {
+      case 'findAll':
+        return m.__values__;
+      case 'findById':
+        console.log('findById', query, JSON.stringify(queryOptions));
+        //return m.__values__[queryOptions.id];
+        return;
+      //case 'update':
+      //case 'destroy':
+      default:
+        return;
+    }
+  });
+
+  return m;
+};
+
+const models = {
+  AdminUsers: defineModel('admin_users'),
+  AdminRoles: defineModel('admin_roles'),
+  AuditLogs: defineModel('audit_logs'),
+};
+
+const genRequest = options => {
+  const req = httpMock.createRequest(options);
   return req;
 };
 
 const genResponse = () => {
-  const res = new http.OutgoingMessage();
-  res.status = code => {
-    res.statusCode = code;
-    return res;
-  };
-  res.set = res.header = (k, v) => {
-    res.headers = res.headers || {};
-    res.headers[k.toLowerCase()] = v;
-  };
+  const res = httpMock.createResponse({
+    eventEmitter: events.EventEmitter,
+  });
   return res;
 };
 
 const options = {
   admin_role: {
-    AdminRoles: AdminRoles,
+    AdminRoles: models.AdminRoles,
     store: store,
     default_role: 'viewer',
   },
   admin_user: {
-    AdminUsers: AdminUsers,
+    AdminUsers: models.AdminUsers,
     default_role: 'viewer',
   },
   audit_log: {
-    AuditLogs: AuditLogs,
+    AuditLogs: models.AuditLogs,
   },
   auth: {
-    AdminRoles: AdminRoles,
-    AdminUsers: AdminUsers,
+    AdminRoles: models.AdminRoles,
+    AdminUsers: models.AdminUsers,
     super_role: 'super',
     auth_jwt: {
       algorithm: 'RS512',
@@ -62,8 +75,17 @@ const options = {
   },
 };
 
+beforeEach(() => {
+  // mockdataをクリア
+  for (let k in models) {
+    const m = models[k];
+    m.__values__ = [];
+  }
+});
+
 module.exports = {
   dmclib: new DmcLib(options),
   genRequest,
   genResponse,
+  models,
 };

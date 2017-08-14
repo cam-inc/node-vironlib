@@ -20,7 +20,7 @@ describe('swagger/controller', () => {
           },
         },
       };
-      const req = test.genRequest(swagger);
+      const req = test.genRequest({swagger});
       const res = test.genResponse();
 
       res.json = result => {
@@ -45,7 +45,7 @@ describe('swagger/controller', () => {
           },
         },
       };
-      const req = test.genRequest(swagger);
+      const req = test.genRequest({swagger});
       const res = test.genResponse();
 
       req.auth = {
