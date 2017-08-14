@@ -62,9 +62,6 @@ const dmclib = new DmcLib({
       client_id: '99999999999-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.apps.googleusercontent.com',
       client_secret: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
       redirect_url: 'https://localhost:3000/googleoauth2callback',
-      scope: [
-        'https://www.googleapis.com/auth/userinfo.email',
-      ],
       allow_email_domains: [
         'your.organization.com',
       ],

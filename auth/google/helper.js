@@ -2,6 +2,10 @@ const axios = require('axios');
 const gapi = require('googleapis');
 const contains = require('mout/array/contains');
 
+const AUTH_SCOPES = [
+  'https://www.googleapis.com/auth/userinfo.email',
+];
+
 const getClient = options => {
   return new gapi.auth.OAuth2(
     options.client_id,
@@ -13,7 +17,7 @@ const getClient = options => {
 const genAuthUrl = (options, referer) => {
   const client = getClient(options);
   return client.generateAuthUrl({
-    scope: options.scope || [],
+    scope: AUTH_SCOPES,
     state: options.state_url || referer,
   });
 };
