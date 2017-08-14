@@ -23,7 +23,7 @@ module.exports = options => {
   // tokenの検証
   return (req, res, next) => {
     jwt({
-      secret: new Buffer(options.rsa_public_key),
+      secret: options.algorithm.startsWith('HS') ? options.secret : new Buffer(options.rsa_public_key),
       credentialsRequired: options.credentials_required !== false,
       requestProperty: 'auth',
       algorithms: [options.algorithm],

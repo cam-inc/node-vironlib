@@ -50,11 +50,14 @@ const dmclib = new DmcLib({
     admin_roles: {{Sequelize.Model}},
     super_role: 'super',
     auth_jwt: {
-      algorithm: 'RS512',
+      algorithm: 'RS512', // RS256,RS384,RS512,HS256,HS384,HS512
       claims: {
         iss: 'issuer',
         aud: 'audience',
       },
+      // for HMAC
+      secret: '...',
+      // for RSA
       rsa_private_key: '...',
       rsa_public_key: '...',
     },

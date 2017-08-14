@@ -18,7 +18,7 @@ const sign = (claims, options) => {
         iss: '', // Token発行者
         aud: '', // このTokenを利用する対象の識別子
       }, options.claims, claims),
-      new Buffer(options.rsa_private_key),
+      options.algorithm.startsWith('HS') ? options.secret : new Buffer(options.rsa_private_key),
       {
         algorithm: options.algorithm,
       }

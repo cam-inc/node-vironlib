@@ -80,9 +80,10 @@ const options = {
     admin_users: models.AdminUsers,
     super_role: 'super',
     auth_jwt: {
-      algorithm: 'RS512',
-      rsa_private_key: 'xxxxxxxxxxxx',
-      rsa_public_key: 'xxxxxxxxxxxx',
+      algorithm: 'HS512',
+      secret: 'test-secret',
+      //rsa_private_key: 'xxxxxxxxxxxx',
+      //rsa_public_key: 'xxxxxxxxxxxx',
     },
   },
   pager: {

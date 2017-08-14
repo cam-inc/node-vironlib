@@ -20,11 +20,19 @@ module.exports = options => {
   if (!options.auth_jwt.algorithm) {
     return logger.warn('[DMCLIB] auth options.auth_jwt.algorithm required.');
   }
-  if (!options.auth_jwt.rsa_private_key) {
-    return logger.warn('[DMCLIB] auth options.auth_jwt.rsa_private_key required.');
-  }
-  if (!options.auth_jwt.rsa_public_key) {
-    return logger.warn('[DMCLIB] auth options.auth_jwt.rsa_public_key required.');
+  if (options.auth_jwt.algorithm.startsWith('HS')) {
+    // HMAC
+    if (!options.auth_jwt.secret) {
+      return logger.warn('[DMCLIB] auth options.auth_jwt.secret required.');
+    }
+  } else {
+    // RSA
+    if (!options.auth_jwt.rsa_private_key) {
+      return logger.warn('[DMCLIB] auth options.auth_jwt.rsa_private_key required.');
+    }
+    if (!options.auth_jwt.rsa_public_key) {
+      return logger.warn('[DMCLIB] auth options.auth_jwt.rsa_public_key required.');
+    }
   }
 
   return {
