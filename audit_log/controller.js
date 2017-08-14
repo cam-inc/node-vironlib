@@ -4,12 +4,12 @@
  * PATH : /auditlog
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AuditLogs
+ * @param {Sequelize.model} options.audit_logs
  * @param {Object} pager
  * @returns {function(*, *, *)}
  */
 const registerList = (options, pager) => {
-  const AuditLogs = options.AuditLogs;
+  const AuditLogs = options.audit_logs;
 
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);

@@ -21,12 +21,12 @@ const genAdminRole = (roleId, paths) => {
  * PATH : /adminrole
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminRoles
+ * @param {Sequelize.model} options.admin_roles
  * @param {Object} pager
  * @returns {function(*, *, *)}
  */
 const registerList = (options, pager) => {
-  const AdminRoles = options.AdminRoles;
+  const AdminRoles = options.admin_roles;
 
   return (req, res) => {
     const limit = Number(req.query.limit || pager.defaultLimit);
@@ -59,12 +59,12 @@ const registerList = (options, pager) => {
  * PATH : /adminrole
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminRoles
+ * @param {Sequelize.model} options.admin_roles
  * @param {Sequelize} options.store
  * @returns {function(*, *, *)}
  */
 const registerCreate = options => {
-  const AdminRoles = options.AdminRoles;
+  const AdminRoles = options.admin_roles;
   const store = options.store;
 
   return (req, res) => {
@@ -103,11 +103,11 @@ const registerCreate = options => {
  * PATH : /adminrole/:role_id
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminRoles
+ * @param {Sequelize.model} options.admin_roles
  * @returns {function(*, *, *)}
  */
 const registerGet = options => {
-  const AdminRoles = options.AdminRoles;
+  const AdminRoles = options.admin_roles;
 
   return (req, res) => {
     const roleId = req.swagger.params.role_id.value;
@@ -128,11 +128,11 @@ const registerGet = options => {
  * PATH : /adminrole/:role_id
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminRoles
+ * @param {Sequelize.model} options.admin_roles
  * @returns {function(*, *, *)}
  */
 const registerRemove = options => {
-  const AdminRoles = options.AdminRoles;
+  const AdminRoles = options.admin_roles;
 
   return (req, res) => {
     const roleId = req.swagger.params.role_id.value;
@@ -150,12 +150,12 @@ const registerRemove = options => {
  * PATH : /adminrole/:role_id
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminRoles
+ * @param {Sequelize.model} options.admin_roles
  * @param {Sequelize} options.store
  * @returns {function(*, *, *)}
  */
 const registerUpdate = options => {
-  const AdminRoles = options.AdminRoles;
+  const AdminRoles = options.admin_roles;
   const store = options.store;
 
   return (req, res) => {

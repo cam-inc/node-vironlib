@@ -9,10 +9,17 @@ const store = new SequelizeMock();
 
 const defineModel = name => {
   const m = store.define(name);
-
+  m.__values__ = [];
   m.create = obj => {
     m.__values__.push(new m.Instance(obj));
     return obj;
+  };
+  m.count = () => {
+    return Promise.resolve()
+      .then(() => {
+        return m.__values__.length;
+      })
+    ;
   };
   m.$queryInterface.$useHandler((query, queryOptions) => {
     switch (query) {
@@ -57,20 +64,20 @@ const options = {
     expose_headers: 'X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
   },
   admin_role: {
-    AdminRoles: models.AdminRoles,
+    admin_roles: models.AdminRoles,
     store: store,
     default_role: 'viewer',
   },
   admin_user: {
-    AdminUsers: models.AdminUsers,
+    admin_users: models.AdminUsers,
     default_role: 'viewer',
   },
   audit_log: {
-    AuditLogs: models.AuditLogs,
+    audit_logs: models.AuditLogs,
   },
   auth: {
-    AdminRoles: models.AdminRoles,
-    AdminUsers: models.AdminUsers,
+    admin_roles: models.AdminRoles,
+    admin_users: models.AdminUsers,
     super_role: 'super',
     auth_jwt: {
       algorithm: 'RS512',

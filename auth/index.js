@@ -4,11 +4,11 @@ const google = require('./google');
 const jwt = require('./jwt');
 
 module.exports = options => {
-  if (!options.AdminUsers) {
-    return console.warn('[DMCLIB] auth options.AdminUsers required.');
+  if (!options.admin_users) {
+    return console.warn('[DMCLIB] auth options.admin_users required.');
   }
-  if (!options.AdminRoles) {
-    return console.warn('[DMCLIB] auth options.AdminRoles required.');
+  if (!options.admin_roles) {
+    return console.warn('[DMCLIB] auth options.admin_roles required.');
   }
   if (!options.super_role) {
     return console.warn('[DMCLIB] auth options.super_role required.');

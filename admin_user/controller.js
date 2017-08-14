@@ -6,12 +6,12 @@ const helperEMail = require('../auth/email/helper');
  * PATH : /adminuser
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminUsers
+ * @param {Sequelize.model} options.admin_users
  * @param {Object} pager
  * @returns {function(*, *, *)}
  */
 const registerList = (options, pager) => {
-  const AdminUsers = options.AdminUsers;
+  const AdminUsers = options.admin_users;
 
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
@@ -19,7 +19,7 @@ const registerList = (options, pager) => {
     const offset = Number(req.query.offset || 0);
     return Promise.resolve()
       .then(() => {
-        return AdminUsers.count('AdminUsers');
+        return AdminUsers.count();
       })
       .then(count => {
         pager.setResHeader(res, limit, offset, count);
@@ -43,12 +43,12 @@ const registerList = (options, pager) => {
  * PATH : /adminuser
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminUsers
+ * @param {Sequelize.model} options.admin_users
  * @param {String} options.default_role;
  * @returns {function(*, *, *)}
  */
 const registerCreate = options => {
-  const AdminUsers = options.AdminUsers;
+  const AdminUsers = options.admin_users;
   const defaultRole = options.default_role;
 
   return (req, res) => {
@@ -79,11 +79,11 @@ const registerCreate = options => {
  * PATH : /adminuser/:id
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminUsers
+ * @param {Sequelize.model} options.admin_users
  * @returns {function(*, *, *)}
  */
 const registerGet = options => {
-  const AdminUsers = options.AdminUsers;
+  const AdminUsers = options.admin_users;
 
   return (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
@@ -102,11 +102,11 @@ const registerGet = options => {
  * PATH : /adminuser/:id
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminUsers
+ * @param {Sequelize.model} options.admin_users
  * @returns {function(*, *, *)}
  */
 const registerRemove = options => {
-  const AdminUsers = options.AdminUsers;
+  const AdminUsers = options.admin_users;
 
   return (req, res) => {
     const id = req.swagger.params.id.value;
@@ -124,11 +124,11 @@ const registerRemove = options => {
  * PATH : /adminuser/:id
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminUsers
+ * @param {Sequelize.model} options.admin_users
  * @returns {function(*, *, *)}
  */
 const registerUpdate = options => {
-  const AdminUsers = options.AdminUsers;
+  const AdminUsers = options.admin_users;
 
   return (req, res) => {
     return Promise.resolve()

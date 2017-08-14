@@ -5,11 +5,11 @@ const middleware = require('./middleware');
 /**
  * AdminRole init
  * @param {Object} options
- * @param {Sequelize.Model} options.AdminRoles
+ * @param {Sequelize.Model} options.admin_roles
  * @param {string} options.default_role
  */
 const init = options => {
-  const AdminRoles = options.AdminRoles;
+  const AdminRoles = options.admin_roles;
   const defaultRole = options.default_role;
 
   return Promise.resolve()
@@ -33,8 +33,8 @@ const init = options => {
 };
 
 module.exports = (options, pager) => {
-  if (!options.AdminRoles) {
-    return console.warn('[DMCLIB] admin_role options.AdminRoles required.');
+  if (!options.admin_roles) {
+    return console.warn('[DMCLIB] admin_role options.admin_roles required.');
   }
   if (!options.store) {
     return console.warn('[DMCLIB] admin_role options.store required.');

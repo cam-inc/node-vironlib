@@ -7,11 +7,11 @@ const getSourceIp = req => {
  * Middleware : Write Audit Log
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AuditLogs
+ * @param {Sequelize.model} options.audit_logs
  * @returns {function(*, *, *)}
  */
 module.exports = options => {
-  const AuditLogs = options.AuditLogs;
+  const AuditLogs = options.audit_logs;
 
   return (req, res, next) => {
     // 監査ログ出力を除外するリクエスト

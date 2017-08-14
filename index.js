@@ -9,20 +9,20 @@ options = {
     expose_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
   },
   audit_log: {
-    AuditLogs: {{Sequelize.Model}}
+    audit_logs: {{Sequelize.Model}}
   },
   admin_user: {
-    AdminUsers: {{Sequelize.Model}},
+    admin_users: {{Sequelize.Model}},
     default_role: 'viewer',
   },
   admin_role: {
-    AdminRoles: {{Sequelize.Model}},
+    admin_roles: {{Sequelize.Model}},
     store: {{Sequelize}},
     default_role: 'viewer',
   },
   auth: {
-    AdminUsers: {{Sequelize.Model}},
-    AdminRoles: {{Sequelize.Model}},
+    admin_users: {{Sequelize.Model}},
+    admin_roles: {{Sequelize.Model}},
     super_role: 'super',
     auth_jwt: {
       algorithm: 'RS512',

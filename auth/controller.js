@@ -37,15 +37,15 @@ const getRoles = (AdminRoles, roleId, superRole) => {
  * PATH : /signin
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminUsers
- * @param {Sequelize.model} options.AdminRoles
+ * @param {Sequelize.model} options.admin_users
+ * @param {Sequelize.model} options.admin_roles
  * @param {String} options.super_role
  * @param {Object} options.auth_jwt
  * @returns {function(*, *, *)}
  */
 const registerSignIn = options => {
-  const AdminUsers = options.AdminUsers;
-  const AdminRoles = options.AdminRoles;
+  const AdminUsers = options.admin_users;
+  const AdminRoles = options.admin_roles;
   const superRole = options.super_role;
   const authJwt = options.auth_jwt;
 
@@ -164,15 +164,15 @@ const registerGoogleSignIn = options => {
  * PATH : /googleoauth2callback
  *
  * @param {Object} options
- * @param {Sequelize.model} options.AdminUsers
- * @param {Sequelize.model} options.AdminRoles
+ * @param {Sequelize.model} options.admin_users
+ * @param {Sequelize.model} options.admin_roles
  * @param {Object} options.google_oauth
  * @param {Object} options.auth_jwt
  * @returns {function(*, *, *)}
  */
 const registerGoogleOAuth2Callback = options => {
-  const AdminUsers = options.AdminUsers;
-  const AdminRoles = options.AdminRoles;
+  const AdminUsers = options.admin_users;
+  const AdminRoles = options.admin_roles;
   const googleOAuth = options.google_oauth;
   const authJwt = options.auth_jwt;
   const superRole = options.super_role;
