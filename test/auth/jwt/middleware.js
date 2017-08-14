@@ -2,7 +2,7 @@ const assert = require('assert');
 const test = require('../../');
 const dmclib = test.dmclib;
 
-describe('audit_log/middleware', () => {
+describe('auth/jwt/middleware', () => {
 
   const middleware = dmclib.auth.jwt.middleware();
   const helper = dmclib.auth.jwt.helper;
