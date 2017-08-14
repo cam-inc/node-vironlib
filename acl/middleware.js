@@ -14,7 +14,7 @@ module.exports = options => {
   }, options);
 
   return (req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', opts.allow_origin || req.get('origin'));
+    res.setHeader('Access-Control-Allow-Origin', opts.allow_origin || req.get('origin') || '');
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, HEAD, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', opts.allow_headers);
