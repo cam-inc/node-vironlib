@@ -19,7 +19,6 @@ const find = (model, query, options={}) => {
     opts.where = query;
   }
   if (!isFinite(options.limit)) {
-    // TODO: サービス側から上書きできない
     opts.limit = constants.DEFAULT_PAGER_LIMIT;
   }
   if (!isFinite(options.offset)) {
