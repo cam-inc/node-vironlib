@@ -4,7 +4,7 @@ const errors = require('../../errors');
 
 const getToken = options => {
   return req => {
-    const jwtHeader = req.get(options.header_key || 'Authorization');
+    const jwtHeader = req.get(options.header_key);
     if (jwtHeader) {
       const parts = jwtHeader.split(' ');
       if (parts.length === 2) {

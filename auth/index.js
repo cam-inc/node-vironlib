@@ -35,6 +35,8 @@ module.exports = options => {
     }
   }
 
+  options.auth_jwt.header_key = options.auth_jwt.header_key || 'Authorization';
+
   return {
     controller: controller(options),
     email: email(),
