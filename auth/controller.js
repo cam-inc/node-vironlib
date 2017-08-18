@@ -55,7 +55,7 @@ const registerSignIn = options => {
     const password = req.body.password;
 
     // メアドでユーザ検索
-    AdminUsers.findOne({where: {email}})
+    return AdminUsers.findOne({where: {email}})
       .then(adminUser => {
         if (adminUser) {
           return adminUser;
@@ -114,7 +114,7 @@ const registerSignIn = options => {
       })
       .then(token => {
         res.setHeader(authJwt.header_key, `Bearer ${token}`);
-        res.end();
+        return res.end();
       })
     ;
   };
@@ -129,7 +129,9 @@ const registerSignIn = options => {
  */
 const registerSignOut = () => {
   return (req, res) => {
-    res.end();
+    return Promise.resolve(() => {
+      return res.end();
+    });
   };
 };
 
@@ -147,15 +149,19 @@ const registerGoogleSignIn = options => {
   if (!googleOAuth) {
     logger.info('[DMCLIB] auth /googlesignin skip.');
     return (req, res) => {
-      logger.error('[DMCLIB] auth /googlesignin is not registered.');
-      res.json(errors.frontend.NotFound());
+      return Promise.resolve(() => {
+        logger.error('[DMCLIB] auth /googlesignin is not registered.');
+        return res.json(errors.frontend.NotFound());
+      });
     };
   }
 
   return (req, res) => {
-    // Googleの認証画面にリダイレクト
-    const authUrl = helperGoogle.genAuthUrl(googleOAuth, req.get('referer'));
-    return res.redirect(authUrl); // 301
+    return Promise.resolve(() => {
+      // Googleの認証画面にリダイレクト
+      const authUrl = helperGoogle.genAuthUrl(googleOAuth, req.get('referer'));
+      return res.redirect(authUrl); // 301
+    });
   };
 };
 
@@ -177,12 +183,15 @@ const registerGoogleOAuth2Callback = options => {
   const googleOAuth = options.google_oauth;
   const authJwt = options.auth_jwt;
   const superRole = options.super_role;
+  const defaultRole = options.default_role;
 
   if (!googleOAuth) {
     logger.info('[DMCLIB] auth /googleoauth2callback skip.');
     return (req, res) => {
-      logger.error('[DMCLIB] auth /googleoauth2callback is not registered.');
-      res.json(errors.frontend.NotFound());
+      return Promise.resolve(() => {
+        logger.error('[DMCLIB] auth /googleoauth2callback is not registered.');
+        return res.json(errors.frontend.NotFound());
+      });
     };
   }
 
@@ -190,7 +199,7 @@ const registerGoogleOAuth2Callback = options => {
     const redirectUrl = req.query.state;
 
     // アクセストークンを取得
-    helperGoogle.getToken(req.query.code, googleOAuth)
+    return helperGoogle.getToken(req.query.code, googleOAuth)
       .then(token => {
         // メールアドレスを検証
         return helperGoogle.allowMailDomain(token, googleOAuth)
@@ -213,12 +222,9 @@ const registerGoogleOAuth2Callback = options => {
             // 1人目かどうか
             return AdminUsers.count()
               .then(cnt => {
-                if (cnt > 0) {
-                  // 1人目じゃなければエラー（管理者がユーザー作成してあげる）
-                  return Promise.reject(errors.frontend.AdminUserNotFound());
-                }
-                // 1人目の場合はスーパーユーザーとして登録する
-                return AdminUsers.create({email: data.email, role_id: superRole});
+                // 1人目の場合はスーパーユーザー、2人目以降はデフォルトロールで登録する
+                const roleId = cnt > 0 ? defaultRole : superRole;
+                return AdminUsers.create({email: data.email, role_id: roleId});
               })
             ;
           })
@@ -240,11 +246,10 @@ const registerGoogleOAuth2Callback = options => {
       .then(token => {
         const authToken = `Bearer ${token}`;
         res.setHeader(authJwt.header_key, authToken);
-        res.redirect(`${redirectUrl}?token=${authToken}`);
+        return res.redirect(`${redirectUrl}?token=${authToken}`);
       })
-      .catch(err => {
-        logger.error(err);
-        res.redirect(redirectUrl);
+      .catch(() => {
+        return res.redirect(redirectUrl);
       })
     ;
   };

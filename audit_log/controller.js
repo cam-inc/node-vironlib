@@ -30,7 +30,7 @@ const registerList = (options, pager) => {
         return AuditLogs.findAll(options);
       })
       .then(list => {
-        res.json(list);
+        return res.json(list);
       })
     ;
   };

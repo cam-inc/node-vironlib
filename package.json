@@ -25,7 +25,8 @@
     "eslint": "^4.2.0",
     "mocha": "^3.5.0",
     "node-mocks-http": "^1.6.4",
-    "sequelize-mock": "^0.9.0"
+    "sequelize-mock": "^0.9.0",
+    "sinon": "^3.2.1"
   },
   "publishConfig": {
     "registry": "https://camobile.jfrog.io/camobile/api/npm/camplat/"

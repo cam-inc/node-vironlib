@@ -49,7 +49,7 @@ const registerList = (options, pager) => {
         const _data = data.slice(offset, offset + limit);
         pager.setResHeader(res, limit, offset, count);
 
-        res.json(_data);
+        return res.json(_data);
       })
     ;
   };
@@ -93,7 +93,7 @@ const registerCreate = options => {
         ;
       })
       .then(() => {
-        res.json({role_id: roleId, paths: paths});
+        return res.json({role_id: roleId, paths: paths});
       })
     ;
   };
@@ -118,7 +118,7 @@ const registerGet = options => {
         const paths = list.map(role => {
           return {allow: true, path: `${role.method}:/${role.resource}`};
         });
-        res.json({paths: paths, role_id: roleId});
+        return res.json({paths: paths, role_id: roleId});
       })
     ;
   };
@@ -140,7 +140,7 @@ const registerRemove = options => {
     const roleId = req.swagger.params.role_id.value;
     return AdminRoles.destroy({where: {role_id: roleId}, force: true})
       .then(() => {
-        res.status(204).end();
+        return res.status(204).end();
       })
     ;
   };
@@ -184,7 +184,7 @@ const registerUpdate = options => {
         ;
       })
       .then(() => {
-        res.json({role_id: roleId, paths: paths});
+        return res.json({role_id: roleId, paths: paths});
       })
     ;
   };

@@ -2,6 +2,8 @@ const events = require('events');
 
 const httpMock = require('node-mocks-http');
 const SequelizeMock = require('sequelize-mock');
+const find = require('mout/array/find');
+const get = require('mout/object/get');
 
 const DmcLib = require('../');
 
@@ -26,9 +28,14 @@ const defineModel = name => {
       case 'findAll':
         return m.__values__;
       case 'findById':
-        console.log('findById', query, JSON.stringify(queryOptions));
-        //return m.__values__[queryOptions.id];
-        return;
+        return find(m.__values__, {id: queryOptions.id}) || null;
+      case 'findOne':
+        const where = get(queryOptions, '0.where');
+        if (!where) {
+          return m.__values__[0] || null;
+        }
+        // TODO: whereにSQLの命令書かれてると動かない
+        return find(m.__values__, where) || null;
       //case 'update':
       //case 'destroy':
       default:
@@ -79,11 +86,22 @@ const options = {
     admin_roles: models.AdminRoles,
     admin_users: models.AdminUsers,
     super_role: 'super',
+    default_role: 'viewer',
     auth_jwt: {
       algorithm: 'HS512',
       secret: 'test-secret',
+      claims: {
+        iss: 'dmc.test',
+        aud: 'dmclib',
+      },
       //rsa_private_key: 'xxxxxxxxxxxx',
       //rsa_public_key: 'xxxxxxxxxxxx',
+    },
+    google_oauth: {
+      client_id: 'xxxxxxxxxxxxxxxxxxxx',
+      client_secret: 'zzzzzzzzzzzzzzzzzzzz',
+      redirect_url: 'http://localhost/redirect',
+      state_url: 'http://localhost/dmc'
     },
   },
   pager: {

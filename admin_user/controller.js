@@ -31,7 +31,7 @@ const registerList = (options, pager) => {
         return AdminUsers.findAll(options);
       })
       .then(list => {
-        res.json(list);
+        return res.json(list);
       })
     ;
   };
@@ -67,7 +67,7 @@ const registerCreate = options => {
         return AdminUsers.create(data);
       })
       .then(data => {
-        res.json(data);
+        return res.json(data);
       })
     ;
   };
@@ -90,7 +90,7 @@ const registerGet = options => {
     const id = req.swagger.params.id.value;
     return AdminUsers.findById(id, {attributes})
       .then(data => {
-        res.json(data);
+        return res.json(data);
       })
     ;
   };
@@ -112,7 +112,7 @@ const registerRemove = options => {
     const id = req.swagger.params.id.value;
     return AdminUsers.destroy({where: {id}, force: true})
       .then(() => {
-        res.status(204).end();
+        return res.status(204).end();
       })
     ;
   };
@@ -152,7 +152,7 @@ const registerUpdate = options => {
         return AdminUsers.update(data, {where: {id}});
       })
       .then(data => {
-        res.json(data);
+        return res.json(data);
       })
     ;
   };

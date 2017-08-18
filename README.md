@@ -49,6 +49,7 @@ const dmclib = new DmcLib({
     admin_users: {{Sequelize.Model}},
     admin_roles: {{Sequelize.Model}},
     super_role: 'super',
+    default_role: 'viewer',
     auth_jwt: {
       algorithm: 'RS512', // RS256,RS384,RS512,HS256,HS384,HS512
       claims: {

@@ -9,7 +9,7 @@ describe('swagger/controller', () => {
 
     const show = swagger.controller.show;
 
-    it('swagger.jsonが取得できる', () => {
+    it('swagger.jsonが取得できる', async() => {
       const swagger = {
         operation: {
         },
@@ -28,10 +28,10 @@ describe('swagger/controller', () => {
         assert(result.paths['/adminuser'].post);
         assert(result.paths['/adminrole'].post);
       };
-      show(req, res);
+      await show(req, res);
     });
 
-    it('権限のないパスはswagger.jsonから削除される', () => {
+    it('権限のないパスはswagger.jsonから削除される', async() => {
       const swagger = {
         operation: {
           security: {
@@ -58,7 +58,7 @@ describe('swagger/controller', () => {
         assert(!result.paths['/adminuser'].post);
         assert(!result.paths['/adminrole']);
       };
-      show(req, res);
+      await show(req, res);
     });
 
   });
