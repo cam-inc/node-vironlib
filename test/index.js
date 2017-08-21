@@ -3,7 +3,11 @@ const events = require('events');
 const httpMock = require('node-mocks-http');
 const SequelizeMock = require('sequelize-mock');
 const find = require('mout/array/find');
+const filter = require('mout/array/filter');
 const get = require('mout/object/get');
+const deepClone = require('mout/lang/deepClone');
+const pick = require('mout/object/pick');
+const sort = require('mout/array/sort');
 
 const DmcLib = require('../');
 
@@ -24,13 +28,47 @@ const defineModel = name => {
     ;
   };
   m.$queryInterface.$useHandler((query, queryOptions) => {
+    let attributes, where, limit, offset, order;
     switch (query) {
       case 'findAll':
-        return m.__values__;
+        const options = queryOptions[0] || {};
+        attributes = options.attributes;
+        order = options.order;
+        limit = options.limit;
+        offset = options.offset || 0;
+        where = options.where;
+
+        let values = deepClone(m.__values__);
+        if (order) {
+          order.forEach(ord => {
+            const field = ord[0];
+            const reverse = !!(ord[1] === 'DESC');
+            values = sort(values, (a, b) => {
+              if (reverse) {
+                return a[field] - b[field];
+              } else {
+                return b[field] - a[field];
+              }
+            });
+          });
+        }
+        if (where) {
+          // TODO: whereにSQLの命令書かれてると動かない
+          values = filter(values, where);
+        }
+        if (limit) {
+          values = values.slice(offset, offset + limit);
+        }
+        if (attributes) {
+          values = values.map(value => {
+            return pick(value, attributes);
+          });
+        }
+        return values;
       case 'findById':
         return find(m.__values__, {id: queryOptions.id}) || null;
       case 'findOne':
-        const where = get(queryOptions, '0.where');
+        where = get(queryOptions, '0.where');
         if (!where) {
           return m.__values__[0] || null;
         }
@@ -39,6 +77,7 @@ const defineModel = name => {
       //case 'update':
       //case 'destroy':
       default:
+        console.warn(`query not supported. ${query}`);
         return;
     }
   });
