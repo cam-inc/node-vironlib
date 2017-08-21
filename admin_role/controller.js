@@ -79,9 +79,9 @@ const registerCreate = options => {
         return store.transaction();
       })
       .then(t => {
-        return AdminRoles.destroy({where: {role_id: roleId}, force: true})
+        return AdminRoles.destroy({where: {role_id: roleId}, force: true, transaction: t})
           .then(() => {
-            return AdminRoles.bulkCreate(list);
+            return AdminRoles.bulkCreate(list, {transaction: t});
           })
           .then(() => {
             return t.commit();
@@ -170,9 +170,9 @@ const registerUpdate = options => {
         return store.transaction();
       })
       .then(t => {
-        return AdminRoles.destroy({where: {role_id: roleId}, force: true})
+        return AdminRoles.destroy({where: {role_id: roleId}, force: true, transaction: t})
           .then(() => {
-            return AdminRoles.bulkCreate(list);
+            return AdminRoles.bulkCreate(list, {transaction: t});
           })
           .then(() => {
             return t.commit();

@@ -16,7 +16,7 @@ const whiteList = [
  * パスに対してアクセス権があるかチェックする
  * @param {string} path
  * @param {string} method
- * @param {array} roles
+ * @param {object} roles - {get: [], post: [], put: [], delete: []}
  */
 const canAccess = (path, method, roles) => {
   method = method.toLowerCase();

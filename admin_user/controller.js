@@ -67,6 +67,8 @@ const registerCreate = options => {
         return AdminUsers.create(data);
       })
       .then(data => {
+        delete data.password;
+        delete data.salt;
         return res.json(data);
       })
     ;

@@ -29,7 +29,7 @@ describe('auth/controller', () => {
       res.end = () => {
         assert(res.get('Authorization').startsWith('Bearer '));
 
-        test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
+        return test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
           .then(m => {
             assert(m.role_id === 'super');
             assert(m.password);

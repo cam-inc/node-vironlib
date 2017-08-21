@@ -6,19 +6,35 @@ const find = require('mout/array/find');
 const filter = require('mout/array/filter');
 const get = require('mout/object/get');
 const deepClone = require('mout/lang/deepClone');
+const deepMatches = require('mout/object/deepMatches');
 const pick = require('mout/object/pick');
+const reject = require('mout/array/reject');
 const sort = require('mout/array/sort');
 
 const DmcLib = require('../');
 
 const store = new SequelizeMock();
 
+store.transaction = fn => {
+  if (!fn) {
+    fn = t => Promise.resolve(t);
+  }
+  return new Promise((resolve, reject) => {
+    const t = {
+      commit: () => { return Promise.resolve(); },
+      rollback: () => { return Promise.resolve(); },
+    };
+    return fn(t).then(resolve, reject);
+  });
+};
+
 const defineModel = name => {
   const m = store.define(name);
   m.__values__ = [];
   m.create = obj => {
-    m.__values__.push(new m.Instance(obj));
-    return obj;
+    const instance = new m.Instance(obj);
+    m.__values__.push(instance);
+    return instance;
   };
   m.count = () => {
     return Promise.resolve()
@@ -28,10 +44,10 @@ const defineModel = name => {
     ;
   };
   m.$queryInterface.$useHandler((query, queryOptions) => {
-    let attributes, where, limit, offset, order;
+    let options, attributes, where, limit, offset, order, force;
     switch (query) {
       case 'findAll':
-        const options = queryOptions[0] || {};
+        options = queryOptions[0] || {};
         attributes = options.attributes;
         order = options.order;
         limit = options.limit;
@@ -66,7 +82,13 @@ const defineModel = name => {
         }
         return values;
       case 'findById':
-        return find(m.__values__, {id: queryOptions.id}) || null;
+        options = queryOptions[1] || {};
+        attributes = options.attributes;
+        const result = find(m.__values__, {id: queryOptions[0]});
+        if (!result) {
+          return null;
+        }
+        return attributes ? pick(result, attributes) : result;
       case 'findOne':
         where = get(queryOptions, '0.where');
         if (!where) {
@@ -74,10 +96,54 @@ const defineModel = name => {
         }
         // TODO: whereにSQLの命令書かれてると動かない
         return find(m.__values__, where) || null;
-      //case 'update':
-      //case 'destroy':
+      case 'update':
+        const data = queryOptions[0];
+        options = queryOptions[1] || {};
+        where = options.where;
+        if (!where) {
+          m.__values__ = m.__values__.map(value => {
+            return new m.Instance(Object.assign(value.dataValues, data));
+          });
+          return [m.__values__.length];
+        } else {
+          let cnt = 0;
+          m.__values__ = m.__values__.map(value => {
+            if (deepMatches(value, where)) {
+              cnt++;
+              return new m.Instance(Object.assign(value.dataValues, data));
+            } else {
+              return value;
+            }
+          });
+          return [cnt];
+        }
+      case 'destroy':
+        options = queryOptions[0] || {};
+        where = options.where;
+        force = options.force;
+        if (!where) {
+          if (force) {
+            m.__values__ = [];
+          } else {
+            m.__values__.forEach(value => {
+              value.deletedAt = new Date();
+            });
+          }
+        } else {
+          if (force) {
+            m.__values__ = reject(m.__values__, value => {
+              return deepMatches(value, where);
+            });
+          } else {
+            m.__values__.forEach(value => {
+              if (deepMatches(value, where)) {
+                value.deletedAt = new Date();
+              }
+            });
+          }
+        }
+        return;
       default:
-        console.warn(`query not supported. ${query}`);
         return;
     }
   });
