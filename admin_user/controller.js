@@ -13,7 +13,7 @@ const helperEMail = require('../auth/email/helper');
 const registerList = (options, pager) => {
   const AdminUsers = options.admin_users;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
@@ -33,6 +33,7 @@ const registerList = (options, pager) => {
       .then(list => {
         return res.json(list);
       })
+      .catch(next)
     ;
   };
 };
@@ -51,7 +52,7 @@ const registerCreate = options => {
   const AdminUsers = options.admin_users;
   const defaultRole = options.default_role;
 
-  return (req, res) => {
+  return (req, res, next) => {
     return Promise.resolve()
       .then(() => {
         // パスワードをハッシュ化
@@ -71,6 +72,7 @@ const registerCreate = options => {
         delete data.salt;
         return res.json(data);
       })
+      .catch(next)
     ;
   };
 };
@@ -87,13 +89,14 @@ const registerCreate = options => {
 const registerGet = options => {
   const AdminUsers = options.admin_users;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const id = req.swagger.params.id.value;
     return AdminUsers.findById(id, {attributes})
       .then(data => {
         return res.json(data);
       })
+      .catch(next)
     ;
   };
 };
@@ -110,12 +113,13 @@ const registerGet = options => {
 const registerRemove = options => {
   const AdminUsers = options.admin_users;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const id = req.swagger.params.id.value;
     return AdminUsers.destroy({where: {id}, force: true})
       .then(() => {
         return res.status(204).end();
       })
+      .catch(next)
     ;
   };
 };
@@ -132,7 +136,7 @@ const registerRemove = options => {
 const registerUpdate = options => {
   const AdminUsers = options.admin_users;
 
-  return (req, res) => {
+  return (req, res, next) => {
     return Promise.resolve()
       .then(() => {
         const password = req.body.password;
@@ -156,6 +160,7 @@ const registerUpdate = options => {
       .then(data => {
         return res.json(data);
       })
+      .catch(next)
     ;
   };
 };

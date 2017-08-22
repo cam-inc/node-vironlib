@@ -30,7 +30,7 @@ const genAdminRole = (roleId, paths) => {
 const registerList = (options, pager) => {
   const AdminRoles = options.admin_roles;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
 
@@ -51,6 +51,7 @@ const registerList = (options, pager) => {
 
         return res.json(_data);
       })
+      .catch(next)
     ;
   };
 };
@@ -69,7 +70,7 @@ const registerCreate = options => {
   const AdminRoles = options.admin_roles;
   const store = options.store;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const roleId = req.body.role_id;
     const paths = req.body.paths;
     const list = genAdminRole(roleId, paths);
@@ -95,6 +96,7 @@ const registerCreate = options => {
       .then(() => {
         return res.json({role_id: roleId, paths: paths});
       })
+      .catch(next)
     ;
   };
 };
@@ -111,7 +113,7 @@ const registerCreate = options => {
 const registerGet = options => {
   const AdminRoles = options.admin_roles;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const roleId = req.swagger.params.role_id.value;
     return AdminRoles.findAll({where: {role_id: roleId}})
       .then(list => {
@@ -120,6 +122,7 @@ const registerGet = options => {
         });
         return res.json({paths: paths, role_id: roleId});
       })
+      .catch(next)
     ;
   };
 };
@@ -136,12 +139,13 @@ const registerGet = options => {
 const registerRemove = options => {
   const AdminRoles = options.admin_roles;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const roleId = req.swagger.params.role_id.value;
     return AdminRoles.destroy({where: {role_id: roleId}, force: true})
       .then(() => {
         return res.status(204).end();
       })
+      .catch(next)
     ;
   };
 };
@@ -160,7 +164,7 @@ const registerUpdate = options => {
   const AdminRoles = options.admin_roles;
   const store = options.store;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const roleId = req.swagger.params.role_id.value;
     const paths = req.body.paths;
     const list = genAdminRole(roleId, paths);
@@ -186,6 +190,7 @@ const registerUpdate = options => {
       .then(() => {
         return res.json({role_id: roleId, paths: paths});
       })
+      .catch(next)
     ;
   };
 };

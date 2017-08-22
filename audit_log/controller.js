@@ -11,7 +11,7 @@
 const registerList = (options, pager) => {
   const AuditLogs = options.audit_logs;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
@@ -32,6 +32,7 @@ const registerList = (options, pager) => {
       .then(list => {
         return res.json(list);
       })
+      .catch(next)
     ;
   };
 };

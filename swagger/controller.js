@@ -11,7 +11,7 @@ const helperAdminRole = require('../admin_role/helper');
  * @returns {function(*, *, *)}
  */
 const registerShow = () => {
-  return (req, res) => {
+  return (req, res, next) => {
     return Promise.resolve()
       .then(() => {
         if (!req.swagger.operation.security) {
@@ -37,6 +37,7 @@ const registerShow = () => {
 
         return res.json(swagger);
       })
+      .catch(next)
     ;
   };
 };

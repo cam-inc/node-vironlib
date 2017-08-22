@@ -50,7 +50,7 @@ const registerSignIn = options => {
   const superRole = options.super_role;
   const authJwt = options.auth_jwt;
 
-  return (req, res) => {
+  return (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
@@ -116,6 +116,7 @@ const registerSignIn = options => {
         res.setHeader(authJwt.header_key, `Bearer ${token}`);
         return res.end();
       })
+      .catch(next)
     ;
   };
 };
@@ -128,10 +129,13 @@ const registerSignIn = options => {
  * @returns {function(*, *, *)}
  */
 const registerSignOut = () => {
-  return (req, res) => {
-    return Promise.resolve(() => {
-      return res.end();
-    });
+  return (req, res, next) => {
+    return Promise.resolve()
+      .then(() => {
+        return res.end();
+      })
+      .catch(next)
+    ;
   };
 };
 
@@ -148,20 +152,26 @@ const registerGoogleSignIn = options => {
   const googleOAuth = options.google_oauth;
   if (!googleOAuth) {
     logger.info('[DMCLIB] auth /googlesignin skip.');
-    return (req, res) => {
-      return Promise.resolve(() => {
-        logger.error('[DMCLIB] auth /googlesignin is not registered.');
-        return res.json(errors.frontend.NotFound());
-      });
+    return (req, res, next) => {
+      return Promise.resolve()
+        .then(() => {
+          logger.error('[DMCLIB] auth /googlesignin is not registered.');
+          return res.json(errors.frontend.NotFound());
+        })
+        .catch(next)
+      ;
     };
   }
 
-  return (req, res) => {
-    return Promise.resolve(() => {
-      // Googleの認証画面にリダイレクト
-      const authUrl = helperGoogle.genAuthUrl(googleOAuth, req.get('referer'));
-      return res.redirect(authUrl); // 301
-    });
+  return (req, res, next) => {
+    return Promise.resolve()
+      .then(() => {
+        // Googleの認証画面にリダイレクト
+        const authUrl = helperGoogle.genAuthUrl(googleOAuth, req.get('referer'));
+        return res.redirect(authUrl); // 301
+      })
+      .catch(next)
+    ;
   };
 };
 
@@ -187,11 +197,14 @@ const registerGoogleOAuth2Callback = options => {
 
   if (!googleOAuth) {
     logger.info('[DMCLIB] auth /googleoauth2callback skip.');
-    return (req, res) => {
-      return Promise.resolve(() => {
-        logger.error('[DMCLIB] auth /googleoauth2callback is not registered.');
-        return res.json(errors.frontend.NotFound());
-      });
+    return (req, res, next) => {
+      return Promise.resolve()
+        .then(() => {
+          logger.error('[DMCLIB] auth /googleoauth2callback is not registered.');
+          return res.json(errors.frontend.NotFound());
+        })
+        .catch(next)
+      ;
     };
   }
 
