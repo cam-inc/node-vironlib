@@ -1,9 +1,9 @@
 const controller = require('./controller');
 const helper = require('./helper');
 
-module.exports = () => {
+module.exports = options => {
   return {
-    controller: controller(),
+    controller: controller(options),
     helper: helper,
   };
 };
