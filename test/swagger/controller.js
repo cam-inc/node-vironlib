@@ -61,5 +61,24 @@ describe('swagger/controller', () => {
       await show(req, res);
     });
 
+    it('hostの書き換えができる', async() => {
+      const swagger = {
+        operation: {
+        },
+        swaggerObject: {
+          host: 'http://hoge',
+          paths: {
+          },
+        },
+      };
+      const req = test.genRequest({swagger});
+      const res = test.genResponse();
+
+      res.rson = result => {
+        assert(result.host === 'http://localhost:3000');
+      };
+      await show(req, res);
+    });
+
   });
 });

@@ -15,7 +15,7 @@ class DmcLib {
     this.errorHandler = require('./error_handler');
     this.errors = require('./errors');
     this.stores = require('./stores');
-    this.swagger = require('./swagger')();
+    this.swagger = require('./swagger')(options.swagger);
   }
 }
 

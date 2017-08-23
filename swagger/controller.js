@@ -10,10 +10,15 @@ const helperAdminRole = require('../admin_role/helper');
  *
  * @returns {function(*, *, *)}
  */
-const registerShow = () => {
+const registerShow = options => {
+  options = options || {};
+
   return (req, res, next) => {
     return Promise.resolve()
       .then(() => {
+        if (options.host) {
+          req.swagger.swaggerObject.host = options.host;
+        }
         if (!req.swagger.operation.security) {
           // swagger.json自体が非認証の場合はそのまま返す
           return res.json(req.swagger.swaggerObject);
@@ -42,8 +47,8 @@ const registerShow = () => {
   };
 };
 
-module.exports = () => {
+module.exports = options => {
   return {
-    show: registerShow(),
+    show: registerShow(options),
   };
 };

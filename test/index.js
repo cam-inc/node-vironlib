@@ -212,6 +212,9 @@ const options = {
   pager: {
     limit: 50,
   },
+  swagger: {
+    host: 'http://localhost:3000',
+  },
 };
 
 beforeEach(() => {
