@@ -75,7 +75,7 @@ const dmclib = new DmcLib({
     limit: 100,
   },
   swagger: {
-    host: 'http://localhost:3000'
+    host: 'localhost:3000'
   },
   logger: {{Logger}},
 });

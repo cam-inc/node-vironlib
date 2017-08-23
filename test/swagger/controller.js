@@ -75,7 +75,7 @@ describe('swagger/controller', () => {
       const res = test.genResponse();
 
       res.rson = result => {
-        assert(result.host === 'http://localhost:3000');
+        assert(result.host === 'localhost:3000');
       };
       await show(req, res);
     });

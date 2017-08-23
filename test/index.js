@@ -213,7 +213,7 @@ const options = {
     limit: 50,
   },
   swagger: {
-    host: 'http://localhost:3000',
+    host: 'localhost:3000',
   },
 };
 
