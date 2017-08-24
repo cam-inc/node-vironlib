@@ -16,6 +16,7 @@ class DmcLib {
     this.errors = require('./errors');
     this.stores = require('./stores');
     this.swagger = require('./swagger')(options.swagger);
+    this.bodyCompletion = require('./body_completion')(options.body_completion);
   }
 }
 
