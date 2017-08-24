@@ -78,6 +78,9 @@ const dmclib = new DmcLib({
     host: 'localhost:3000'
   },
   logger: {{Logger}},
+  body_completion: {
+    exclude_paths: ['/user'],
+  },
 });
 ```
 
