@@ -7,9 +7,9 @@ const contains = require('mout/array/contains');
  * @returns {function(*, *, *)}
  */
 module.exports = options => {
-  const paths = options.paths;
+  const excludedPaths = options.excludedPaths;
   return (req, res, next) => {
-    if (req.method !== 'PUT' || contains(paths, req.path)) {
+    if (req.method !== 'PUT' && req.method !== 'POST' || contains(excludedPaths, req.path)) {
       return next();
     }
     req.swagger.operation.parameters.forEach(parameter => {
