@@ -216,7 +216,7 @@ const options = {
     host: 'localhost:3000',
   },
   body_completion: {
-    excludedPaths: ['/ping'],
+    excludePaths: ['/ping'],
   }
 };
 
