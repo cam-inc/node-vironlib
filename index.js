@@ -11,12 +11,13 @@ class DmcLib {
     this.adminUser = require('./admin_user')(options.admin_user || {}, this.pager);
     this.auditLog = require('./audit_log')(options.audit_log || {}, this.pager);
     this.auth = require('./auth')(options.auth || {});
+    this.bodyCompletion = require('./body_completion')(options.body_completion || {});
     this.constants = require('./constants');
     this.errorHandler = require('./error_handler');
     this.errors = require('./errors');
     this.stores = require('./stores');
     this.swagger = require('./swagger')(options.swagger);
-    this.bodyCompletion = require('./body_completion')(options.body_completion || {});
+    this.swaggerValidator = require('./swagger_validator');
   }
 }
 
