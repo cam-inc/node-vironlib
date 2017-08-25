@@ -236,6 +236,33 @@ describe('admin_user/controller', () => {
       await update(req, res);
     });
 
+    it('パスワードがnullだった場合、パスワードを更新しない', async() => {
+      const req = test.genRequest({
+        swagger: Object.assign({
+          params: {
+            id: {
+              value: data.id,
+            },
+          },
+        }, swagger),
+        body: {
+          password: null,
+          role_id: 'tester',
+        },
+      });
+      const res = test.genResponse();
+
+      res.json = () => {
+        return test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
+          .then(m => {
+            assert(m.role_id === 'tester');
+            assert(m.password === 'aaaaaaaaaaaaaaaa');
+          })
+        ;
+      };
+      await update(req, res);
+    });
+
   });
 
 });
