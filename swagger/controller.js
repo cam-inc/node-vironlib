@@ -1,4 +1,6 @@
 const deepClone = require('mout/lang/deepClone');
+const get = require('mout/object/get');
+const filter = require('mout/array/filter');
 const isEmpty = require('mout/lang/isEmpty');
 
 const helperAdminRole = require('../admin_role/helper');
@@ -32,6 +34,18 @@ const registerShow = options => {
             if (!helperAdminRole.canAccess(path, m, roles)) {
               // 権限がないパスをswaggerから削除
               delete swagger.paths[path][m];
+            }
+            // x-refからも削除
+            const xRef = get(swagger.paths, `${path}.${m}.x-ref`);
+            if (xRef) {
+              const newXRef = filter(xRef, ref => {
+                return helperAdminRole.canAccess(ref.path, ref.method, roles);
+              });
+              if (isEmpty(newXRef)) {
+                delete swagger.paths[path][m]['x-ref'];
+              } else {
+                swagger.paths[path][m]['x-ref'] = newXRef;
+              }
             }
           }
           if (isEmpty(swagger.paths[path])) {

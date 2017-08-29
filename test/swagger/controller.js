@@ -40,7 +40,7 @@ describe('swagger/controller', () => {
         },
         swaggerObject: {
           paths: {
-            '/adminuser': {get: {}, post: {}},
+            '/adminuser': {get: {'x-ref': [{method: 'post', path: '/adminuser'}]}, post: {}},
             '/adminrole': {post: {}},
           },
         },
@@ -55,6 +55,7 @@ describe('swagger/controller', () => {
       };
       res.json = result => {
         assert(result.paths['/adminuser'].get);
+        assert(!result.paths['/adminuser'].get['x-ref']);
         assert(!result.paths['/adminuser'].post);
         assert(!result.paths['/adminrole']);
       };
