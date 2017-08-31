@@ -175,6 +175,24 @@ describe('auth/controller', () => {
       await googleSignIn(req, res);
     });
 
+    it('redirect_urlを渡せばそのURLがstateに含まれたURLにリダイレクトされる', async() => {
+      const req = test.genRequest({
+        query: {
+          redirect_url: 'http://dmc.com/test',
+        },
+      });
+      const res = test.genResponse();
+
+      res.redirect = redirectUrl => {
+        assert(redirectUrl);
+        const parsed = url.parse(redirectUrl);
+        const query = qs.parse(parsed.query);
+        assert(query.state === 'http://dmc.com/test');
+      };
+
+      await googleSignIn(req, res);
+    });
+
   });
 
   describe('googleOAuth2Callback', () => {

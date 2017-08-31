@@ -167,7 +167,7 @@ const registerGoogleSignIn = options => {
     return Promise.resolve()
       .then(() => {
         // Googleの認証画面にリダイレクト
-        const authUrl = helperGoogle.genAuthUrl(googleOAuth, req.get('referer'));
+        const authUrl = helperGoogle.genAuthUrl(googleOAuth, req.query.redirect_url || req.get('referer'));
         return res.redirect(authUrl); // 301
       })
       .catch(next)

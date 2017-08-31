@@ -33,8 +33,7 @@ describe('auth/google/helper', () => {
         client_id: 'xxxxxxxxxxxxxxxxxxxx',
         client_secret: 'zzzzzzzzzzzzzzzzzzzz',
         redirect_url: 'http://localhost/redirect',
-        state_url: 'http://localhost/dmc'
-      });
+      }, 'http://localhost/dmc');
       const parsed = url.parse(result);
       assert(parsed.host === 'accounts.google.com');
       const query = qs.parse(parsed.query);

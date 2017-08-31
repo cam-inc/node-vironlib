@@ -206,7 +206,6 @@ const options = {
       client_id: 'xxxxxxxxxxxxxxxxxxxx',
       client_secret: 'zzzzzzzzzzzzzzzzzzzz',
       redirect_url: 'http://localhost/redirect',
-      state_url: 'http://localhost/dmc'
     },
   },
   pager: {
