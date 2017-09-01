@@ -10,6 +10,8 @@ const deepMatches = require('mout/object/deepMatches');
 const pick = require('mout/object/pick');
 const reject = require('mout/array/reject');
 const sort = require('mout/array/sort');
+const every = require('mout/object/every');
+const isObject = require('mout/lang/isObject');
 
 const VironLib = require('../');
 
@@ -43,6 +45,25 @@ const defineModel = name => {
       })
     ;
   };
+
+  const simulateWhere = (rec, where) => {
+    return every(where, (v, k) => {
+      if (isObject(v)) {
+        return every(v, (_v, _k) => {
+          // TODO: 必要に応じてメンテする
+          switch (_k) {
+            case '$like':
+              return !!rec[k].match(new RegExp(`^${_v.replace(/%/g, '.*')}$`));
+            default:
+              return true;
+          }
+        });
+      } else {
+        return rec[k] === v;
+      }
+    });
+  };
+
   m.$queryInterface.$useHandler((query, queryOptions) => {
     let options, attributes, where, limit, offset, order, force;
     switch (query) {
@@ -69,8 +90,7 @@ const defineModel = name => {
           });
         }
         if (where) {
-          // TODO: whereにSQLの命令書かれてると動かない
-          values = filter(values, where);
+          values = filter(values, rec => simulateWhere(rec, where));
         }
         if (limit) {
           values = values.slice(offset, offset + limit);
@@ -95,7 +115,7 @@ const defineModel = name => {
           return m.__values__[0] || null;
         }
         // TODO: whereにSQLの命令書かれてると動かない
-        return find(m.__values__, where) || null;
+        return find(m.__values__, rec => simulateWhere(rec, where)) || null;
       case 'update':
         const data = queryOptions[0];
         options = queryOptions[1] || {};
