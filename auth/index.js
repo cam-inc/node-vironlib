@@ -40,7 +40,7 @@ module.exports = options => {
   return {
     controller: controller(options),
     email: email(),
-    google: google(),
+    google: google(options),
     jwt: jwt(options.auth_jwt),
   };
 };

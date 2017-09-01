@@ -32,6 +32,7 @@ describe('auth/jwt/middleware', () => {
         return new Promise(resolve => {
           middleware(req, res, err => {
             assert(!err);
+            assert(res.get('Authorization') === `Bearer ${token}`);
             resolve();
           });
         });

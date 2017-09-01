@@ -1,36 +1,10 @@
-const reduce = require('mout/object/reduce');
-
 const logger = require('../logger');
 const helperGoogle = require('./google/helper');
 const helperJwt = require('./jwt/helper');
 const helperEMail = require('./email/helper');
+const helperAdminRole = require('../admin_role/helper');
 
 const errors = require('../errors');
-
-const getRoles = (AdminRoles, roleId, superRole) => {
-  if (roleId === superRole) {
-    return new Promise(resolve => {
-      resolve({
-        get: ['*'],
-        post: ['*'],
-        put: ['*'],
-        delete: ['*'],
-        patch: ['*'],
-      });
-    });
-  }
-
-  return AdminRoles.findAll({where: {role_id: roleId}})
-    .then(roles => {
-      return reduce(roles, (ret, role) => {
-        const method = role.method.toLowerCase();
-        ret[method] = ret[method] || [];
-        ret[method].push(role.resource);
-        return ret;
-      }, {});
-    })
-  ;
-};
 
 /**
  * Controller : Sing In
@@ -102,7 +76,7 @@ const registerSignIn = options => {
       })
       .then(adminUser => {
         // ロールを取得
-        return getRoles(AdminRoles, adminUser.role_id, superRole);
+        return helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
       })
       .then(roles => {
         // JWTを生成
@@ -243,7 +217,7 @@ const registerGoogleOAuth2Callback = options => {
           })
           .then(adminUser => {
             // ロールを取得
-            return getRoles(AdminRoles, adminUser.role_id, superRole);
+            return helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
           })
           .then(roles => {
             // JWTを生成

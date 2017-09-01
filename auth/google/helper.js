@@ -17,6 +17,8 @@ const getClient = options => {
 const genAuthUrl = (options, stateUrl) => {
   const client = getClient(options);
   return client.generateAuthUrl({
+    approval_prompt: 'force',
+    access_type: 'offline',
     scope: AUTH_SCOPES,
     state: stateUrl,
   });
@@ -29,7 +31,7 @@ const getToken = (code, options) => {
       if (err) {
         return reject(err);
       }
-      resolve(token.access_token);
+      resolve(token);
     });
   });
 };
@@ -38,7 +40,7 @@ const getMailAddress = token => {
   const url = 'https://www.googleapis.com/oauth2/v2/userinfo';
   return axios.get(url, {
     headers: {
-      Authorization: `OAuth ${token}`,
+      Authorization: `OAuth ${token.access_token}`,
     },
   })
     .then(res => {
@@ -56,10 +58,23 @@ const allowMailDomain = (token, options) => {
   ;
 };
 
+const refreshToken = (token, options) => {
+  const client = getClient(options);
+  return new Promise((resolve, reject) => {
+    client.refreshToken_(token.refresh_token, (err, token) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(token);
+    });
+  });
+};
+
 module.exports = {
   getClient,
   genAuthUrl,
   getToken,
   getMailAddress,
   allowMailDomain,
+  refreshToken,
 };

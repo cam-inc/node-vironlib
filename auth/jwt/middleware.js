@@ -36,6 +36,7 @@ module.exports = options => {
       if (err) {
         return next(err);
       }
+      res.setHeader(options.header_key, req.get(options.header_key));
       next();
     });
   };

@@ -26,6 +26,16 @@ const sign = (claims, options) => {
     resolve(token);
   });
 };
+
+/**
+ * jwt をデコードする
+ * @param {string} token - jwt
+ */
+const decode = token => {
+  return jwt.decode(token);
+};
+
 module.exports = {
-  sign
+  sign,
+  decode,
 };

@@ -65,7 +65,7 @@ describe('auth/google/helper', () => {
     it('アクセストークンを取得できる', async() => {
       await helper.getToken('ccccooooddddeeee', {})
         .then(token => {
-          assert(token === 'token:ccccooooddddeeee');
+          assert(token.access_token === 'token:ccccooooddddeeee');
         })
       ;
     });
@@ -84,7 +84,7 @@ describe('auth/google/helper', () => {
     });
 
     it('メールアドレスを取得できる', async() => {
-      await helper.getMailAddress('xxxxx')
+      await helper.getMailAddress({access_token: 'xxxxx'})
         .then(email => {
           assert(email === 'test@dmc.com');
 
@@ -111,7 +111,7 @@ describe('auth/google/helper', () => {
     });
 
     it('許可されているドメインの場合はメールアドレスが取得できる', async() => {
-      await helper.allowMailDomain('xxxxx', {
+      await helper.allowMailDomain({access_token: 'xxxxx'}, {
         allow_email_domains: ['dmc.com'],
       })
         .then(email => {
@@ -121,7 +121,7 @@ describe('auth/google/helper', () => {
     });
 
     it('許可されていないドメインの場合はfalse', async() => {
-      await helper.allowMailDomain('xxxxx', {
+      await helper.allowMailDomain({access_token: 'xxxxx'}, {
         allow_email_domains: ['dummy.com'],
       })
         .then(email => {
