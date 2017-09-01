@@ -34,13 +34,13 @@ const init = options => {
 
 module.exports = (options, pager, logger) => {
   if (!options.admin_roles) {
-    return logger.warn('[DMCLIB] admin_role options.admin_roles required.');
+    return logger.warn('[VIRONLIB] admin_role options.admin_roles required.');
   }
   if (!options.store) {
-    return logger.warn('[DMCLIB] admin_role options.store required.');
+    return logger.warn('[VIRONLIB] admin_role options.store required.');
   }
   if (!options.default_role) {
-    return logger.warn('[DMCLIB] admin_role options.default_role required.');
+    return logger.warn('[VIRONLIB] admin_role options.default_role required.');
   }
 
   init(options);

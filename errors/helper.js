@@ -1,7 +1,7 @@
 /**
- * dmclib固有のエラー型
+ * vironlib固有のエラー型
  */
-class DmcLibError extends Error {
+class VironLibError extends Error {
   constructor(message) {
     super(message);
     this.message = message;
@@ -20,7 +20,7 @@ class DmcLibError extends Error {
  * @returns {Error}
  */
 const genError = (prefix, httpCode, kind, number, name, message) => {
-  const err = new DmcLibError(message);
+  const err = new VironLibError(message);
   err.statusCode = httpCode;
   err.data = {
     id: `#${prefix}-${kind}-${number}`,

@@ -1,7 +1,7 @@
 const assert = require('assert');
 const test = require('../');
-const dmclib = test.dmclib;
-const acl = dmclib.acl;
+const vironlib = test.vironlib;
+const acl = vironlib.acl;
 
 describe('acl/middleware', () => {
 

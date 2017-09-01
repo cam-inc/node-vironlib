@@ -1,9 +1,10 @@
 {
-  "name": "node-dmclib",
+  "name": "node-vironlib",
   "version": "1.1.0",
   "description": "Generic library for DMC",
   "keywords": [
     "dmc",
+    "viron",
     "library",
     "node.js"
   ],

@@ -1,6 +1,6 @@
 const assert = require('assert');
 const test = require('../');
-const adminRole = test.dmclib.adminRole;
+const adminRole = test.vironlib.adminRole;
 
 describe('admin_role/helper', () => {
 

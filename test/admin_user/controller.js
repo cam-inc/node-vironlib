@@ -2,8 +2,8 @@ const assert = require('assert');
 const times = require('mout/function/times');
 
 const test = require('../');
-const dmclib = test.dmclib;
-const adminUser = dmclib.adminUser;
+const vironlib = test.vironlib;
+const adminUser = vironlib.adminUser;
 
 describe('admin_user/controller', () => {
 

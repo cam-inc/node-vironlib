@@ -1,7 +1,7 @@
 const assert = require('assert');
 const test = require('../');
-const dmclib = test.dmclib;
-const bodyCompletion = dmclib.bodyCompletion;
+const vironlib = test.vironlib;
+const bodyCompletion = vironlib.bodyCompletion;
 
 describe('body_completion/middleware', () => {
 

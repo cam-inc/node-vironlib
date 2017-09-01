@@ -2,13 +2,13 @@ const assert = require('assert');
 const sinon = require('sinon');
 
 const test = require('../../');
-const dmclib = test.dmclib;
+const vironlib = test.vironlib;
 
 describe('auth/google/middleware', () => {
   let stubHelperGoogle;
 
-  const middleware = dmclib.auth.google.middleware();
-  const helperGoogle = dmclib.auth.google.helper;
+  const middleware = vironlib.auth.google.middleware();
+  const helperGoogle = vironlib.auth.google.helper;
 
   beforeEach(() => {
     stubHelperGoogle = sinon.stub(helperGoogle);

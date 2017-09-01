@@ -1,7 +1,7 @@
 /**
- * DmcLib
+ * VironLib
  */
-class DmcLib {
+class VironLib {
   constructor(options) {
     this.logger = require('./logger')(options.logger);
     this.pager = require('./pager')(options.pager);
@@ -21,4 +21,4 @@ class DmcLib {
   }
 }
 
-module.exports = DmcLib;
+module.exports = VironLib;

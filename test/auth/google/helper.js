@@ -7,11 +7,11 @@ const gapi = require('googleapis');
 const sinon = require('sinon');
 
 const test = require('../../');
-const dmclib = test.dmclib;
+const vironlib = test.vironlib;
 
 describe('auth/google/helper', () => {
 
-  const helper = dmclib.auth.google.helper;
+  const helper = vironlib.auth.google.helper;
 
   describe('getClient', () => {
 

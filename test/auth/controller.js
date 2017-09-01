@@ -6,16 +6,16 @@ const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
 
 const test = require('../');
-const dmclib = test.dmclib;
+const vironlib = test.vironlib;
 
 describe('auth/controller', () => {
 
-  const controller = dmclib.auth.controller;
+  const controller = vironlib.auth.controller;
 
   describe('signIn', () => {
 
     const signIn = controller.signIn;
-    const helperEMail = dmclib.auth.email.helper;
+    const helperEMail = vironlib.auth.email.helper;
 
     it('1人目はスーパーユーザーとして登録される', async() => {
       const req = test.genRequest({
@@ -198,7 +198,7 @@ describe('auth/controller', () => {
   describe('googleOAuth2Callback', () => {
 
     const googleOAuth2Callback = controller.googleOAuth2Callback;
-    const helperGoogle = dmclib.auth.google.helper;
+    const helperGoogle = vironlib.auth.google.helper;
 
     let getTokenStub, allowMailDomainStub;
 

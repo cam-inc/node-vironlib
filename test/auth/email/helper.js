@@ -1,11 +1,11 @@
 const assert = require('assert');
 
 const test = require('../../');
-const dmclib = test.dmclib;
+const vironlib = test.vironlib;
 
 describe('auth/email/helper', () => {
 
-  const helper = dmclib.auth.email.helper;
+  const helper = vironlib.auth.email.helper;
 
   describe('genSalt', () => {
 

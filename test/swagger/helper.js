@@ -1,6 +1,6 @@
 const assert = require('assert');
-const dmclib = require('../').dmclib;
-const swagger = dmclib.swagger;
+const vironlib = require('../').vironlib;
+const swagger = vironlib.swagger;
 const test = require('../');
 const times = require('mout/function/times');
 

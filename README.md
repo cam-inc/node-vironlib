@@ -1,4 +1,4 @@
-# node-dmclib
+# node-vironlib
 Generic library for DMC
 
 # Description
@@ -21,13 +21,13 @@ DMC用のNode.jsライブラリです
 
 ## Install
 ```
-$ npm install node-dmclib --registry https://camobile.jfrog.io/camobile/api/npm/camplat-virtual/
+$ npm install node-vironlib --registry https://camobile.jfrog.io/camobile/api/npm/camplat-virtual/
 ```
 
 ## Configure
 ```
-const DmcLib = require('node-dmclib');
-const dmclib = new DmcLib({
+const VironLib = require('node-vironlib');
+const vironlib = new VironLib({
   acl: {
     allow_origin: '*',
     allow_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',

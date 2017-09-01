@@ -125,11 +125,11 @@ const registerSignOut = () => {
 const registerGoogleSignIn = options => {
   const googleOAuth = options.google_oauth;
   if (!googleOAuth) {
-    logger.info('[DMCLIB] auth /googlesignin skip.');
+    logger.info('[VIRONLIB] auth /googlesignin skip.');
     return (req, res, next) => {
       return Promise.resolve()
         .then(() => {
-          logger.error('[DMCLIB] auth /googlesignin is not registered.');
+          logger.error('[VIRONLIB] auth /googlesignin is not registered.');
           return res.json(errors.frontend.NotFound());
         })
         .catch(next)
@@ -170,11 +170,11 @@ const registerGoogleOAuth2Callback = options => {
   const defaultRole = options.default_role;
 
   if (!googleOAuth) {
-    logger.info('[DMCLIB] auth /googleoauth2callback skip.');
+    logger.info('[VIRONLIB] auth /googleoauth2callback skip.');
     return (req, res, next) => {
       return Promise.resolve()
         .then(() => {
-          logger.error('[DMCLIB] auth /googleoauth2callback is not registered.');
+          logger.error('[VIRONLIB] auth /googleoauth2callback is not registered.');
           return res.json(errors.frontend.NotFound());
         })
         .catch(next)

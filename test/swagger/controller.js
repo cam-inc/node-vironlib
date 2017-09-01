@@ -1,7 +1,7 @@
 const assert = require('assert');
 const test = require('../');
-const dmclib = test.dmclib;
-const swagger = dmclib.swagger;
+const vironlib = test.vironlib;
+const swagger = vironlib.swagger;
 
 describe('swagger/controller', () => {
 

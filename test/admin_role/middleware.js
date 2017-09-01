@@ -1,7 +1,7 @@
 const assert = require('assert');
 const test = require('../');
-const dmclib = test.dmclib;
-const adminRole = dmclib.adminRole;
+const vironlib = test.vironlib;
+const adminRole = vironlib.adminRole;
 
 describe('admin_role/middleware', () => {
 

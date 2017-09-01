@@ -1,11 +1,11 @@
 const assert = require('assert');
 const test = require('../../');
-const dmclib = test.dmclib;
+const vironlib = test.vironlib;
 
 describe('auth/jwt/middleware', () => {
 
-  const middleware = dmclib.auth.jwt.middleware();
-  const helper = dmclib.auth.jwt.helper;
+  const middleware = vironlib.auth.jwt.middleware();
+  const helper = vironlib.auth.jwt.helper;
 
   it('検証に成功する', async() => {
     await helper.sign({

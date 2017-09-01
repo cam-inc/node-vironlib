@@ -1,8 +1,8 @@
 const assert = require('assert');
 
 const test = require('./');
-const dmclib = test.dmclib;
-const pager = dmclib.pager;
+const vironlib = test.vironlib;
+const pager = vironlib.pager;
 
 describe('pager', () => {
 

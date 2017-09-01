@@ -11,7 +11,7 @@ const pick = require('mout/object/pick');
 const reject = require('mout/array/reject');
 const sort = require('mout/array/sort');
 
-const DmcLib = require('../');
+const VironLib = require('../');
 
 const store = new SequelizeMock();
 
@@ -197,7 +197,7 @@ const options = {
       secret: 'test-secret',
       claims: {
         iss: 'dmc.test',
-        aud: 'dmclib',
+        aud: 'vironlib',
       },
       //rsa_private_key: 'xxxxxxxxxxxx',
       //rsa_public_key: 'xxxxxxxxxxxx',
@@ -228,7 +228,7 @@ beforeEach(() => {
 });
 
 module.exports = {
-  dmclib: new DmcLib(options),
+  vironlib: new VironLib(options),
   genRequest,
   genResponse,
   models,

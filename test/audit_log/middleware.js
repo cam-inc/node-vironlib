@@ -1,7 +1,7 @@
 const assert = require('assert');
 const test = require('../');
-const dmclib = test.dmclib;
-const auditLog = dmclib.auditLog;
+const vironlib = test.vironlib;
+const auditLog = vironlib.auditLog;
 
 describe('audit_log/middleware', () => {
 

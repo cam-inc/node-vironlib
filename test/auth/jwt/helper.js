@@ -2,11 +2,11 @@ const assert = require('assert');
 const jwt = require('jsonwebtoken');
 
 const test = require('../../');
-const dmclib = test.dmclib;
+const vironlib = test.vironlib;
 
 describe('auth/jwt/helper', () => {
 
-  const helper = dmclib.auth.jwt.helper;
+  const helper = vironlib.auth.jwt.helper;
 
   describe('sign', () => {
 
