@@ -42,6 +42,9 @@ module.exports = (options, pager, logger) => {
   if (!options.default_role) {
     return logger.warn('[VIRONLIB] admin_role options.default_role required.');
   }
+  if (!options.admin_users) {
+    return logger.warn('[VIRONLIB] admin_role options.admin_users required.');
+  }
 
   init(options);
 

@@ -54,4 +54,8 @@ module.exports = {
    * Admin User Not Found
    */
   AdminUserNotFound: () => genError(404, '0001', '0001', 'AdminUserNotFound', 'Admin User Not Found'),
+  /**
+   * Currently Used Admin Role
+   */
+  CurrentlyUsedAdminRole: () => genError(400, '0001', '0002', 'CurrentlyUsedAdminRole', 'Currently Used Admin Role'),
 };

@@ -1,6 +1,7 @@
 const reduce = require('mout/object/reduce');
 
 const logger = require('../logger');
+const errors = require('../errors');
 
 const genAdminRole = (roleId, paths) => {
   return reduce(paths, (ret, obj) => {
@@ -134,15 +135,34 @@ const registerGet = options => {
  *
  * @param {Object} options
  * @param {Sequelize.model} options.admin_roles
+ * @param {Sequelize.model} options.admin_users
  * @returns {function(*, *, *)}
  */
 const registerRemove = options => {
   const AdminRoles = options.admin_roles;
-
+  const AdminUsers = options.admin_users;
   return (req, res, next) => {
     const roleId = req.swagger.params.role_id.value;
-    return AdminRoles.destroy({where: {role_id: roleId}, force: true})
+    return AdminUsers.findAll({where: {role_id: roleId}})
+      .then(list => {
+        // 削除対象の権限を持っているユーザがいたら、エラーを返す。
+        if (list.length !== 0) {
+          return next(errors.frontend.CurrentlyUsedAdminRole());
+        }
+        return AdminRoles.destroy({where: {role_id: roleId}, force: true});
+      })
       .then(() => {
+        // 一覧取得
+        return AdminRoles.findAll();
+      })
+      .then(list => {
+        // swagger書き換え
+        const enums = new Set();
+        list.forEach(role => {
+          enums.add(role.dataValues.role_id);
+        });
+        const def = req.swagger.swaggerObject.definition.UpdateAdminUserPayload;
+        def.properties.role_id.enum = Array.from(enums);
         return res.status(204).end();
       })
       .catch(next)
@@ -195,12 +215,12 @@ const registerUpdate = options => {
   };
 };
 
-module.exports = (options, pager) => {
+module.exports = (options, pager, adminUserOption) => {
   return {
     list: registerList(options, pager),
     create: registerCreate(options),
     get: registerGet(options),
-    remove: registerRemove(options),
+    remove: registerRemove(options, adminUserOption),
     update: registerUpdate(options),
   };
 };

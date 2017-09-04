@@ -42,6 +42,7 @@ const vironlib = new VironLib({
   },
   admin_role: {
     admin_roles: {{Sequelize.Model}},
+    admin_users: {{Sequelize.Model}},
     store: {{Sequelize}},
     default_role: 'viewer',
   },
