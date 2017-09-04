@@ -111,6 +111,14 @@ describe('admin_role/controller', () => {
 
   describe('create', () => {
 
+    beforeEach(() => {
+      test.models.AdminRoles.create({
+        role_id: 'role',
+        method: 'GET',
+        resource: 'resource',
+      });
+    });
+
     const create = adminRole.controller.create;
 
     it('管理ロールが作成できる', async() => {
@@ -134,11 +142,33 @@ describe('admin_role/controller', () => {
 
         return test.models.AdminRoles.findAll({where: {role_id: 'tester'}})
           .then(roles => {
+            assert(req.swagger.swaggerObject.definitions.UpdateAdminUserPayload.properties.role_id.enum.length === 2);
             assert(roles.length === 4);
           })
         ;
       };
       await create(req, res);
+    });
+
+    it('存在するrole_idで登録しようとした際、エラーを返す', async() => {
+      const req = test.genRequest({
+        swagger,
+        body: {
+          role_id: 'role',
+          paths: [
+            {allow: true, path: 'GET:/test'},
+            {allow: true, path: 'POST:/test'},
+            {allow: true, path: 'PUT:/test'},
+            {allow: true, path: 'DELETE:/test'},
+          ]
+        },
+      });
+      const res = test.genResponse();
+
+      await create(req, res, err => {
+        assert(err.statusCode === 400);
+        assert(err.data.name === 'CurrentlyUsedAdminRole');
+      });
     });
 
   });

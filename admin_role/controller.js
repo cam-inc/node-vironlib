@@ -69,32 +69,30 @@ const registerList = (options, pager) => {
  */
 const registerCreate = options => {
   const AdminRoles = options.admin_roles;
-  const store = options.store;
 
   return (req, res, next) => {
     const roleId = req.body.role_id;
     const paths = req.body.paths;
     const list = genAdminRole(roleId, paths);
-
-    return Promise.resolve()
-      .then(() => {
-        return store.transaction();
-      })
-      .then(t => {
-        return AdminRoles.destroy({where: {role_id: roleId}, force: true, transaction: t})
-          .then(() => {
-            return AdminRoles.bulkCreate(list, {transaction: t});
-          })
-          .then(() => {
-            return t.commit();
-          })
-          .catch(err => {
-            logger.error(err);
-            return t.rollback();
-          })
-        ;
+    return AdminRoles.findAll({where: {role_id: roleId}})
+      .then(data => {
+        if (data.length !== 0) {
+          return next(errors.frontend.CurrentlyUsedAdminRole());
+        }
+        return AdminRoles.bulkCreate(list);
       })
       .then(() => {
+        // 一覧取得
+        return AdminRoles.findAll();
+      })
+      .then(list => {
+        // swagger書き換え
+        const enums = new Set();
+        list.forEach(role => {
+          enums.add(role.dataValues.role_id);
+        });
+        const def = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
+        def.properties.role_id.enum = Array.from(enums);
         return res.json({role_id: roleId, paths: paths});
       })
       .catch(next)
