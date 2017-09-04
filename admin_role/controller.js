@@ -144,28 +144,27 @@ const registerRemove = (options, adminUserOption) => {
   const AdminUsers = adminUserOption.admin_users;
   return (req, res, next) => {
     const roleId = req.swagger.params.role_id.value;
-    // 削除対象の権限を持っているユーザがいたら、エラーを返す。
     return AdminUsers.findAll({where: {role_id: roleId}})
       .then(list => {
+        // 削除対象の権限を持っているユーザがいたら、エラーを返す。
         if (list.length !== 0) {
           return next(errors.frontend.CurrentlyUsedAdminRole());
         }
-        return AdminRoles.destroy({where: {role_id: roleId}, force: true})
-          .then(() => {
-            // 一覧取得
-            AdminRoles.findAll()
-              .then(list => {
-                const enums = new Set();
-                list.forEach(role => {
-                  enums.add(role.dataValues.role_id);
-                });
-                const def = req.swagger.swaggerObject.definition.UpdateAdminUserPayload;
-                def.properties.role_id.enum = Array.from(enums);
-                return res.status(204).end();
-              })
-            ;
-          })
-        ;
+        return AdminRoles.destroy({where: {role_id: roleId}, force: true});
+      })
+      .then(() => {
+        // 一覧取得
+        return AdminRoles.findAll();
+      })
+      .then(list => {
+        // swagger書き換え
+        const enums = new Set();
+        list.forEach(role => {
+          enums.add(role.dataValues.role_id);
+        });
+        const def = req.swagger.swaggerObject.definition.UpdateAdminUserPayload;
+        def.properties.role_id.enum = Array.from(enums);
+        return res.status(204).end();
       })
       .catch(next)
     ;
