@@ -58,4 +58,8 @@ module.exports = {
    * Currently Used Admin Role
    */
   CurrentlyUsedAdminRole: () => genError(400, '0001', '0002', 'CurrentlyUsedAdminRole', 'Currently Used Admin Role'),
+  /**
+   * Already Used Role ID
+   */
+  AlreadyUsedRoleID: () => genError(400, '0001', '0003', 'AlreadyUsedRoleID', 'Already Used Role ID'),
 };
