@@ -17,7 +17,7 @@ module.exports = {
   /**
    * 外部APIのエラー全般に使用する.
    */
-  ExternalServerError: () => genError(500, '0000', '0000', 'ExternalServerError', 'External Server Error'),
+  ExternalServerError: code => genError(code || 500, '0000', '0000', 'ExternalServerError', 'External Server Error'),
   /**
    * 外部APIのリクエストエラー全般に使用する.
    */

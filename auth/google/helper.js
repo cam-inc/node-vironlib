@@ -1,6 +1,9 @@
 const axios = require('axios');
 const gapi = require('googleapis');
 const contains = require('mout/array/contains');
+const get = require('mout/object/get');
+
+const errors = require('../../errors');
 
 const AUTH_SCOPES = [
   'https://www.googleapis.com/auth/userinfo.email',
@@ -29,7 +32,9 @@ const getToken = (code, options) => {
   return new Promise((resolve, reject) => {
     client.getToken(code, (err, token) => {
       if (err) {
-        return reject(err);
+        const e = errors.external.ExternalServerError(err.code);
+        e.orig_error = err;
+        return reject(e);
       }
       resolve(token);
     });
@@ -45,6 +50,12 @@ const getMailAddress = token => {
   })
     .then(res => {
       return res.data.email;
+    })
+    .catch(err => {
+      const status = get(err, 'response.status');
+      const e = errors.external.ExternalServerError(status);
+      e.orig_error = err;
+      throw e;
     })
   ;
 };
@@ -63,7 +74,9 @@ const refreshToken = (token, options) => {
   return new Promise((resolve, reject) => {
     client.refreshToken_(token.refresh_token, (err, token) => {
       if (err) {
-        return reject(err);
+        const e = errors.external.ExternalServerError(err.code);
+        e.orig_error = err;
+        return reject(e);
       }
       resolve(token);
     });
