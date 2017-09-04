@@ -22,6 +22,17 @@ describe('admin_role/controller', () => {
         },
       },
     },
+    swaggerObject: {
+      definition: {
+        UpdateAdminUserPayload: {
+          properties: {
+            role_id: {
+              enum: ['tester'],
+            },
+          },
+        },
+      },
+    },
   };
 
   describe('list', () => {
@@ -184,7 +195,12 @@ describe('admin_role/controller', () => {
         {role_id: 'tester', resource: 'test', method: 'POST'},
         {role_id: 'tester', resource: 'test', method: 'PUT'},
         {role_id: 'tester', resource: 'test', method: 'DELETE'},
+        {role_id: 'viewer', resource: 'test', method: 'DELETE'},
       ]);
+      test.models.AdminUsers.create({
+        email: 'test@dmc.com',
+        role_id: 'viewer',
+      });
     });
 
     it('1件削除できる', async() => {
@@ -202,13 +218,32 @@ describe('admin_role/controller', () => {
       res.end = () => {
         assert(true);
 
-        return test.models.AdminUsers.findAll({where: {role_id: 'tester'}})
-          .then(m => {
-            assert(m.length === 0);
+        return test.models.AdminRoles.findAll()
+          .then(list => {
+            assert(req.swagger.swaggerObject.definition.UpdateAdminUserPayload.properties.role_id.enum.length === 1);
+            assert(list.length === 1);
           })
         ;
       };
       await remove(req, res);
+    });
+
+    it('削除対象の権限を持っているユーザがいる為、エラーを返す。', async() => {
+      const req = test.genRequest({
+        swagger: Object.assign({
+          params: {
+            role_id: {
+              value: 'viewer',
+            },
+          },
+        }, swagger),
+      });
+      const res = test.genResponse();
+
+      await remove(req, res, err => {
+        assert(err.statusCode === 400);
+        assert(err.data.name === 'CurrentlyUsedAdminRole');
+      });
     });
 
   });

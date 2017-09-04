@@ -32,7 +32,7 @@ const init = options => {
   ;
 };
 
-module.exports = (options, pager, logger) => {
+module.exports = (options, pager, adminUserOption, logger) => {
   if (!options.admin_roles) {
     return logger.warn('[VIRONLIB] admin_role options.admin_roles required.');
   }
@@ -46,7 +46,7 @@ module.exports = (options, pager, logger) => {
   init(options);
 
   return {
-    controller: controller(options, pager),
+    controller: controller(options, pager, adminUserOption),
     helper: helper,
     middleware: () => middleware(options),
   };
