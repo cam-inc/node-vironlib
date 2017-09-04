@@ -161,7 +161,7 @@ const registerRemove = options => {
         list.forEach(role => {
           enums.add(role.dataValues.role_id);
         });
-        const def = req.swagger.swaggerObject.definition.UpdateAdminUserPayload;
+        const def = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
         def.properties.role_id.enum = Array.from(enums);
         return res.status(204).end();
       })

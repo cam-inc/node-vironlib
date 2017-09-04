@@ -23,7 +23,7 @@ describe('admin_role/controller', () => {
       },
     },
     swaggerObject: {
-      definition: {
+      definitions: {
         UpdateAdminUserPayload: {
           properties: {
             role_id: {
@@ -220,7 +220,7 @@ describe('admin_role/controller', () => {
 
         return test.models.AdminRoles.findAll()
           .then(list => {
-            assert(req.swagger.swaggerObject.definition.UpdateAdminUserPayload.properties.role_id.enum.length === 1);
+            assert(req.swagger.swaggerObject.definitions.UpdateAdminUserPayload.properties.role_id.enum.length === 1);
             assert(list.length === 1);
           })
         ;
