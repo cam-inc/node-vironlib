@@ -197,6 +197,7 @@ const options = {
   },
   admin_role: {
     admin_roles: models.AdminRoles,
+    admin_users: models.AdminUsers,
     store: store,
     default_role: 'viewer',
   },

@@ -32,7 +32,7 @@ const init = options => {
   ;
 };
 
-module.exports = (options, pager, adminUserOption, logger) => {
+module.exports = (options, pager, logger) => {
   if (!options.admin_roles) {
     return logger.warn('[VIRONLIB] admin_role options.admin_roles required.');
   }
@@ -42,14 +42,14 @@ module.exports = (options, pager, adminUserOption, logger) => {
   if (!options.default_role) {
     return logger.warn('[VIRONLIB] admin_role options.default_role required.');
   }
-  if (!adminUserOption.admin_users) {
-    return logger.warn('[VIRONLIB] admin_role adminUserOption.admin_users required.');
+  if (!options.admin_users) {
+    return logger.warn('[VIRONLIB] admin_role options.admin_users required.');
   }
 
   init(options);
 
   return {
-    controller: controller(options, pager, adminUserOption),
+    controller: controller(options, pager),
     helper: helper,
     middleware: () => middleware(options),
   };

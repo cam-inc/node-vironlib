@@ -134,14 +134,13 @@ const registerGet = options => {
  * PATH : /adminrole/:role_id
  *
  * @param {Object} options
- * @param {Object} adminUserOption
  * @param {Sequelize.model} options.admin_roles
- * @param {Sequelize.model} adminUserOption.admin_users
+ * @param {Sequelize.model} options.admin_users
  * @returns {function(*, *, *)}
  */
-const registerRemove = (options, adminUserOption) => {
+const registerRemove = options => {
   const AdminRoles = options.admin_roles;
-  const AdminUsers = adminUserOption.admin_users;
+  const AdminUsers = options.admin_users;
   return (req, res, next) => {
     const roleId = req.swagger.params.role_id.value;
     return AdminUsers.findAll({where: {role_id: roleId}})
