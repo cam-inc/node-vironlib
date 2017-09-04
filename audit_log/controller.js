@@ -21,8 +21,19 @@ const registerList = (options, pager) => {
       })
       .then(count => {
         pager.setResHeader(res, limit, offset, count);
+        const where = {};
+        if (req.query.user_id) {
+          where.user_id = {$like: `${req.query.user_id}%`};
+        }
+        if (req.query.request_method) {
+          where.request_method = req.query.request_method;
+        }
+        if (req.query.request_uri) {
+          where.request_uri = {$like: `${req.query.request_uri}%`};
+        }
         const options = {
           attributes,
+          where,
           limit,
           offset,
           order: [['createdAt', 'DESC']],

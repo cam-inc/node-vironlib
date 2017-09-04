@@ -99,5 +99,23 @@ describe('audit_log/controller', () => {
       await list(req, res);
     });
 
+    it('user_id,response_method,response_uriで検索できる', async() => {
+      const req = test.genRequest({
+        swagger,
+        query: {
+          user_id: 'user_107',
+          request_method: 'GET',
+          request_uri: '/test/1'
+        },
+      });
+      const res = test.genResponse();
+
+      res.json = result => {
+        assert(result.length === 1);
+        assert(result[0].user_id === 'user_107');
+      };
+      await list(req, res);
+    });
+
   });
 });
