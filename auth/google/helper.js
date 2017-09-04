@@ -72,13 +72,16 @@ const allowMailDomain = (token, options) => {
 const refreshToken = (token, options) => {
   const client = getClient(options);
   return new Promise((resolve, reject) => {
-    client.refreshToken_(token.refresh_token, (err, token) => {
+    client.refreshToken_(token.refresh_token, (err, newToken) => {
       if (err) {
         const e = errors.external.ExternalServerError(err.code);
         e.orig_error = err;
         return reject(e);
       }
-      resolve(token);
+      if (!newToken.refresh_token) {
+        newToken.refresh_token = token.refresh_token;
+      }
+      resolve(newToken);
     });
   });
 };
