@@ -167,7 +167,7 @@ describe('admin_role/controller', () => {
 
       await create(req, res, err => {
         assert(err.statusCode === 400);
-        assert(err.data.name === 'CurrentlyUsedAdminRole');
+        assert(err.data.name === 'AlreadyUsedRoleID');
       });
     });
 

@@ -77,7 +77,7 @@ const registerCreate = options => {
     return AdminRoles.findAll({where: {role_id: roleId}})
       .then(data => {
         if (data.length !== 0) {
-          return next(errors.frontend.CurrentlyUsedAdminRole());
+          return next(errors.frontend.AlreadyUsedRoleID());
         }
         return AdminRoles.bulkCreate(list);
       })
