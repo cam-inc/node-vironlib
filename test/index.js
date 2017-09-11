@@ -45,6 +45,48 @@ const defineModel = name => {
       })
     ;
   };
+  m.findAndCountAll = options => {
+    const attributes = options.attributes;
+    const order = options.order;
+    const limit = options.limit;
+    const offset = options.offset || 0;
+    const where = options.where;
+    let result = {};
+    let values = deepClone(m.__values__);
+    if (order) {
+      order.forEach(ord => {
+        const field = ord[0];
+        const reverse = !!(ord[1] === 'DESC');
+        values = sort(values, (a, b) => {
+          if (reverse) {
+            return a[field] - b[field];
+          } else {
+            return b[field] - a[field];
+          }
+        });
+      });
+    }
+    if (where) {
+      values = filter(values, rec => simulateWhere(rec, where));
+      result.count = values.length;
+    } else {
+      result.count = m.__values__.length;
+    }
+    if (limit) {
+      values = values.slice(offset, offset + limit);
+    }
+    if (attributes) {
+      values = values.map(value => {
+        return pick(value, attributes);
+      });
+    }
+    result.rows = values;
+    return Promise.resolve()
+      .then(() => {
+        return result;
+      })
+    ;
+  };
 
   const simulateWhere = (rec, where) => {
     return every(where, (v, k) => {
