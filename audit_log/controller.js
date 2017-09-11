@@ -15,13 +15,9 @@ const registerList = (options, pager) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
+    const where = {};
     return Promise.resolve()
       .then(() => {
-        return AuditLogs.count();
-      })
-      .then(count => {
-        pager.setResHeader(res, limit, offset, count);
-        const where = {};
         if (req.query.user_id) {
           where.user_id = {$like: `${req.query.user_id}%`};
         }
@@ -38,10 +34,11 @@ const registerList = (options, pager) => {
           offset,
           order: [['createdAt', 'DESC']],
         };
-        return AuditLogs.findAll(options);
+        return AuditLogs.findAndCountAll(options);
       })
-      .then(list => {
-        return res.json(list);
+      .then(result => {
+        pager.setResHeader(res, limit, offset, result.count);
+        return res.json(result.rows);
       })
       .catch(next)
     ;

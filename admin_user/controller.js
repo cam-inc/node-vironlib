@@ -19,19 +19,16 @@ const registerList = (options, pager) => {
     const offset = Number(req.query.offset || 0);
     return Promise.resolve()
       .then(() => {
-        return AdminUsers.count();
-      })
-      .then(count => {
-        pager.setResHeader(res, limit, offset, count);
         const options = {
           attributes,
           limit,
           offset,
         };
-        return AdminUsers.findAll(options);
+        return AdminUsers.findAndCountAll(options);
       })
-      .then(list => {
-        return res.json(list);
+      .then(result => {
+        pager.setResHeader(res, limit, offset, result.count);
+        return res.json(result.rows);
       })
       .catch(next)
     ;
