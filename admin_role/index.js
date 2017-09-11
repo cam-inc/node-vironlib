@@ -1,6 +1,7 @@
 const controller = require('./controller');
 const helper = require('./helper');
 const middleware = require('./middleware');
+const logger = require('../logger');
 
 /**
  * AdminRole init
@@ -32,7 +33,7 @@ const init = options => {
   ;
 };
 
-module.exports = (options, pager, logger) => {
+module.exports = (options, pager) => {
   if (!options.admin_roles) {
     return logger.warn('[VIRONLIB] admin_role options.admin_roles required.');
   }

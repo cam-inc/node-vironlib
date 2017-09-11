@@ -235,7 +235,8 @@ const registerGoogleOAuth2Callback = options => {
         res.setHeader(authJwt.header_key, authToken);
         return res.redirect(`${redirectUrl}?token=${authToken}`);
       })
-      .catch(() => {
+      .catch(e => {
+        logger.error(e);
         return res.redirect(redirectUrl);
       })
     ;
