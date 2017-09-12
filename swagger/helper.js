@@ -1,5 +1,6 @@
 const adminRoleHelper = require('../admin_role/helper');
 const contains = require('mout/array/contains');
+const find = require('mout/object/find');
 
 /**
  * Get swagger host port
@@ -60,9 +61,10 @@ const genAdminUserRoleId = (swaggerExpress, AdminRoles) => {
  * @param swaggerExpress
  */
 const autoGenerate = (swaggerExpress, models) => {
+  const AdminRoles = find(models, model => { return model.tableName === 'admin_roles'; });
   return Promise.all([
     genAdminRolePaths(swaggerExpress),
-    genAdminUserRoleId(swaggerExpress, models.AdminRoles)
+    genAdminUserRoleId(swaggerExpress, AdminRoles)
   ]);
 };
 
