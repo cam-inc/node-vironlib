@@ -2,7 +2,6 @@ const deepClone = require('mout/lang/deepClone');
 const get = require('mout/object/get');
 const filter = require('mout/array/filter');
 const isEmpty = require('mout/lang/isEmpty');
-const find = require('mout/object/find');
 
 const helperAdminRole = require('../admin_role/helper');
 
@@ -26,16 +25,18 @@ const registerShow = options => {
           // swagger.json自体が非認証の場合はそのまま返す
           return res.json(req.swagger.swaggerObject);
         }
-        const AdminRoles = find(options.store.models, model => { return model.tableName === 'admin_roles'; });
+        const AdminRoles = options.admin_roles;
         AdminRoles.findAll()
           .then(list => {
-            // swagger書き換え
-            const enums = new Set();
-            list.forEach(role => {
-              enums.add(role.dataValues.role_id);
-            });
             const def = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
-            def.properties.role_id.enum = Array.from(enums);
+            if (def) {
+              // swagger書き換え
+              const enums = new Set();
+              list.forEach(role => {
+                enums.add(role.dataValues.role_id);
+              });
+              def.properties.role_id.enum = Array.from(enums);
+            }
             // 権限がないパスをswagger.jsonから消して返す
             const swagger = deepClone(req.swagger.swaggerObject);
             const roles = req.auth.roles;

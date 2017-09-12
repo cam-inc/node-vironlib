@@ -276,7 +276,7 @@ const options = {
   },
   swagger: {
     host: 'localhost:3000',
-    store: store,
+    admin_roles: models.AdminRoles,
   },
   body_completion: {
     exclude_paths: ['/ping'],
