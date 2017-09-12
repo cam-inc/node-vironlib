@@ -82,17 +82,6 @@ const registerCreate = options => {
         return AdminRoles.bulkCreate(list);
       })
       .then(() => {
-        // 一覧取得
-        return AdminRoles.findAll();
-      })
-      .then(list => {
-        // swagger書き換え
-        const enums = new Set();
-        list.forEach(role => {
-          enums.add(role.dataValues.role_id);
-        });
-        const def = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
-        def.properties.role_id.enum = Array.from(enums);
         return res.json({role_id: roleId, paths: paths});
       })
       .catch(next)
@@ -150,17 +139,6 @@ const registerRemove = options => {
         return AdminRoles.destroy({where: {role_id: roleId}, force: true});
       })
       .then(() => {
-        // 一覧取得
-        return AdminRoles.findAll();
-      })
-      .then(list => {
-        // swagger書き換え
-        const enums = new Set();
-        list.forEach(role => {
-          enums.add(role.dataValues.role_id);
-        });
-        const def = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
-        def.properties.role_id.enum = Array.from(enums);
         return res.status(204).end();
       })
       .catch(next)

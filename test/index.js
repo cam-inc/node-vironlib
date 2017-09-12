@@ -276,6 +276,7 @@ const options = {
   },
   swagger: {
     host: 'localhost:3000',
+    store: store,
   },
   body_completion: {
     exclude_paths: ['/ping'],

@@ -2,10 +2,25 @@ const assert = require('assert');
 const test = require('../');
 const vironlib = test.vironlib;
 const swagger = vironlib.swagger;
+const times = require('mout/function/times');
 
 describe('swagger/controller', () => {
 
   describe('show', () => {
+
+    beforeEach(() => {
+      times(5, i => {
+        times(5, j => {
+          ['get', 'post', 'put', 'delete'].forEach(method => {
+            test.models.AdminRoles.create({
+              role_id: `role${i}`,
+              method: method,
+              resource: `resource${j}`,
+            });
+          });
+        });
+      });
+    });
 
     const show = swagger.controller.show;
 
@@ -17,6 +32,15 @@ describe('swagger/controller', () => {
           paths: {
             '/adminuser': {get: {}, post: {}},
             '/adminrole': {post: {}},
+          },
+          definitions: {
+            UpdateAdminUserPayload: {
+              properties: {
+                role_id: {
+                  enum: ['tester'],
+                },
+              },
+            },
           },
         },
       };
@@ -42,6 +66,15 @@ describe('swagger/controller', () => {
           paths: {
             '/adminuser': {get: {'x-ref': [{method: 'post', path: '/adminuser'}]}, post: {}},
             '/adminrole': {post: {}},
+          },
+          definitions: {
+            UpdateAdminUserPayload: {
+              properties: {
+                role_id: {
+                  enum: ['tester'],
+                },
+              },
+            },
           },
         },
       };
@@ -75,8 +108,46 @@ describe('swagger/controller', () => {
       const req = test.genRequest({swagger});
       const res = test.genResponse();
 
-      res.rson = result => {
+      res.json = result => {
         assert(result.host === 'localhost:3000');
+      };
+      await show(req, res);
+    });
+
+    it('role_idのenum変更に成功', async() => {
+      const swagger = {
+        operation: {
+          security: {
+            jwt: ['api:access'],
+          },
+        },
+        swaggerObject: {
+          paths: {
+          },
+          definitions: {
+            UpdateAdminUserPayload: {
+              properties: {
+                role_id: {
+                  enum: ['tester'],
+                },
+              },
+            },
+          },
+        },
+      };
+      const req = test.genRequest({swagger});
+      const res = test.genResponse();
+
+      req.auth = {
+        roles: {
+          get: '*',
+        },
+      };
+
+      res.json = result => {
+        assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.length === 5);
+        assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('role0'));
+        assert(!result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('tester'));
       };
       await show(req, res);
     });

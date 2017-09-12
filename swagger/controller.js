@@ -2,6 +2,7 @@ const deepClone = require('mout/lang/deepClone');
 const get = require('mout/object/get');
 const filter = require('mout/array/filter');
 const isEmpty = require('mout/lang/isEmpty');
+const find = require('mout/object/find');
 
 const helperAdminRole = require('../admin_role/helper');
 
@@ -25,36 +26,46 @@ const registerShow = options => {
           // swagger.json自体が非認証の場合はそのまま返す
           return res.json(req.swagger.swaggerObject);
         }
-
-        // 権限がないパスをswagger.jsonから消して返す
-        const swagger = deepClone(req.swagger.swaggerObject);
-        const roles = req.auth.roles;
-        for (let path in swagger.paths) {
-          for (let m in swagger.paths[path]) {
-            if (!helperAdminRole.canAccess(path, m, roles)) {
-              // 権限がないパスをswaggerから削除
-              delete swagger.paths[path][m];
-            }
-            // x-refからも削除
-            const xRef = get(swagger.paths, `${path}.${m}.x-ref`);
-            if (xRef) {
-              const newXRef = filter(xRef, ref => {
-                return helperAdminRole.canAccess(ref.path, ref.method, roles);
-              });
-              if (isEmpty(newXRef)) {
-                delete swagger.paths[path][m]['x-ref'];
-              } else {
-                swagger.paths[path][m]['x-ref'] = newXRef;
+        const AdminRoles = find(options.store.models, model => { return model.tableName === 'admin_roles'; });
+        AdminRoles.findAll()
+          .then(list => {
+            // swagger書き換え
+            const enums = new Set();
+            list.forEach(role => {
+              enums.add(role.dataValues.role_id);
+            });
+            const def = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
+            def.properties.role_id.enum = Array.from(enums);
+            // 権限がないパスをswagger.jsonから消して返す
+            const swagger = deepClone(req.swagger.swaggerObject);
+            const roles = req.auth.roles;
+            for (let path in swagger.paths) {
+              for (let m in swagger.paths[path]) {
+                if (!helperAdminRole.canAccess(path, m, roles)) {
+                  // 権限がないパスをswaggerから削除
+                  delete swagger.paths[path][m];
+                }
+                // x-refからも削除
+                const xRef = get(swagger.paths, `${path}.${m}.x-ref`);
+                if (xRef) {
+                  const newXRef = filter(xRef, ref => {
+                    return helperAdminRole.canAccess(ref.path, ref.method, roles);
+                  });
+                  if (isEmpty(newXRef)) {
+                    delete swagger.paths[path][m]['x-ref'];
+                  } else {
+                    swagger.paths[path][m]['x-ref'] = newXRef;
+                  }
+                }
+              }
+              if (isEmpty(swagger.paths[path])) {
+                // pathが空になった場合はキー自体を削除
+                delete swagger.paths[path];
               }
             }
-          }
-          if (isEmpty(swagger.paths[path])) {
-            // pathが空になった場合はキー自体を削除
-            delete swagger.paths[path];
-          }
-        }
-
-        return res.json(swagger);
+            return res.json(swagger);
+          })
+        ;
       })
       .catch(next)
     ;

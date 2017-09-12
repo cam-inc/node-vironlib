@@ -142,7 +142,6 @@ describe('admin_role/controller', () => {
 
         return test.models.AdminRoles.findAll({where: {role_id: 'tester'}})
           .then(roles => {
-            assert(req.swagger.swaggerObject.definitions.UpdateAdminUserPayload.properties.role_id.enum.length === 2);
             assert(roles.length === 4);
           })
         ;
@@ -250,7 +249,6 @@ describe('admin_role/controller', () => {
 
         return test.models.AdminRoles.findAll()
           .then(list => {
-            assert(req.swagger.swaggerObject.definitions.UpdateAdminUserPayload.properties.role_id.enum.length === 1);
             assert(list.length === 1);
           })
         ;
