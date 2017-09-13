@@ -76,7 +76,8 @@ const vironlib = new VironLib({
     limit: 100,
   },
   swagger: {
-    host: 'localhost:3000'
+    host: 'localhost:3000',
+    admin_roles: {{Sequelize.Model}},
   },
   logger: {{Logger}},
   body_completion: {
