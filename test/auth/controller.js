@@ -20,7 +20,7 @@ describe('auth/controller', () => {
     it('1人目はスーパーユーザーとして登録される', async() => {
       const req = test.genRequest({
         body: {
-          email: 'test@dmc.com',
+          email: 'test@viron.com',
           password: 'aaaaaaaa',
         },
       });
@@ -29,7 +29,7 @@ describe('auth/controller', () => {
       res.end = () => {
         assert(res.get('Authorization').startsWith('Bearer '));
 
-        return test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
+        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
           .then(m => {
             assert(m.role_id === 'super');
             assert(m.password);
@@ -45,7 +45,7 @@ describe('auth/controller', () => {
       await helperEMail.genHash('aaaaaaaa', salt)
         .then(hash => {
           return test.models.AdminUsers.create({
-            email: 'test2@dmc.com',
+            email: 'test2@viron.com',
             role_id: 'viewer',
             password: hash,
             salt: salt,
@@ -54,7 +54,7 @@ describe('auth/controller', () => {
         .then(() => {
           const req = test.genRequest({
             body: {
-              email: 'test2@dmc.com',
+              email: 'test2@viron.com',
               password: 'aaaaaaaa',
             },
           });
@@ -65,7 +65,7 @@ describe('auth/controller', () => {
             assert(token);
             const decoded = jwt.decode(token);
             assert(decoded);
-            assert(decoded.sub === 'test2@dmc.com');
+            assert(decoded.sub === 'test2@viron.com');
           };
 
           return signIn(req, res);
@@ -78,7 +78,7 @@ describe('auth/controller', () => {
       await helperEMail.genHash('aaaaaaaa', salt)
         .then(hash => {
           return test.models.AdminUsers.create({
-            email: 'super@dmc.com',
+            email: 'super@viron.com',
             role_id: 'super',
             password: hash,
             salt: salt,
@@ -87,7 +87,7 @@ describe('auth/controller', () => {
         .then(() => {
           const req = test.genRequest({
             body: {
-              email: 'test@dmc.com',
+              email: 'test@viron.com',
               password: 'bbbbbbbb',
             },
           });
@@ -112,7 +112,7 @@ describe('auth/controller', () => {
       await helperEMail.genHash('aaaaaaaa', salt)
         .then(hash => {
           return test.models.AdminUsers.create({
-            email: 'test@dmc.com',
+            email: 'test@viron.com',
             role_id: 'viewer',
             password: hash,
             salt: salt,
@@ -121,7 +121,7 @@ describe('auth/controller', () => {
         .then(() => {
           const req = test.genRequest({
             body: {
-              email: 'test@dmc.com',
+              email: 'test@viron.com',
               password: 'bbbbbbbb',
             },
           });
@@ -178,7 +178,7 @@ describe('auth/controller', () => {
     it('redirect_urlを渡せばそのURLがstateに含まれたURLにリダイレクトされる', async() => {
       const req = test.genRequest({
         query: {
-          redirect_url: 'http://dmc.com/test',
+          redirect_url: 'http://viron.com/test',
         },
       });
       const res = test.genResponse();
@@ -187,7 +187,7 @@ describe('auth/controller', () => {
         assert(redirectUrl);
         const parsed = url.parse(redirectUrl);
         const query = qs.parse(parsed.query);
-        assert(query.state === 'http://dmc.com/test');
+        assert(query.state === 'http://viron.com/test');
       };
 
       await googleSignIn(req, res);
@@ -214,7 +214,7 @@ describe('auth/controller', () => {
 
     it('1人目はスーパーユーザーとして登録される', async() => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
-      allowMailDomainStub.resolves('test@dmc.com');
+      allowMailDomainStub.resolves('test@viron.com');
 
       const req = test.genRequest({
         query: {
@@ -231,7 +231,7 @@ describe('auth/controller', () => {
         const query = qs.parse(parsed.query);
         assert(query.token.startsWith('Bearer '));
 
-        return test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
+        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
           .then(m => {
             assert(m.role_id === 'super');
           })
@@ -243,9 +243,9 @@ describe('auth/controller', () => {
 
     it('存在すればログインできる', async() => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
-      allowMailDomainStub.resolves('test2@dmc.com');
+      allowMailDomainStub.resolves('test2@viron.com');
       test.models.AdminUsers.create({
-        email: 'test2@dmc.com',
+        email: 'test2@viron.com',
         role_id: 'viewer',
       });
 
@@ -264,7 +264,7 @@ describe('auth/controller', () => {
         assert(token);
         const decoded = jwt.decode(token);
         assert(decoded);
-        assert(decoded.sub === 'test2@dmc.com');
+        assert(decoded.sub === 'test2@viron.com');
       };
 
       await googleOAuth2Callback(req, res);
@@ -272,9 +272,9 @@ describe('auth/controller', () => {
 
     it('存在しないユーザーは作成される', async() => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
-      allowMailDomainStub.resolves('test2@dmc.com');
+      allowMailDomainStub.resolves('test2@viron.com');
       test.models.AdminUsers.create({
-        email: 'super@dmc.com',
+        email: 'super@viron.com',
         role_id: 'super',
       });
 
@@ -293,9 +293,9 @@ describe('auth/controller', () => {
         assert(token);
         const decoded = jwt.decode(token);
         assert(decoded);
-        assert(decoded.sub === 'test2@dmc.com');
+        assert(decoded.sub === 'test2@viron.com');
 
-        return test.models.AdminUsers.findOne({where: {email: 'test2@dmc.com'}})
+        return test.models.AdminUsers.findOne({where: {email: 'test2@viron.com'}})
           .then(m => {
             assert(m.role_id === 'viewer');
           })

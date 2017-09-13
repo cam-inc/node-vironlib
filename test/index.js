@@ -259,7 +259,7 @@ const options = {
       algorithm: 'HS512',
       secret: 'test-secret',
       claims: {
-        iss: 'dmc.test',
+        iss: 'viron.test',
         aud: 'vironlib',
       },
       //rsa_private_key: 'xxxxxxxxxxxx',

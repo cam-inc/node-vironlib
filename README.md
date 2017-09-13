@@ -1,9 +1,9 @@
 # node-vironlib
-Generic library for DMC
+Generic library for Viron
 
 # Description
 
-DMC用のNode.jsライブラリです
+Viron用のNode.jsライブラリです
 
 # Features
 

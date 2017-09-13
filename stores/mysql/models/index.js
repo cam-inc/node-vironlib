@@ -1,4 +1,4 @@
-// dmc definition models
+// viron definition models
 module.exports = {
   AdminRoles: require('./admin_roles'),
   AdminUsers: require('./admin_users'),

@@ -76,7 +76,7 @@ describe('auth/google/helper', () => {
 
     beforeEach(() => {
       stubGet = sinon.stub(axios, 'get');
-      stubGet.resolves({data: {email: 'test@dmc.com'}});
+      stubGet.resolves({data: {email: 'test@viron.com'}});
     });
 
     afterEach(() => {
@@ -86,7 +86,7 @@ describe('auth/google/helper', () => {
     it('メールアドレスを取得できる', async() => {
       await helper.getMailAddress({access_token: 'xxxxx'})
         .then(email => {
-          assert(email === 'test@dmc.com');
+          assert(email === 'test@viron.com');
 
           assert(stubGet.calledWith('https://www.googleapis.com/oauth2/v2/userinfo', {
             headers: {
@@ -103,7 +103,7 @@ describe('auth/google/helper', () => {
 
     beforeEach(() => {
       stubGet = sinon.stub(axios, 'get');
-      stubGet.resolves({data: {email: 'test@dmc.com'}});
+      stubGet.resolves({data: {email: 'test@viron.com'}});
     });
 
     afterEach(() => {
@@ -112,10 +112,10 @@ describe('auth/google/helper', () => {
 
     it('許可されているドメインの場合はメールアドレスが取得できる', async() => {
       await helper.allowMailDomain({access_token: 'xxxxx'}, {
-        allow_email_domains: ['dmc.com'],
+        allow_email_domains: ['viron.com'],
       })
         .then(email => {
-          assert(email === 'test@dmc.com');
+          assert(email === 'test@viron.com');
         })
       ;
     });

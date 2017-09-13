@@ -30,7 +30,7 @@ describe('admin_user/controller', () => {
     beforeEach(() => {
       times(110, i => {
         test.models.AdminUsers.create({
-          email: `test${i}@dmc.com`,
+          email: `test${i}@viron.com`,
           role_id: 'viewer',
         });
       });
@@ -102,17 +102,17 @@ describe('admin_user/controller', () => {
       const req = test.genRequest({
         swagger,
         body: {
-          email: 'test@dmc.com',
+          email: 'test@viron.com',
           password: 'aaaaaaaa',
         },
       });
       const res = test.genResponse();
 
       res.json = result => {
-        assert(result.email === 'test@dmc.com');
+        assert(result.email === 'test@viron.com');
         assert(result.role_id === 'viewer');
 
-        return test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
+        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
           .then(m => {
             assert(m.role_id === 'viewer');
             assert(m.password);
@@ -132,7 +132,7 @@ describe('admin_user/controller', () => {
 
     beforeEach(() => {
       data = test.models.AdminUsers.create({
-        email: 'test@dmc.com',
+        email: 'test@viron.com',
         role_id: 'viewer',
       });
     });
@@ -150,7 +150,7 @@ describe('admin_user/controller', () => {
       const res = test.genResponse();
 
       res.json = result => {
-        assert(result.email === 'test@dmc.com');
+        assert(result.email === 'test@viron.com');
         assert(result.role_id === 'viewer');
       };
       await get(req, res);
@@ -165,7 +165,7 @@ describe('admin_user/controller', () => {
 
     beforeEach(() => {
       data = test.models.AdminUsers.create({
-        email: 'test@dmc.com',
+        email: 'test@viron.com',
         role_id: 'viewer',
       });
     });
@@ -185,7 +185,7 @@ describe('admin_user/controller', () => {
       res.end = () => {
         assert(true);
 
-        return test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
+        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
           .then(m => {
             assert(!m);
           })
@@ -203,7 +203,7 @@ describe('admin_user/controller', () => {
 
     beforeEach(() => {
       data = test.models.AdminUsers.create({
-        email: 'test@dmc.com',
+        email: 'test@viron.com',
         role_id: 'viewer',
         password: 'aaaaaaaaaaaaaaaa',
       });
@@ -226,7 +226,7 @@ describe('admin_user/controller', () => {
       const res = test.genResponse();
 
       res.json = () => {
-        return test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
+        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
           .then(m => {
             assert(m.role_id === 'tester');
             assert(m.password !== 'aaaaaaaaaaaaaaaa');
@@ -253,7 +253,7 @@ describe('admin_user/controller', () => {
       const res = test.genResponse();
 
       res.json = () => {
-        return test.models.AdminUsers.findOne({where: {email: 'test@dmc.com'}})
+        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
           .then(m => {
             assert(m.role_id === 'tester');
             assert(m.password === 'aaaaaaaaaaaaaaaa');
