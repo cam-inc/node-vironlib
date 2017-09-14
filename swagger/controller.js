@@ -31,7 +31,7 @@ const registerShow = options => {
             const def = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
             if (def) {
               // swagger書き換え
-              const enums = new Set();
+              const enums = new Set(['super']);
               list.forEach(role => {
                 enums.add(role.dataValues.role_id);
               });
