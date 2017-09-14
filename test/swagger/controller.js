@@ -145,8 +145,9 @@ describe('swagger/controller', () => {
       };
 
       res.json = result => {
-        assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.length === 5);
+        assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.length === 6);
         assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('role0'));
+        assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('super'));
         assert(!result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('tester'));
       };
       await show(req, res);
