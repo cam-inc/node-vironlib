@@ -33,12 +33,12 @@ describe('auth/google/helper', () => {
         client_id: 'xxxxxxxxxxxxxxxxxxxx',
         client_secret: 'zzzzzzzzzzzzzzzzzzzz',
         redirect_url: 'http://localhost/redirect',
-      }, 'http://localhost/dmc');
+      }, 'http://localhost/viron');
       const parsed = url.parse(result);
       assert(parsed.host === 'accounts.google.com');
       const query = qs.parse(parsed.query);
       assert(query.scope === 'https://www.googleapis.com/auth/userinfo.email');
-      assert(query.state === 'http://localhost/dmc');
+      assert(query.state === 'http://localhost/viron');
       assert(query.response_type === 'code');
       assert(query.client_id === 'xxxxxxxxxxxxxxxxxxxx');
       assert(query.redirect_uri === 'http://localhost/redirect');

@@ -3,9 +3,9 @@ const reduce = require('mout/object/reduce');
 
 // 常にアクセスOKなリソース
 const whiteList = [
-  'dmc',
+  'viron',
   'swagger.json',
-  'dmc_authtype',
+  'viron_authtype',
   'signin',
   'signout',
   'googlesignin',
