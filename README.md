@@ -72,6 +72,9 @@ const vironlib = new VironLib({
       ],
     },
   },
+  autocomplete: {
+    store: {{Sequelize}},
+  },
   pager: {
     limit: 100,
   },

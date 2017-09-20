@@ -31,6 +31,24 @@ store.transaction = fn => {
 };
 
 const defineModel = name => {
+  const simulateWhere = (rec, where) => {
+    return every(where, (v, k) => {
+      if (isObject(v)) {
+        return every(v, (_v, _k) => {
+          // TODO: 必要に応じてメンテする
+          switch (_k) {
+            case '$like':
+              return !!rec[k].match(new RegExp(`^${_v.replace(/%/g, '.*')}$`));
+            default:
+              return true;
+          }
+        });
+      } else {
+        return rec[k] === v;
+      }
+    });
+  };
+
   const m = store.define(name);
   m.__values__ = [];
   m.create = obj => {
@@ -86,24 +104,6 @@ const defineModel = name => {
         return result;
       })
     ;
-  };
-
-  const simulateWhere = (rec, where) => {
-    return every(where, (v, k) => {
-      if (isObject(v)) {
-        return every(v, (_v, _k) => {
-          // TODO: 必要に応じてメンテする
-          switch (_k) {
-            case '$like':
-              return !!rec[k].match(new RegExp(`^${_v.replace(/%/g, '.*')}$`));
-            default:
-              return true;
-          }
-        });
-      } else {
-        return rec[k] === v;
-      }
-    });
   };
 
   m.$queryInterface.$useHandler((query, queryOptions) => {
@@ -270,6 +270,9 @@ const options = {
       client_secret: 'zzzzzzzzzzzzzzzzzzzz',
       redirect_url: 'http://localhost/redirect',
     },
+  },
+  autocomplete: {
+    store: store,
   },
   pager: {
     limit: 50,
