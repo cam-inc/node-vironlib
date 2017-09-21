@@ -26,6 +26,8 @@ const genAdminRolePaths = swaggerExpress => {
     for (let path in paths) {
       for (let method in paths[path]) {
         const resource = path.split('/')[1];
+        // ワイルドカード
+        enums.add(`${method.toUpperCase()}:/*`);
         // ホワイトリストに入っているリソースは無視
         if (resource && !contains(adminRoleHelper.whiteList, resource)) {
           enums.add(`${method.toUpperCase()}:/${resource}`);

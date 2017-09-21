@@ -82,7 +82,11 @@ describe('swagger/helper', () => {
       await autoGenerate(swaggerExpress, test.models)
         .then(() => {
           const list = swaggerExpress.runner.swagger.definitions.adminrolepath.properties.path.enum;
-          assert(list.length === 8);
+          assert(list.length === 12);
+          assert(list.includes('GET:/*'));
+          assert(list.includes('POST:/*'));
+          assert(list.includes('PUT:/*'));
+          assert(list.includes('DELETE:/*'));
           assert(list.includes('GET:/adminuser'));
           assert(list.includes('POST:/adminuser'));
           assert(list.includes('PUT:/adminuser'));

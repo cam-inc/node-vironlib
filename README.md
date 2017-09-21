@@ -28,6 +28,9 @@ $ npm install node-vironlib --registry https://camobile.jfrog.io/camobile/api/np
 ```
 const VironLib = require('node-vironlib');
 const vironlib = new VironLib({
+  account: {
+    admin_users: {{Sequelize.Model}},
+  },
   acl: {
     allow_origin: '*',
     allow_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
