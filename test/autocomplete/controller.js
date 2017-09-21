@@ -23,6 +23,7 @@ describe('autocomplete/controller', () => {
       const req = test.genRequest({
         query: {
           model: 'admin_users',
+          value: 'id',
           email: 'test1',
         },
       });
@@ -31,28 +32,9 @@ describe('autocomplete/controller', () => {
       res.json = result => {
         // 1, 10〜19, 100
         assert(result.length === 12);
-        // disp未指定時、nameはvalueと一致する
-        assert(result[0].value === result[0].name);
-      };
-      await list(req, res);
-    });
-
-    it('dispを指定した場合はnameとして取得できる', async() => {
-      const req = test.genRequest({
-        query: {
-          model: 'admin_users',
-          email: '0@viron.com',
-          disp: 'id',
-        },
-      });
-      const res = test.genResponse();
-
-      res.json = result => {
-        // 0, 10, 20, 30,,,
-        assert(result.length === 11);
-        assert(result[0].value === 'test0@viron.com');
-        // disp指定時、nameはdispに指定したフィールドの値になる
-        assert(result[0].name !== result[0].value);
+        assert(result[0].value !== result[0].name);
+        assert(result[0].name === 'test1@viron.com');
+        assert(result[1].name === 'test10@viron.com');
       };
       await list(req, res);
     });
@@ -61,7 +43,7 @@ describe('autocomplete/controller', () => {
       const req = test.genRequest({
         query: {
           email: '0@viron.com',
-          disp: 'id',
+          value: 'id',
         },
       });
       const res = test.genResponse();
@@ -77,7 +59,7 @@ describe('autocomplete/controller', () => {
         query: {
           model: '__dummy__',
           email: '0@viron.com',
-          disp: 'id',
+          value: 'id',
         },
       });
       const res = test.genResponse();

@@ -19,9 +19,9 @@ const registerList = options => {
   return (req, res, next) => {
     const query = clone(req.query);
     const model = query.model;
-    const disp = query.disp;
-    if (!model) {
-      logger.warn('[VIRONLIB] autocomplete query.model is required.');
+    const value = query.value;
+    if (!model || !value) {
+      logger.warn('[VIRONLIB] autocomplete query.model,query.value is required.');
       return res.json([]);
     }
 
@@ -32,12 +32,9 @@ const registerList = options => {
     }
 
     delete query.model;
-    delete query.disp;
+    delete query.value;
     const field = Object.keys(query)[0];
-    const attributes = [field];
-    if (disp) {
-      attributes.push(disp);
-    }
+    const attributes = [field, value];
     const opts = {
       where: {
         [field]: {$like: `%${query[field]}%`},
@@ -50,8 +47,8 @@ const registerList = options => {
       .then(list => {
         const result = list.map(data => {
           return {
-            name: disp ? data[disp] : data[field],
-            value: data[field],
+            name: data[field],
+            value: data[value],
           };
         });
         res.json(result);
