@@ -23,12 +23,22 @@ const init = options => {
         return;
       }
 
-      const m = {
-        role_id: defaultRole,
-        method: 'GET',
-        resource: '*',
-      };
-      return AdminRoles.create(m);
+      const tasks = [
+        // 全参照権限
+        AdminRoles.create({
+          role_id: defaultRole,
+          method: 'GET',
+          resource: '*',
+        }),
+        // 自分のアカウント情報を更新するための権限
+        AdminRoles.create({
+          role_id: defaultRole,
+          method: 'PUT',
+          resource: 'account',
+        }),
+      ];
+
+      return Promise.all(tasks);
     })
   ;
 };

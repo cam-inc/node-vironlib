@@ -6,6 +6,7 @@ class VironLib {
     this.logger = require('./logger')(options.logger);
     this.pager = require('./pager')(options.pager);
 
+    this.account = require('./account')(options.account || {});
     this.acl = require('./acl')(options.acl || {});
     this.adminRole = require('./admin_role')(options.admin_role || {}, this.pager);
     this.adminUser = require('./admin_user')(options.admin_user || {}, this.pager);

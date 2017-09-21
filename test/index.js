@@ -232,6 +232,9 @@ const genResponse = () => {
 };
 
 const options = {
+  account: {
+    admin_users: models.AdminUsers,
+  },
   acl: {
     allow_origin: 'http://localhost:3000',
     allow_headers: 'Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
