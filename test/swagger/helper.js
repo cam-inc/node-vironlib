@@ -79,7 +79,7 @@ describe('swagger/helper', () => {
     };
 
     it('自動生成されたパスがadminrolepathのenumにセットされる', async() => {
-      await autoGenerate(swaggerExpress, test.models)
+      await autoGenerate(swaggerExpress)
         .then(() => {
           const list = swaggerExpress.runner.swagger.definitions.adminrolepath.properties.path.enum;
           assert(list.length === 12);
@@ -95,25 +95,6 @@ describe('swagger/helper', () => {
           assert(list.includes('POST:/adminrole'));
           assert(list.includes('PUT:/adminrole'));
           assert(list.includes('DELETE:/adminrole'));
-        })
-      ;
-    });
-
-    it('自動生成されたrole_idがUpdateAdminUserPayloadのenumにセットされる', async() => {
-      await autoGenerate(swaggerExpress, test.models)
-        .then(() => {
-          const list = swaggerExpress.runner.swagger.definitions.UpdateAdminUserPayload.properties.role_id.enum;
-          assert(list.length === 10);
-          assert(list.includes('role0'));
-          assert(list.includes('role1'));
-          assert(list.includes('role2'));
-          assert(list.includes('role3'));
-          assert(list.includes('role4'));
-          assert(list.includes('role5'));
-          assert(list.includes('role6'));
-          assert(list.includes('role7'));
-          assert(list.includes('role8'));
-          assert(list.includes('role9'));
         })
       ;
     });

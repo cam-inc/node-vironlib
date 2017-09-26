@@ -31,13 +31,24 @@ const registerShow = options => {
             list.forEach(role => {
               enums.add(role.dataValues.role_id);
             });
+            const enumArray = Array.from(enums);
             const updateAdminUserPayload = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
             if (updateAdminUserPayload) {
-              updateAdminUserPayload.properties.role_id.enum = Array.from(enums);
+              if (isEmpty(enumArray)) {
+                // enumが0件だとswaggerのvalidation errorになるので削除する
+                delete updateAdminUserPayload.properties.role_id.enum;
+              } else {
+                updateAdminUserPayload.properties.role_id.enum = enumArray;
+              }
             }
             const createAdminUserPayload = req.swagger.swaggerObject.definitions.CreateAdminUserPayload;
             if (createAdminUserPayload) {
-              createAdminUserPayload.properties.role_id.enum = Array.from(enums);
+              if (isEmpty(enumArray)) {
+                // enumが0件だとswaggerのvalidation errorになるので削除する
+                delete createAdminUserPayload.properties.role_id.enum;
+              } else {
+                createAdminUserPayload.properties.role_id.enum = enumArray;
+              }
             }
 
             // 権限がないパスをswagger.jsonから消して返す

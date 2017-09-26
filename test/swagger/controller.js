@@ -8,20 +8,6 @@ describe('swagger/controller', () => {
 
   describe('show', () => {
 
-    beforeEach(() => {
-      times(5, i => {
-        times(5, j => {
-          ['get', 'post', 'put', 'delete'].forEach(method => {
-            test.models.AdminRoles.create({
-              role_id: `role${i}`,
-              method: method,
-              resource: `resource${j}`,
-            });
-          });
-        });
-      });
-    });
-
     const show = swagger.controller.show;
 
     it('swagger.jsonが取得できる', async() => {
@@ -114,6 +100,18 @@ describe('swagger/controller', () => {
     });
 
     it('role_idのenum変更に成功', async() => {
+      times(5, i => {
+        times(5, j => {
+          ['get', 'post', 'put', 'delete'].forEach(method => {
+            test.models.AdminRoles.create({
+              role_id: `role${i}`,
+              method: method,
+              resource: `resource${j}`,
+            });
+          });
+        });
+      });
+
       const swagger = {
         operation: {
           security: {
@@ -148,6 +146,43 @@ describe('swagger/controller', () => {
         assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('role0'));
         assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('super'));
         assert(!result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('tester'));
+      };
+      await show(req, res);
+    });
+
+    it('AdminRolesが空の場合はsuperのみ', async() => {
+      const swagger = {
+        operation: {
+          security: {
+            jwt: ['api:access'],
+          },
+        },
+        swaggerObject: {
+          paths: {
+          },
+          definitions: {
+            UpdateAdminUserPayload: {
+              properties: {
+                role_id: {
+                  enum: ['tester'],
+                },
+              },
+            },
+          },
+        },
+      };
+      const req = test.genRequest({swagger});
+      const res = test.genResponse();
+
+      req.auth = {
+        roles: {
+          get: '*',
+        },
+      };
+
+      res.json = result => {
+        assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.length === 1);
+        assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum[0] === 'super');
       };
       await show(req, res);
     });

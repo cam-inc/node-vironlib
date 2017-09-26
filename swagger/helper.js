@@ -1,6 +1,5 @@
 const adminRoleHelper = require('../admin_role/helper');
 const contains = require('mout/array/contains');
-const find = require('mout/object/find');
 
 /**
  * Get swagger host port
@@ -41,32 +40,12 @@ const genAdminRolePaths = swaggerExpress => {
 };
 
 /**
- * AdminUser create/update 用のenum配列を自動生成する
- * @param swaggerExpress
- * @returns {Promise.<TResult>}
- */
-const genAdminUserRoleId = (swaggerExpress, AdminRoles) => {
-  return AdminRoles.findAll()
-    .then(list => {
-      const enums = new Set();
-      list.forEach(role => {
-        enums.add(role.dataValues.role_id);
-      });
-      const def = swaggerExpress.runner.swagger.definitions.UpdateAdminUserPayload;
-      def.properties.role_id.enum = Array.from(enums);
-    })
-  ;
-};
-
-/**
  * Auto Generate swagger.json
  * @param swaggerExpress
  */
-const autoGenerate = (swaggerExpress, models) => {
-  const AdminRoles = find(models, model => { return model.tableName === 'admin_roles'; });
+const autoGenerate = swaggerExpress => {
   return Promise.all([
     genAdminRolePaths(swaggerExpress),
-    genAdminUserRoleId(swaggerExpress, AdminRoles)
   ]);
 };
 
