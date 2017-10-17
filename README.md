@@ -21,7 +21,7 @@ Viron用のNode.jsライブラリです
 
 ## Install
 ```
-$ npm install node-vironlib --registry https://camobile.jfrog.io/camobile/api/npm/camplat-virtual/
+$ npm install node-vironlib
 ```
 
 ## Configure
