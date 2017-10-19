@@ -25,8 +25,7 @@ const list = (store, ...args) => {
       return store.helper.find(...args);
     })
     .then(list => {
-      const _args = [args[0], args[1]];
-      return store.helper.count(..._args)
+      return store.helper.count(...args)
         .then(count => {
           return {count, list};
         })
