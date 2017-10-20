@@ -1,4 +1,5 @@
 const deepClone = require('mout/lang/deepClone');
+const has = require('mout/object/has');
 const isEmpty = require('mout/lang/isEmpty');
 
 const helperAdminRole = require('../admin_role/helper');
@@ -33,7 +34,7 @@ const registerShow = options => {
             });
             const enumArray = Array.from(enums);
             const updateAdminUserPayload = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
-            if (updateAdminUserPayload) {
+            if (has(updateAdminUserPayload || {}, 'properties.role_id')) {
               if (isEmpty(enumArray)) {
                 // enumが0件だとswaggerのvalidation errorになるので削除する
                 delete updateAdminUserPayload.properties.role_id.enum;
@@ -42,7 +43,7 @@ const registerShow = options => {
               }
             }
             const createAdminUserPayload = req.swagger.swaggerObject.definitions.CreateAdminUserPayload;
-            if (createAdminUserPayload) {
+            if (has(createAdminUserPayload || {}, 'properties.role_id')) {
               if (isEmpty(enumArray)) {
                 // enumが0件だとswaggerのvalidation errorになるので削除する
                 delete createAdminUserPayload.properties.role_id.enum;
