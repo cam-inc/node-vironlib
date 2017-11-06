@@ -1,3 +1,5 @@
+const get = require('mout/object/get');
+const isFunction = require('mout/lang/isFunction');
 const reject = require('mout/array/reject');
 
 /**
@@ -5,10 +7,30 @@ const reject = require('mout/array/reject');
  * @see swagger-node-runner/fittings/swagger_validator.js
  */
 module.exports = (fittingDef, pipes) => {
-  const validatorConfig = {
-    validateResponse: !!fittingDef.validateResponse
-  };
-  const middleware = pipes.config.swaggerNodeRunner.swaggerTools.swaggerValidator(validatorConfig);
+  const fn = get(pipes, 'config.swaggerNodeRunner.swaggerTools.swaggerValidator');
+  let middleware;
+  if (isFunction(fn)) {
+    // swagger-express-mw@0.1.0
+    const validatorConfig = {
+      validateResponse: !!fittingDef.validateResponse
+    };
+    middleware = fn(validatorConfig);
+  } else {
+    // swagger-express-mw@0.7.0
+    middleware = (req, res, next) => {
+      if (!req.swagger.operation) {
+        return next();
+      }
+
+      const validateResult = req.swagger.operation.validateRequest(req);
+      next({
+        failedValidation: !!validateResult.errors.length,
+        results: {
+          errors: validateResult.errors,
+        },
+      });
+    };
+  }
 
   return (context, next) => {
     middleware(context.request, context.response, err => {
