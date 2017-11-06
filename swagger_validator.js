@@ -23,11 +23,13 @@ module.exports = (fittingDef, pipes) => {
       }
 
       const validateResult = req.swagger.operation.validateRequest(req);
+      if (!validateResult.errors.length) {
+        return next();
+      }
+
       next({
-        failedValidation: !!validateResult.errors.length,
-        results: {
-          errors: validateResult.errors,
-        },
+        failedValidation: true,
+        results: validateResult,
       });
     };
   }
