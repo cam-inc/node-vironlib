@@ -1,5 +1,5 @@
 const get = require('mout/object/get');
-const isFunction = require('mout/lang/isFunction');
+const {isFunction, isArray, isEmpty} = require('mout/lang');
 const reject = require('mout/array/reject');
 
 /**
@@ -29,7 +29,7 @@ module.exports = (fittingDef, pipes) => {
 
       next({
         failedValidation: true,
-        results: validateResult,
+        results: validateResult.errors,
       });
     };
   }
@@ -40,9 +40,12 @@ module.exports = (fittingDef, pipes) => {
         // validationエラー以外はスルー
         return next(err);
       }
+      const results = isArray(err.results) ? err.results : [err.results];
       // type: null 以外のフィールドでもnull値を許容する
-      const newErrors = reject(err.results.errors, err => {
-        return err.message.match(/^Expected type [\w.]+ but found type null$/);
+      const newErrors = reject(results, result => {
+        return isEmpty(reject(result.errors, err => {
+          return err.message.match(/^Expected type [\w.]+ but found type null$/);
+        }));
       });
       if (newErrors.length) {
         err.results.errors = newErrors;
