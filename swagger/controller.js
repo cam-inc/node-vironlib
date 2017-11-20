@@ -1,3 +1,4 @@
+const JsonRefs = require('json-refs');
 const deepClone = require('mout/lang/deepClone');
 const has = require('mout/object/has');
 const isEmpty = require('mout/lang/isEmpty');
@@ -70,6 +71,27 @@ const registerShow = options => {
             return res.json(swagger);
           })
         ;
+      })
+      .then(() => {
+        // 書き換えたswaggerObjectでAPIの定義を上書きしておく
+        return JsonRefs.resolveRefs(req.swagger.swaggerObject, {
+          includeInvalid: true,
+          filter: ['relative', 'remote'],
+          loaderOptions: {},
+        });
+      })
+      .then(remoteResults => {
+        return JsonRefs.resolveRefs(remoteResults.value || req.swagger.swaggerObject, {
+          includeInvalid: true,
+          loaderOptions: {},
+        }).then(results => {
+          if (has(req, 'swagger.runner.api')) {
+            req.swagger.runner.api.definition = req.swagger.swaggerObject;
+            req.swagger.runner.api.definitionFullyResolved = remoteResults.resolved;
+            req.swagger.runner.api.definitionRemotesResolved = results.resolved;
+            req.swagger.runner.api.references = results.refs;
+          }
+        });
       })
       .catch(next)
     ;

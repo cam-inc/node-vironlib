@@ -9,6 +9,9 @@ module.exports = pipes => {
     if (!req.swagger.swaggerObject) {
       req.swagger.swaggerObject = pipes.config.swaggerNodeRunner.swagger;
     }
+    if (!req.swagger.runner) {
+      req.swagger.runner = pipes.config.swaggerNodeRunner;
+    }
     next();
   };
 };
