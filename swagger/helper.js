@@ -20,7 +20,8 @@ const getPort = (swaggerExpress, defaultValue) => {
  */
 const genAdminRolePaths = swaggerExpress => {
   return new Promise(resolve => {
-    const paths = swaggerExpress.runner.swagger.paths;
+    const swagger = swaggerExpress.runner ? swaggerExpress.runner.swagger : swaggerExpress;
+    const paths = swagger.paths;
     const enums = new Set();
     for (let path in paths) {
       for (let method in paths[path]) {
@@ -33,7 +34,7 @@ const genAdminRolePaths = swaggerExpress => {
         }
       }
     }
-    const def = swaggerExpress.runner.swagger.definitions.adminrolepath;
+    const def = swagger.definitions.adminrolepath;
     def.properties.path.enum = Array.from(enums);
     resolve();
   });

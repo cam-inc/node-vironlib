@@ -99,6 +99,27 @@ describe('swagger/helper', () => {
       ;
     });
 
+    it('swaggerオブジェクトを直接渡すこともできる', async() => {
+      await autoGenerate(swaggerExpress.runner.swagger)
+        .then(() => {
+          const list = swaggerExpress.runner.swagger.definitions.adminrolepath.properties.path.enum;
+          assert(list.length === 12);
+          assert(list.includes('GET:/*'));
+          assert(list.includes('POST:/*'));
+          assert(list.includes('PUT:/*'));
+          assert(list.includes('DELETE:/*'));
+          assert(list.includes('GET:/adminuser'));
+          assert(list.includes('POST:/adminuser'));
+          assert(list.includes('PUT:/adminuser'));
+          assert(list.includes('DELETE:/adminuser'));
+          assert(list.includes('GET:/adminrole'));
+          assert(list.includes('POST:/adminrole'));
+          assert(list.includes('PUT:/adminrole'));
+          assert(list.includes('DELETE:/adminrole'));
+        })
+      ;
+    });
+
   });
 
 });
