@@ -41,10 +41,10 @@ module.exports = (fittingDef, pipes) => {
         return next(err);
       }
       const results = isArray(err.results) ? err.results : [err.results];
-      // type: null 以外のフィールドでもnull値を許容する
       const newErrors = reject(results, result => {
         return isEmpty(reject(result.errors, err => {
-          return err.message.match(/^Expected type [\w.]+ but found type null$/);
+          return err.code === 'ENUM_MISMATCH' || // 動的生成部分のvalidateができないので無視する
+            err.message.match(/^Expected type [\w.]+ but found type null$/); // type: null 以外のフィールドでもnull値を許容する
         }));
       });
       if (newErrors.length) {
