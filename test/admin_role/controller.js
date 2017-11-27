@@ -7,35 +7,25 @@ const adminRole = vironlib.adminRole;
 
 describe('admin_role/controller', () => {
 
-  const swagger = {
-    operation: {
-      responses: {
-        200: {
-          schema: {
-            items: {
-              properties: {
-                role_id: {},
-                paths: {},
+  describe('list', () => {
+
+    const swagger = {
+      operation: {
+        responses: {
+          200: {
+            schema: {
+              items: {
+                properties: {
+                  role_id: {},
+                  paths: {type: 'array'},
+                },
               },
             },
           },
         },
       },
-    },
-    swaggerObject: {
-      definitions: {
-        UpdateAdminUserPayload: {
-          properties: {
-            role_id: {
-              enum: ['tester'],
-            },
-          },
-        },
-      },
-    },
-  };
-
-  describe('list', () => {
+      swaggerObject: {},
+    };
 
     beforeEach(() => {
       times(110, i => {
@@ -111,6 +101,24 @@ describe('admin_role/controller', () => {
 
   describe('create', () => {
 
+    const swagger = {
+      operation: {
+        responses: {
+          200: {
+            schema: {
+              items: {
+                properties: {
+                  role_id: {},
+                  paths: {type: 'array'},
+                },
+              },
+            },
+          },
+        },
+      },
+      swaggerObject: {},
+    };
+
     beforeEach(() => {
       test.models.AdminRoles.create({
         role_id: 'role',
@@ -174,6 +182,22 @@ describe('admin_role/controller', () => {
 
   describe('get', () => {
 
+    const swagger = {
+      operation: {
+        responses: {
+          200: {
+            schema: {
+              properties: {
+                role_id: {},
+                paths: {type: 'array'},
+              },
+            },
+          },
+        },
+      },
+      swaggerObject: {},
+    };
+
     const get = adminRole.controller.get;
 
     beforeEach(() => {
@@ -215,6 +239,22 @@ describe('admin_role/controller', () => {
   });
 
   describe('remove', () => {
+
+    const swagger = {
+      operation: {
+        responses: {
+          200: {
+            schema: {
+              properties: {
+                role_id: {},
+                paths: {type: 'array'},
+              },
+            },
+          },
+        },
+      },
+      swaggerObject: {},
+    };
 
     const remove = adminRole.controller.remove;
 
@@ -277,6 +317,32 @@ describe('admin_role/controller', () => {
   });
 
   describe('update', () => {
+
+    const swagger = {
+      operation: {
+        responses: {
+          200: {
+            schema: {
+              properties: {
+                role_id: {},
+                paths: {type: 'array'},
+              },
+            },
+          },
+        },
+      },
+      swaggerObject: {
+        definitions: {
+          UpdateAdminUserPayload: {
+            properties: {
+              role_id: {
+                enum: ['tester'],
+              },
+            },
+          },
+        },
+      },
+    };
 
     const update = adminRole.controller.update;
 

@@ -4,7 +4,13 @@ const logger = require('../logger');
 const errors = require('../errors');
 
 const genAdminRole = (roleId, paths) => {
-  return reduce(paths, (ret, obj) => {
+  return reduce(paths, (ret, obj, k) => {
+    if (!obj.path) {
+      obj = {
+        path: k,
+        allow: obj,
+      };
+    }
     if (!obj.allow) {
       return ret;
     }
@@ -38,8 +44,15 @@ const registerList = (options, pager) => {
     return AdminRoles.findAll()
       .then(list => {
         const data = reduce(reduce(list, (ret, role) => {
-          ret[role.role_id] = ret[role.role_id] || [];
-          ret[role.role_id].push({allow: true, path: `${role.method}:/${role.resource}`});
+          if (req.swagger.operation.responses[200].schema.items.properties.paths.type === 'array') {
+            // paths: [{"allow":true, "path":"GET:/users"}] パターン
+            ret[role.role_id] = ret[role.role_id] || [];
+            ret[role.role_id].push({allow: true, path: `${role.method}:/${role.resource}`});
+          } else {
+            // paths: {"GET:/users": true} パターン
+            ret[role.role_id] = ret[role.role_id] || {};
+            ret[role.role_id][`${role.method}:/${role.resource}`] = true;
+          }
           return ret;
         }, {}), (ret, paths, roleId) => {
           ret.push({paths: paths, role_id: roleId});
@@ -105,9 +118,19 @@ const registerGet = options => {
     const roleId = req.swagger.params.role_id.value;
     return AdminRoles.findAll({where: {role_id: roleId}})
       .then(list => {
-        const paths = list.map(role => {
-          return {allow: true, path: `${role.method}:/${role.resource}`};
-        });
+        let paths;
+        if (req.swagger.operation.responses[200].schema.properties.paths.type === 'array') {
+          // paths: [{"allow":true, "path":"GET:/users"}] パターン
+          paths = list.map(role => {
+            return {allow: true, path: `${role.method}:/${role.resource}`};
+          });
+        } else {
+          // paths: {"GET:/users": true} パターン
+          paths = reduce(list, (obj, role) => {
+            obj[`${role.method}:/${role.resource}`] = true;
+            return obj;
+          }, {});
+        }
         return res.json({paths: paths, role_id: roleId});
       })
       .catch(next)

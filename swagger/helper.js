@@ -35,7 +35,20 @@ const genAdminRolePaths = swaggerExpress => {
       }
     }
     const def = swagger.definitions.adminrolepath;
-    def.properties.path.enum = Array.from(enums);
+    if (def.properties && def.properties.allow) {
+      // paths: [{"allow":true, "path":"GET:/users"}] パターン
+      def.properties.path.enum = Array.from(enums);
+    } else {
+      // paths: {"GET:/users": true} パターン
+      const map = {};
+      Array.from(enums).forEach(path => {
+        map[path] = {
+          type: 'boolean',
+          default: false
+        };
+      });
+      def.properties = map;
+    }
     resolve();
   });
 };

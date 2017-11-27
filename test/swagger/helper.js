@@ -57,6 +57,7 @@ describe('swagger/helper', () => {
                 path: {
                   enum: [],
                 },
+                allow: {type: 'boolean'},
               },
             },
             UpdateAdminUserPayload: {
