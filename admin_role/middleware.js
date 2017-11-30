@@ -9,7 +9,7 @@ const helper = require('./helper');
  */
 module.exports = () => {
   return (req, res, next) => {
-    if (!req.swagger.operation.security) {
+    if (!get(req, 'swagger.operation.security')) {
       // 認証不要なリクエスト
       return next();
     }

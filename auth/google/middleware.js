@@ -1,5 +1,4 @@
 const get = require('mout/object/get');
-const has = require('mout/object/has');
 const helperGoogle = require('./helper');
 const helperJwt = require('../jwt/helper');
 const helperAdminRole = require('../../admin_role/helper');
@@ -19,7 +18,7 @@ module.exports = options => {
   const superRole = options.super_role;
 
   return (req, res, next) => {
-    if (!has(req, 'swagger.operation.security')) {
+    if (!get(req, 'swagger.operation.security')) {
       // 認証不要なリクエスト
       return next();
     }
