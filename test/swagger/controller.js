@@ -123,9 +123,14 @@ describe('swagger/controller', () => {
           },
           definitions: {
             UpdateAdminUserPayload: {
+              type: 'object',
               properties: {
                 role_id: {
-                  enum: ['tester'],
+                  'x-autogen-enum': {
+                    model: 'admin_roles',
+                    field: 'role_id',
+                    defaults: ['super'],
+                  }
                 },
               },
             },
@@ -162,9 +167,14 @@ describe('swagger/controller', () => {
           },
           definitions: {
             UpdateAdminUserPayload: {
+              type: 'object',
               properties: {
                 role_id: {
-                  enum: ['tester'],
+                  'x-autogen-enum': {
+                    model: 'admin_roles',
+                    field: 'role_id',
+                    defaults: ['super'],
+                  }
                 },
               },
             },

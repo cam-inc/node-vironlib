@@ -1,8 +1,55 @@
 const deepClone = require('mout/lang/deepClone');
-const has = require('mout/object/has');
+const {has, merge} = require('mout/object');
 const isEmpty = require('mout/lang/isEmpty');
 
 const helperAdminRole = require('../admin_role/helper');
+
+const genEnum = async (def, store) => {
+  const defEnum = def['x-autogen-enum'];
+  const Model = store.models[defEnum.model];
+  const field = defEnum.field;
+  const list = await Model.findAll();
+  const enums = new Set(defEnum.defaults);
+  list.forEach(rec => enums.add(rec[field]));
+  return Array.from(enums);
+};
+
+const traverse = async (def, store) => {
+  if (!def) {
+    return def;
+  }
+
+  if (def.type === 'object' && def.properties) {
+    const tasks = Object.keys(def.properties).map(key => {
+      return traverse(def.properties[key], store)
+        .then(_def => {
+          return {[key]: _def};
+        });
+    });
+    def.properties = await Promise.all(tasks)
+      .then(results => {
+        return merge(...results);
+      })
+    ;
+  }
+  if (def.type === 'array' && def.items) {
+    const tasks = Object.keys(def.items).map(key => {
+      return traverse(def.items[key], store)
+        .then(_def => {
+          return {[key]: _def};
+        });
+    });
+    def.items = await Promise.all(tasks)
+      .then(results => {
+        return merge(...results);
+      })
+    ;
+  }
+  if (def['x-autogen-enum']) {
+    def.enum = await genEnum(def, store);
+  }
+  return def;
+};
 
 /**
  * Controller : swagger.json
@@ -15,61 +62,45 @@ const registerShow = options => {
   options = options || {};
 
   return (req, res, next) => {
+    const swaggerObject = deepClone(req.swagger.swaggerObject);
+
     return Promise.resolve()
       .then(() => {
+        if (!swaggerObject.definitions) {
+          return;
+        }
+        const tasks = Object.keys(swaggerObject.definitions).map(key => {
+          return traverse(swaggerObject.definitions[key], options.store)
+            .then(result => {
+              return {[key]: result};
+            });
+        });
+        return Promise.all(tasks).then(results => merge(...results));
+      })
+      .then(() => {
         if (options.host) {
-          req.swagger.swaggerObject.host = options.host;
+          swaggerObject.host = options.host;
         }
         if (!req.swagger.operation.security) {
           // swagger.json自体が非認証の場合はそのまま返す
-          return res.json(req.swagger.swaggerObject);
+          return res.json(swaggerObject);
         }
-        const AdminRoles = options.admin_roles;
-        return AdminRoles.findAll()
-          .then(list => {
-            // RoleIDのenumを生成し、swaggerにセットする
-            const enums = new Set(options.super_role && [options.super_role]);
-            list.forEach(role => {
-              enums.add(role.dataValues.role_id);
-            });
-            const enumArray = Array.from(enums);
-            const updateAdminUserPayload = req.swagger.swaggerObject.definitions.UpdateAdminUserPayload;
-            if (has(updateAdminUserPayload || {}, 'properties.role_id')) {
-              if (isEmpty(enumArray)) {
-                // enumが0件だとswaggerのvalidation errorになるので削除する
-                delete updateAdminUserPayload.properties.role_id.enum;
-              } else {
-                updateAdminUserPayload.properties.role_id.enum = enumArray;
-              }
-            }
-            const createAdminUserPayload = req.swagger.swaggerObject.definitions.CreateAdminUserPayload;
-            if (has(createAdminUserPayload || {}, 'properties.role_id')) {
-              if (isEmpty(enumArray)) {
-                // enumが0件だとswaggerのvalidation errorになるので削除する
-                delete createAdminUserPayload.properties.role_id.enum;
-              } else {
-                createAdminUserPayload.properties.role_id.enum = enumArray;
-              }
-            }
 
-            // 権限がないパスをswagger.jsonから消して返す
-            const swagger = deepClone(req.swagger.swaggerObject);
-            const roles = req.auth.roles;
-            for (let path in swagger.paths) {
-              for (let m in swagger.paths[path]) {
-                if (!helperAdminRole.canAccess(path, m, roles)) {
-                  // 権限がないパスをswaggerから削除
-                  delete swagger.paths[path][m];
-                }
-              }
-              if (isEmpty(swagger.paths[path])) {
-                // pathが空になった場合はキー自体を削除
-                delete swagger.paths[path];
-              }
+        // 権限がないパスをswagger.jsonから消して返す
+        const roles = req.auth.roles;
+        for (let path in swaggerObject.paths) {
+          for (let m in swaggerObject.paths[path]) {
+            if (!helperAdminRole.canAccess(path, m, roles)) {
+              // 権限がないパスをswaggerから削除
+              delete swaggerObject.paths[path][m];
             }
-            return res.json(swagger);
-          })
-        ;
+          }
+          if (isEmpty(swaggerObject.paths[path])) {
+            // pathが空になった場合はキー自体を削除
+            delete swaggerObject.paths[path];
+          }
+        }
+        return res.json(swaggerObject);
       })
       .catch(next)
     ;

@@ -83,7 +83,7 @@ const vironlib = new VironLib({
   },
   swagger: {
     host: 'localhost:3000',
-    admin_roles: {{Sequelize.Model}},
+    store: {{Sequelize}},
     super_role: 'super',
   },
   logger: {{Logger}},

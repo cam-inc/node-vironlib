@@ -282,8 +282,8 @@ const options = {
   },
   swagger: {
     host: 'localhost:3000',
-    admin_roles: models.AdminRoles,
     super_role: 'super',
+    store: store,
   },
   body_completion: {
     exclude_paths: ['/ping'],
