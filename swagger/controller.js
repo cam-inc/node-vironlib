@@ -1,12 +1,12 @@
 const deepClone = require('mout/lang/deepClone');
-const {has, merge} = require('mout/object');
+const {find, has, merge} = require('mout/object');
 const isEmpty = require('mout/lang/isEmpty');
 
 const helperAdminRole = require('../admin_role/helper');
 
 const genEnum = async (def, store) => {
   const defEnum = def['x-autogen-enum'];
-  const Model = store.models[defEnum.model];
+  const Model = find(store.models, mdl => mdl.tableName === defEnum.model);
   const field = defEnum.field;
   const list = await Model.findAll();
   const enums = new Set(defEnum.defaults);
