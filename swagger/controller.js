@@ -14,14 +14,14 @@ const genEnum = async (def, store) => {
   return Array.from(enums);
 };
 
-const traverse = async (def, store) => {
+const transform = async (def, store) => {
   if (!def) {
     return def;
   }
 
   if (def.type === 'object' && def.properties) {
     const tasks = Object.keys(def.properties).map(key => {
-      return traverse(def.properties[key], store)
+      return transform(def.properties[key], store)
         .then(_def => {
           return {[key]: _def};
         });
@@ -34,7 +34,7 @@ const traverse = async (def, store) => {
   }
   if (def.type === 'array' && def.items) {
     const tasks = Object.keys(def.items).map(key => {
-      return traverse(def.items[key], store)
+      return transform(def.items[key], store)
         .then(_def => {
           return {[key]: _def};
         });
@@ -62,15 +62,13 @@ const registerShow = options => {
   options = options || {};
 
   return (req, res, next) => {
-    const swaggerObject = deepClone(req.swagger.swaggerObject);
-
     return Promise.resolve()
       .then(() => {
-        if (!swaggerObject.definitions) {
+        if (!req.swagger.swaggerObject.definitions) {
           return;
         }
-        const tasks = Object.keys(swaggerObject.definitions).map(key => {
-          return traverse(swaggerObject.definitions[key], options.store)
+        const tasks = Object.keys(req.swagger.swaggerObject.definitions).map(key => {
+          return transform(req.swagger.swaggerObject.definitions[key], options.store)
             .then(result => {
               return {[key]: result};
             });
@@ -79,14 +77,15 @@ const registerShow = options => {
       })
       .then(() => {
         if (options.host) {
-          swaggerObject.host = options.host;
+          req.swagger.swaggerObject.host = options.host;
         }
         if (!req.swagger.operation.security) {
           // swagger.json自体が非認証の場合はそのまま返す
-          return res.json(swaggerObject);
+          return res.json(req.swagger.swaggerObject);
         }
 
         // 権限がないパスをswagger.jsonから消して返す
+        const swaggerObject = deepClone(req.swagger.swaggerObject);
         const roles = req.auth.roles;
         for (let path in swaggerObject.paths) {
           for (let m in swaggerObject.paths[path]) {
