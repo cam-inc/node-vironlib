@@ -1,6 +1,6 @@
 const deepClone = require('mout/lang/deepClone');
 const {find, has, merge} = require('mout/object');
-const isEmpty = require('mout/lang/isEmpty');
+const {isEmpty, isArray, isPlainObject} = require('mout/lang');
 
 const helperAdminRole = require('../admin_role/helper');
 
@@ -27,12 +27,8 @@ const transform = async (def, store) => {
         });
     });
     def.properties = await Promise.all(tasks)
-      .then(results => {
-        return merge(...results);
-      })
-    ;
-  }
-  if (def.type === 'array' && def.items) {
+      .then(results => merge(...results));
+  } else if (def.type === 'array' && def.items) {
     const tasks = Object.keys(def.items).map(key => {
       return transform(def.items[key], store)
         .then(_def => {
@@ -40,14 +36,26 @@ const transform = async (def, store) => {
         });
     });
     def.items = await Promise.all(tasks)
-      .then(results => {
-        return merge(...results);
-      })
-    ;
+      .then(results => merge(...results));
+  } else if (isPlainObject(def)) {
+    const tasks = Object.keys(def).map(key => {
+      return transform(def[key], store)
+        .then(_def => {
+          return {[key]: _def};
+        });
+    });
+    def = await Promise.all(tasks)
+      .then(results => merge(...results));
+  } else if (isArray(def)) {
+    const tasks = def.map(d => {
+      return transform(d, store);
+    });
+    def = await Promise.all(tasks);
   }
   if (def['x-autogen-enum']) {
     def.enum = await genEnum(def, store);
   }
+
   return def;
 };
 
