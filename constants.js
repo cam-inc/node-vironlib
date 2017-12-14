@@ -6,13 +6,7 @@ module.exports = {
   VIRON_STYLE_LIST: 'list', // WebComponent リスト表示
   VIRON_STYLE_TABLE: 'table', // WebComponent テーブル表示
   VIRON_STYLE_NUMBER: 'number', // WebComponent 数字表示
-  VIRON_STYLE_GRAPH_SCATTERPLOT: 'graph-scatterplot',
-  VIRON_STYLE_GRAPH_LINE: 'graph-line',
-  VIRON_STYLE_GRAPH_BAR: 'graph-bar',
-  VIRON_STYLE_GRAPH_HORIZONTAL_BAR: 'graph-horizontal-bar',
-  VIRON_STYLE_GRAPH_STACKED_BAR: 'graph-stacked-bar',
-  VIRON_STYLE_GRAPH_HORIZONTAL_STACKED_BAR: 'graph-horizontal-stacked-bar',
-  VIRON_STYLE_GRAPH_STACKED_AREA: 'graph-stacked-area',
+  VIRON_STYLE_CHART: 'chart',
 
   VIRON_SECTION_DASHBOARD: 'dashboard', // ダッシュボードセクション
   VIRON_SECTION_MANAGE: 'manage', // 管理セクション
@@ -20,4 +14,13 @@ module.exports = {
   VIRON_SUPER_ROLE: 'super',
 
   DEFAULT_PAGER_LIMIT: 100, // リストビュー1ページあたりの表示件数
+
+  // for v0
+  VIRON_STYLE_GRAPH_SCATTERPLOT: 'graph-scatterplot',
+  VIRON_STYLE_GRAPH_LINE: 'graph-line',
+  VIRON_STYLE_GRAPH_BAR: 'graph-bar',
+  VIRON_STYLE_GRAPH_HORIZONTAL_BAR: 'graph-horizontal-bar',
+  VIRON_STYLE_GRAPH_STACKED_BAR: 'graph-stacked-bar',
+  VIRON_STYLE_GRAPH_HORIZONTAL_STACKED_BAR: 'graph-horizontal-stacked-bar',
+  VIRON_STYLE_GRAPH_STACKED_AREA: 'graph-stacked-area',
 };
