@@ -7,7 +7,7 @@ describe('body_completion/middleware', () => {
 
   const middleware = bodyCompletion.middleware();
 
-  it('リクエストbody内で足りないキーを保管する', done => {
+  it('リクエストbody内で足りないキーを補完する', done => {
     const req = test.genRequest({
       method: 'PUT',
       url: '/example',
@@ -171,4 +171,61 @@ describe('body_completion/middleware', () => {
       done();
     });
   });
+
+  it('x-body-completionで補完する', done => {
+    const req = test.genRequest({
+      method: 'PUT',
+      url: '/example',
+      connection: {
+        remoteAddress: '127.0.0.1',
+      },
+      body: {
+        id: 1,
+        description: 'aaa',
+        address: '',
+      },
+      swagger: {
+        operation: {
+          parameters: [
+            {
+              in: 'body',
+              schema: {
+                properties: {
+                  address: {
+                    type: 'string'
+                  },
+                  description: {
+                    type: 'string'
+                  },
+                  id: {
+                    type: 'integer'
+                  },
+                  name: {
+                    type: 'string',
+                    'x-completion-value': '',
+                  }
+                }
+              }
+            },
+            {
+              in: 'query',
+              schema: {
+                properties: {
+                  id: {
+                    type: 'integer'
+                  }
+                }
+              }
+            }
+          ]
+        },
+      }
+    });
+    const res = test.genResponse();
+    middleware(req, res, () => {
+      assert(req.body.name === '');
+      done();
+    });
+  });
+
 });

@@ -1,4 +1,6 @@
 const contains = require('mout/array/contains');
+const has = require('mout/object/has');
+
 /**
  * Middleware : completion body
  *
@@ -16,7 +18,12 @@ module.exports = options => {
       if (parameter.in === 'body') {
         Object.keys(parameter.schema.properties).forEach(key => {
           if (req.body[key] === undefined) {
-            req.body[key] = null;
+            const def = parameter.schema.properties[key];
+            if (has(def, 'x-completion-value')) {
+              req.body[key] = def['x-completion-value'];
+            } else {
+              req.body[key] = null;
+            }
           }
         });
       }
