@@ -197,5 +197,60 @@ describe('swagger/controller', () => {
       await show(req, res);
     });
 
+    it('checklistの自動生成ができる', async() => {
+      times(5, i => {
+        ['get', 'post', 'put', 'delete'].forEach(method => {
+          test.models.AdminRoles.create({
+            role_id: `role${i}`,
+            method: method,
+            resource: `r1`,
+          });
+        });
+      });
+
+      const swagger = {
+        operation: {
+          security: {
+            jwt: ['api:access'],
+          },
+        },
+        swaggerObject: {
+          paths: {
+          },
+          definitions: {
+            TestPayload: {
+              type: 'object',
+              properties: {
+                check_list: {
+                  'x-autogen-checklist': {
+                    model: 'admin_roles',
+                    field: 'role_id',
+                    defaults: ['super'],
+                    default: false,
+                  }
+                },
+              },
+            },
+          },
+        },
+      };
+      const req = test.genRequest({swagger});
+      const res = test.genResponse();
+
+      req.auth = {
+        roles: {
+          get: '*',
+        },
+      };
+
+      res.json = result => {
+        assert(result.definitions.TestPayload.properties.check_list.type === 'object');
+        assert(Object.keys(result.definitions.TestPayload.properties.check_list.properties).length === 6);
+        assert(result.definitions.TestPayload.properties.check_list.properties.super.type === 'boolean');
+        assert(result.definitions.TestPayload.properties.check_list.properties.super.default === false);
+      };
+      await show(req, res);
+    });
+
   });
 });

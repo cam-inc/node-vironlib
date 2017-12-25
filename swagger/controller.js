@@ -8,10 +8,37 @@ const genEnum = async (def, store) => {
   const defEnum = def['x-autogen-enum'];
   const Model = find(store.models, mdl => mdl.tableName === defEnum.model);
   const field = defEnum.field;
-  const list = await Model.findAll();
+  const list = await Model.findAll({attributes: [field]});
   const enums = new Set(defEnum.defaults);
   list.forEach(rec => enums.add(rec[field]));
   return Array.from(enums);
+};
+
+const genCheckList = async (def, store) => {
+  const defCheckList = def['x-autogen-checklist'];
+  const Model = find(store.models, mdl => mdl.tableName === defCheckList.model);
+  const field = defCheckList.field;
+  const list = await Model.findAll({attributes: [field]});
+  const map = {};
+  list.forEach(rec => {
+    const val = rec[field];
+    map[val] = {
+      type: 'boolean',
+      default: defCheckList.default,
+    };
+  });
+  if (defCheckList.defaults) {
+    defCheckList.defaults.forEach(val => {
+      map[val] = {
+        type: 'boolean',
+        default: defCheckList.default,
+      };
+    });
+  }
+  return {
+    type: 'object',
+    properties: map,
+  };
 };
 
 const transform = async (def, store) => {
@@ -54,6 +81,9 @@ const transform = async (def, store) => {
   }
   if (def['x-autogen-enum']) {
     def.enum = await genEnum(def, store);
+  }
+  if (def['x-autogen-checklist']) {
+    def = await genCheckList(def, store);
   }
 
   return def;
