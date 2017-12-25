@@ -53,8 +53,10 @@ const transform = async (def, store) => {
           return {[key]: _def};
         });
     });
-    def.properties = await Promise.all(tasks)
-      .then(results => merge(...results));
+    if (tasks.length) {
+      def.properties = await Promise.all(tasks)
+        .then(results => merge(...results));
+    }
   } else if (def.type === 'array' && def.items) {
     const tasks = Object.keys(def.items).map(key => {
       return transform(def.items[key], store)
@@ -62,8 +64,10 @@ const transform = async (def, store) => {
           return {[key]: _def};
         });
     });
-    def.items = await Promise.all(tasks)
-      .then(results => merge(...results));
+    if (tasks.length) {
+      def.items = await Promise.all(tasks)
+        .then(results => merge(...results));
+    }
   } else if (isPlainObject(def)) {
     const tasks = Object.keys(def).map(key => {
       return transform(def[key], store)
@@ -71,13 +75,17 @@ const transform = async (def, store) => {
           return {[key]: _def};
         });
     });
-    def = await Promise.all(tasks)
-      .then(results => merge(...results));
+    if (tasks.length) {
+      def = await Promise.all(tasks)
+        .then(results => merge(...results));
+    }
   } else if (isArray(def)) {
     const tasks = def.map(d => {
       return transform(d, store);
     });
-    def = await Promise.all(tasks);
+    if (tasks.length) {
+      def = await Promise.all(tasks);
+    }
   }
   if (def['x-autogen-enum']) {
     def.enum = await genEnum(def, store);
