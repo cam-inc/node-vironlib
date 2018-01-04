@@ -8,7 +8,8 @@
     "node.js"
   ],
   "scripts": {
-    "prepush": "npm run test",
+    "lint": "eslint .",
+    "prepush": "npm run lint && npm run test",
     "test": "mocha --reporter spec --ui bdd --timeout 3000 --recursive test"
   },
   "author": "",

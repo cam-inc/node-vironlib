@@ -1,24 +1,36 @@
 const deepClone = require('mout/lang/deepClone');
-const {find, has, merge} = require('mout/object');
+const {find, has, merge, set} = require('mout/object');
 const {isEmpty, isArray, isPlainObject} = require('mout/lang');
 
 const helperAdminRole = require('../admin_role/helper');
 
-const genEnum = async (def, store) => {
+const genEnum = async (def, store, cache) => {
   const defEnum = def['x-autogen-enum'];
   const Model = find(store.models, mdl => mdl.tableName === defEnum.model);
   const field = defEnum.field;
-  const list = await Model.findAll({attributes: [field]});
+  let list;
+  if (has(cache, `${defEnum.model}.${field}`)) {
+    list = cache[defEnum.model][field];
+  } else {
+    list = await Model.findAll({attributes: [field]});
+    set(cache, `${defEnum.model}.${field}`, list);
+  }
   const enums = new Set(defEnum.defaults);
   list.forEach(rec => enums.add(rec[field]));
   return Array.from(enums);
 };
 
-const genCheckList = async (def, store) => {
+const genCheckList = async (def, store, cache) => {
   const defCheckList = def['x-autogen-checklist'];
   const Model = find(store.models, mdl => mdl.tableName === defCheckList.model);
   const field = defCheckList.field;
-  const list = await Model.findAll({attributes: [field]});
+  let list;
+  if (has(cache, `${defCheckList.model}.${field}`)) {
+    list = cache[defCheckList.model][field];
+  } else {
+    list = await Model.findAll({attributes: [field]});
+    set(cache, `${defCheckList.model}.${field}`, list);
+  }
   const map = {};
   list.forEach(rec => {
     const val = rec[field];
@@ -35,20 +47,17 @@ const genCheckList = async (def, store) => {
       };
     });
   }
-  return {
-    type: 'object',
-    properties: map,
-  };
+  return map;
 };
 
-const transform = async (def, store) => {
+const transform = async (def, store, cache) => {
   if (!def) {
     return def;
   }
 
   if (def.type === 'object' && def.properties) {
     const tasks = Object.keys(def.properties).map(key => {
-      return transform(def.properties[key], store)
+      return transform(def.properties[key], store, cache)
         .then(_def => {
           return {[key]: _def};
         });
@@ -59,7 +68,7 @@ const transform = async (def, store) => {
     }
   } else if (def.type === 'array' && def.items) {
     const tasks = Object.keys(def.items).map(key => {
-      return transform(def.items[key], store)
+      return transform(def.items[key], store, cache)
         .then(_def => {
           return {[key]: _def};
         });
@@ -70,7 +79,7 @@ const transform = async (def, store) => {
     }
   } else if (isPlainObject(def)) {
     const tasks = Object.keys(def).map(key => {
-      return transform(def[key], store)
+      return transform(def[key], store, cache)
         .then(_def => {
           return {[key]: _def};
         });
@@ -81,17 +90,18 @@ const transform = async (def, store) => {
     }
   } else if (isArray(def)) {
     const tasks = def.map(d => {
-      return transform(d, store);
+      return transform(d, store, cache);
     });
     if (tasks.length) {
       def = await Promise.all(tasks);
     }
   }
   if (def['x-autogen-enum']) {
-    def.enum = await genEnum(def, store);
+    def.enum = await genEnum(def, store, cache);
   }
   if (def['x-autogen-checklist']) {
-    def = await genCheckList(def, store);
+    def.properties = await genCheckList(def, store, cache);
+    def.type = def.type || 'object';
   }
 
   return def;
@@ -113,8 +123,9 @@ const registerShow = options => {
         if (!req.swagger.swaggerObject.definitions) {
           return;
         }
+        const cache = {};
         const tasks = Object.keys(req.swagger.swaggerObject.definitions).map(key => {
-          return transform(req.swagger.swaggerObject.definitions[key], options.store)
+          return transform(req.swagger.swaggerObject.definitions[key], options.store, cache)
             .then(result => {
               return {[key]: result};
             });

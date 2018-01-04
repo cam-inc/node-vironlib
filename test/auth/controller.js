@@ -17,7 +17,7 @@ describe('auth/controller', () => {
     const signIn = controller.signIn;
     const helperEMail = vironlib.auth.email.helper;
 
-    it('1人目はスーパーユーザーとして登録される', async() => {
+    it('1人目はスーパーユーザーとして登録される', async () => {
       const req = test.genRequest({
         body: {
           email: 'test@viron.com',
@@ -40,7 +40,7 @@ describe('auth/controller', () => {
       await signIn(req, res);
     });
 
-    it('存在すればログインできる', async() => {
+    it('存在すればログインできる', async () => {
       const salt = helperEMail.genSalt();
       await helperEMail.genHash('aaaaaaaa', salt)
         .then(hash => {
@@ -73,7 +73,7 @@ describe('auth/controller', () => {
       ;
     });
 
-    it('存在しないユーザーはAdminUserNotFoundエラー', async() => {
+    it('存在しないユーザーはAdminUserNotFoundエラー', async () => {
       const salt = helperEMail.genSalt();
       await helperEMail.genHash('aaaaaaaa', salt)
         .then(hash => {
@@ -107,7 +107,7 @@ describe('auth/controller', () => {
       ;
     });
 
-    it('パスワード入力ミスはSigninFailedエラー', async() => {
+    it('パスワード入力ミスはSigninFailedエラー', async () => {
       const salt = helperEMail.genSalt();
       await helperEMail.genHash('aaaaaaaa', salt)
         .then(hash => {
@@ -147,7 +147,7 @@ describe('auth/controller', () => {
 
     const signOut = controller.signOut;
 
-    it('叩ければOK', async() => {
+    it('叩ければOK', async () => {
       const req = test.genRequest();
       const res = test.genResponse();
 
@@ -164,7 +164,7 @@ describe('auth/controller', () => {
 
     const googleSignIn = controller.googleSignIn;
 
-    it('Googleの認証URLにリダイレクトされる', async() => {
+    it('Googleの認証URLにリダイレクトされる', async () => {
       const req = test.genRequest();
       const res = test.genResponse();
 
@@ -175,7 +175,7 @@ describe('auth/controller', () => {
       await googleSignIn(req, res);
     });
 
-    it('redirect_urlを渡せばそのURLがstateに含まれたURLにリダイレクトされる', async() => {
+    it('redirect_urlを渡せばそのURLがstateに含まれたURLにリダイレクトされる', async () => {
       const req = test.genRequest({
         query: {
           redirect_url: 'http://viron.com/test',
@@ -212,7 +212,7 @@ describe('auth/controller', () => {
       allowMailDomainStub.restore();
     });
 
-    it('1人目はスーパーユーザーとして登録される', async() => {
+    it('1人目はスーパーユーザーとして登録される', async () => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
       allowMailDomainStub.resolves('test@viron.com');
 
@@ -241,7 +241,7 @@ describe('auth/controller', () => {
       await googleOAuth2Callback(req, res);
     });
 
-    it('存在すればログインできる', async() => {
+    it('存在すればログインできる', async () => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
       allowMailDomainStub.resolves('test2@viron.com');
       test.models.AdminUsers.create({
@@ -270,7 +270,7 @@ describe('auth/controller', () => {
       await googleOAuth2Callback(req, res);
     });
 
-    it('存在しないユーザーは作成される', async() => {
+    it('存在しないユーザーは作成される', async () => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
       allowMailDomainStub.resolves('test2@viron.com');
       test.models.AdminUsers.create({
@@ -305,7 +305,7 @@ describe('auth/controller', () => {
       await googleOAuth2Callback(req, res);
     });
 
-    it('許可されていないメールアドレスはログインできない', async() => {
+    it('許可されていないメールアドレスはログインできない', async () => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
       allowMailDomainStub.resolves(false);
 

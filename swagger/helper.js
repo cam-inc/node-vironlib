@@ -34,7 +34,7 @@ const genAdminRolePaths = swaggerExpress => {
         }
       }
     }
-    const def = swagger.definitions.adminrolepath;
+    const def = swagger.definitions.adminrolepath || swagger.definitions.AdminRolePath || {type: 'object'};
     if (def.properties && def.properties.allow) {
       // paths: [{"allow":true, "path":"GET:/users"}] パターン
       def.properties.path.enum = Array.from(enums);

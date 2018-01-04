@@ -19,7 +19,7 @@ describe('autocomplete/controller', () => {
 
     const list = autocomplete.controller.list;
 
-    it('emailで部分一致検索した結果が取得できる', async() => {
+    it('emailで部分一致検索した結果が取得できる', async () => {
       const req = test.genRequest({
         query: {
           model: 'admin_users',
@@ -39,7 +39,7 @@ describe('autocomplete/controller', () => {
       await list(req, res);
     });
 
-    it('model未指定時は空配列', async() => {
+    it('model未指定時は空配列', async () => {
       const req = test.genRequest({
         query: {
           email: '0@viron.com',
@@ -54,7 +54,7 @@ describe('autocomplete/controller', () => {
       await list(req, res);
     });
 
-    it('modelに一致するテーブルがない場合は空配列', async() => {
+    it('modelに一致するテーブルがない場合は空配列', async () => {
       const req = test.genRequest({
         query: {
           model: '__dummy__',

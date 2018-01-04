@@ -38,7 +38,7 @@ describe('admin_user/controller', () => {
 
     const list = adminUser.controller.list;
 
-    it('1ページ目が取得できる', async() => {
+    it('1ページ目が取得できる', async () => {
       const req = test.genRequest({swagger});
       const res = test.genResponse();
 
@@ -52,7 +52,7 @@ describe('admin_user/controller', () => {
       await list(req, res);
     });
 
-    it('2ページ目が取得できる', async() => {
+    it('2ページ目が取得できる', async () => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -72,7 +72,7 @@ describe('admin_user/controller', () => {
       await list(req, res);
     });
 
-    it('最終ページが取得できる', async() => {
+    it('最終ページが取得できる', async () => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -98,7 +98,7 @@ describe('admin_user/controller', () => {
 
     const create = adminUser.controller.create;
 
-    it('管理ユーザーが作成できる', async() => {
+    it('管理ユーザーが作成できる', async () => {
       const req = test.genRequest({
         swagger,
         body: {
@@ -137,7 +137,7 @@ describe('admin_user/controller', () => {
       });
     });
 
-    it('1件取得できる', async() => {
+    it('1件取得できる', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -170,7 +170,7 @@ describe('admin_user/controller', () => {
       });
     });
 
-    it('1件削除できる', async() => {
+    it('1件削除できる', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -209,7 +209,7 @@ describe('admin_user/controller', () => {
       });
     });
 
-    it('1件更新できる', async() => {
+    it('1件更新できる', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -236,7 +236,7 @@ describe('admin_user/controller', () => {
       await update(req, res);
     });
 
-    it('パスワードがnullだった場合、パスワードを更新しない', async() => {
+    it('パスワードがnullだった場合、パスワードを更新しない', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {

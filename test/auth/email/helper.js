@@ -9,7 +9,7 @@ describe('auth/email/helper', () => {
 
   describe('genSalt', () => {
 
-    it('ソルトが生成される', async() => {
+    it('ソルトが生成される', async () => {
       const salt = helper.genSalt();
       assert(salt);
       assert(typeof salt === 'string');
@@ -19,7 +19,7 @@ describe('auth/email/helper', () => {
 
   describe('genHash', () => {
 
-    it('パスワードハッシュが生成される', async() => {
+    it('パスワードハッシュが生成される', async () => {
       await helper.genHash('test', 'salt')
         .then(hash => {
           assert(hash);
@@ -28,7 +28,7 @@ describe('auth/email/helper', () => {
         });
     });
 
-    it('同一のパスワード/ソルトからは同一のハッシュが生成される', async() => {
+    it('同一のパスワード/ソルトからは同一のハッシュが生成される', async () => {
       const results = [];
 
       await helper.genHash('test', 'salt')
@@ -50,17 +50,17 @@ describe('auth/email/helper', () => {
   describe('verify', () => {
     let password, salt;
 
-    before(async() => {
+    before(async () => {
       salt = 'salt';
       password = await helper.genHash('test', salt);
     });
 
-    it('パスワード認証に成功する', async() => {
+    it('パスワード認証に成功する', async () => {
       const result = await helper.verify('test', password, salt);
       assert(result === true);
     });
 
-    it('パスワード認証に失敗する', async() => {
+    it('パスワード認証に失敗する', async () => {
       const result = await helper.verify('fake', password, salt);
       assert(result === false);
     });

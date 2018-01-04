@@ -62,7 +62,7 @@ describe('auth/google/helper', () => {
       stubOAuthClient.restore();
     });
 
-    it('アクセストークンを取得できる', async() => {
+    it('アクセストークンを取得できる', async () => {
       await helper.getToken('ccccooooddddeeee', {})
         .then(token => {
           assert(token.access_token === 'token:ccccooooddddeeee');
@@ -83,7 +83,7 @@ describe('auth/google/helper', () => {
       stubGet.restore();
     });
 
-    it('メールアドレスを取得できる', async() => {
+    it('メールアドレスを取得できる', async () => {
       await helper.getMailAddress({access_token: 'xxxxx'})
         .then(email => {
           assert(email === 'test@viron.com');
@@ -110,7 +110,7 @@ describe('auth/google/helper', () => {
       stubGet.restore();
     });
 
-    it('許可されているドメインの場合はメールアドレスが取得できる', async() => {
+    it('許可されているドメインの場合はメールアドレスが取得できる', async () => {
       await helper.allowMailDomain({access_token: 'xxxxx'}, {
         allow_email_domains: ['viron.com'],
       })
@@ -120,7 +120,7 @@ describe('auth/google/helper', () => {
       ;
     });
 
-    it('許可されていないドメインの場合はfalse', async() => {
+    it('許可されていないドメインの場合はfalse', async () => {
       await helper.allowMailDomain({access_token: 'xxxxx'}, {
         allow_email_domains: ['dummy.com'],
       })

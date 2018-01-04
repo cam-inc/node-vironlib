@@ -44,7 +44,7 @@ describe('admin_role/helper', () => {
       });
     });
 
-    it('スーパー権限の場合はすべてワイルドカード', async() => {
+    it('スーパー権限の場合はすべてワイルドカード', async () => {
       await getRoles(test.models.AdminRoles, 'super', 'super')
         .then(roles => {
           assert(roles.get[0] === '*');
@@ -56,7 +56,7 @@ describe('admin_role/helper', () => {
       ;
     });
 
-    it('所持している権限のみ取得できる', async() => {
+    it('所持している権限のみ取得できる', async () => {
       await getRoles(test.models.AdminRoles, 'tester', 'super')
         .then(roles => {
           assert(roles.get.length === 1);

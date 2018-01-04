@@ -43,7 +43,7 @@ describe('admin_role/controller', () => {
 
     const list = adminRole.controller.list;
 
-    it('1ページ目が取得できる', async() => {
+    it('1ページ目が取得できる', async () => {
       const req = test.genRequest({swagger});
       const res = test.genResponse();
 
@@ -57,7 +57,7 @@ describe('admin_role/controller', () => {
       await list(req, res);
     });
 
-    it('2ページ目が取得できる', async() => {
+    it('2ページ目が取得できる', async () => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -77,7 +77,7 @@ describe('admin_role/controller', () => {
       await list(req, res);
     });
 
-    it('最終ページが取得できる', async() => {
+    it('最終ページが取得できる', async () => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -129,7 +129,7 @@ describe('admin_role/controller', () => {
 
     const create = adminRole.controller.create;
 
-    it('管理ロールが作成できる', async() => {
+    it('管理ロールが作成できる', async () => {
       const req = test.genRequest({
         swagger,
         body: {
@@ -157,7 +157,7 @@ describe('admin_role/controller', () => {
       await create(req, res);
     });
 
-    it('存在するrole_idで登録しようとした際、エラーを返す', async() => {
+    it('存在するrole_idで登録しようとした際、エラーを返す', async () => {
       const req = test.genRequest({
         swagger,
         body: {
@@ -209,7 +209,7 @@ describe('admin_role/controller', () => {
       ]);
     });
 
-    it('1件取得できる', async() => {
+    it('1件取得できる', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -272,7 +272,7 @@ describe('admin_role/controller', () => {
       });
     });
 
-    it('1件削除できる', async() => {
+    it('1件削除できる', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -296,7 +296,7 @@ describe('admin_role/controller', () => {
       await remove(req, res);
     });
 
-    it('削除対象の権限を持っているユーザがいる為、エラーを返す。', async() => {
+    it('削除対象の権限を持っているユーザがいる為、エラーを返す。', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -355,7 +355,7 @@ describe('admin_role/controller', () => {
       ]);
     });
 
-    it('1件更新できる', async() => {
+    it('1件更新できる', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {

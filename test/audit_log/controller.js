@@ -45,7 +45,7 @@ describe('audit_log/controller', () => {
       },
     };
 
-    it('1ページ目が取得できる', async() => {
+    it('1ページ目が取得できる', async () => {
       const req = test.genRequest({swagger});
       const res = test.genResponse();
 
@@ -59,7 +59,7 @@ describe('audit_log/controller', () => {
       await list(req, res);
     });
 
-    it('2ページ目が取得できる', async() => {
+    it('2ページ目が取得できる', async () => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -79,7 +79,7 @@ describe('audit_log/controller', () => {
       await list(req, res);
     });
 
-    it('最終ページが取得できる', async() => {
+    it('最終ページが取得できる', async () => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -99,7 +99,7 @@ describe('audit_log/controller', () => {
       await list(req, res);
     });
 
-    it('user_id,response_method,response_uriで検索できる', async() => {
+    it('user_id,response_method,response_uriで検索できる', async () => {
       const req = test.genRequest({
         swagger,
         query: {

@@ -7,7 +7,7 @@ describe('auth/jwt/middleware', () => {
   const middleware = vironlib.auth.jwt.middleware();
   const helper = vironlib.auth.jwt.helper;
 
-  it('検証に成功する', async() => {
+  it('検証に成功する', async () => {
     await helper.sign({
       sub: 'test',
     }, {
@@ -40,7 +40,7 @@ describe('auth/jwt/middleware', () => {
     ;
   });
 
-  it('検証に失敗する', async() => {
+  it('検証に失敗する', async () => {
     await helper.sign({
       sub: 'test',
     }, {

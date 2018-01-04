@@ -35,7 +35,7 @@ describe('account/controller', () => {
 
     const list = account.controller.list;
 
-    it('1件取得できる', async() => {
+    it('1件取得できる', async () => {
       const req = test.genRequest({
         swagger,
         auth: {
@@ -66,7 +66,7 @@ describe('account/controller', () => {
       });
     });
 
-    it('1件取得できる', async() => {
+    it('1件取得できる', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -103,7 +103,7 @@ describe('account/controller', () => {
       });
     });
 
-    it('1件更新できる', async() => {
+    it('1件更新できる', async () => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {

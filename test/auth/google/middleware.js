@@ -20,7 +20,7 @@ describe('auth/google/middleware', () => {
     });
   });
 
-  it('トークンリフレッシュを行いメアドを取得できた場合はAuthorizationヘッダを更新する', async() => {
+  it('トークンリフレッシュを行いメアドを取得できた場合はAuthorizationヘッダを更新する', async () => {
     stubHelperGoogle.getMailAddress.onCall(0).resolves();
     stubHelperGoogle.getMailAddress.onCall(1).resolves('test@viron.com');
     stubHelperGoogle.refreshToken.resolves({
@@ -68,7 +68,7 @@ describe('auth/google/middleware', () => {
     ;
   });
 
-  it('トークンリフレッシュを行ってもメアドを取得できない場合はUnauthorizedエラー', async() => {
+  it('トークンリフレッシュを行ってもメアドを取得できない場合はUnauthorizedエラー', async () => {
     stubHelperGoogle.getMailAddress.resolves();
     stubHelperGoogle.refreshToken.resolves({
       access_token: 'new_atoken',
@@ -98,7 +98,7 @@ describe('auth/google/middleware', () => {
     });
   });
 
-  it('401以外のエラーの場合はそのままエラーを返す', async() => {
+  it('401以外のエラーの場合はそのままエラーを返す', async () => {
     const e = new Error();
     e.statusCode = 500;
     stubHelperGoogle.getMailAddress.rejects(e);
@@ -126,7 +126,7 @@ describe('auth/google/middleware', () => {
     });
   });
 
-  it('google認証を利用していない場合は何もしない', async() => {
+  it('google認証を利用していない場合は何もしない', async () => {
     const req = test.genRequest({
       swagger: {
         operation: {
@@ -146,7 +146,7 @@ describe('auth/google/middleware', () => {
     });
   });
 
-  it('認証不要なリクエストの場合は何もしない', async() => {
+  it('認証不要なリクエストの場合は何もしない', async () => {
     const req = test.genRequest();
     const res = test.genResponse();
 

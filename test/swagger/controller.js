@@ -10,7 +10,7 @@ describe('swagger/controller', () => {
 
     const show = swagger.controller.show;
 
-    it('swagger.jsonが取得できる', async() => {
+    it('swagger.jsonが取得できる', async () => {
       const swagger = {
         operation: {
         },
@@ -41,7 +41,7 @@ describe('swagger/controller', () => {
       await show(req, res);
     });
 
-    it('権限のないパスはswagger.jsonから削除される', async() => {
+    it('権限のないパスはswagger.jsonから削除される', async () => {
       const swagger = {
         operation: {
           security: {
@@ -80,7 +80,7 @@ describe('swagger/controller', () => {
       await show(req, res);
     });
 
-    it('hostの書き換えができる', async() => {
+    it('hostの書き換えができる', async () => {
       const swagger = {
         operation: {
         },
@@ -99,7 +99,7 @@ describe('swagger/controller', () => {
       await show(req, res);
     });
 
-    it('role_idのenum変更に成功', async() => {
+    it('role_idのenum変更に成功', async () => {
       times(5, i => {
         times(5, j => {
           ['get', 'post', 'put', 'delete'].forEach(method => {
@@ -155,7 +155,7 @@ describe('swagger/controller', () => {
       await show(req, res);
     });
 
-    it('AdminRolesが空の場合はsuperのみ', async() => {
+    it('AdminRolesが空の場合はsuperのみ', async () => {
       const swagger = {
         operation: {
           security: {
@@ -197,13 +197,13 @@ describe('swagger/controller', () => {
       await show(req, res);
     });
 
-    it('checklistの自動生成ができる', async() => {
+    it('checklistの自動生成ができる', async () => {
       times(5, i => {
         ['get', 'post', 'put', 'delete'].forEach(method => {
           test.models.AdminRoles.create({
             role_id: `role${i}`,
             method: method,
-            resource: `r1`,
+            resource: 'r1',
           });
         });
       });

@@ -10,7 +10,7 @@ describe('auth/jwt/helper', () => {
 
   describe('sign', () => {
 
-    it('RSASSAで署名できる', async() => {
+    it('RSASSAで署名できる', async () => {
       const privateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIIBOgIBAAJBALOCFOJGP/dVfp/F27qiQ2fMPx6sGr3DNlrJmlrk7qtxetnuwJso
 ueEt7PXQ/2476xfReebSPuGvbqSpP/JK5CcCAwEAAQJAfIvxr3lsYlBYVcSzCtAQ
@@ -59,7 +59,7 @@ NlrJmlrk7qtxetnuwJsoueEt7PXQ/2476xfReebSPuGvbqSpP/JK5CcCAwEAAQ==
       ;
     });
 
-    it('HMACで署名できる', async() => {
+    it('HMACで署名できる', async () => {
       const secret = '===secret===';
 
       await helper.sign({

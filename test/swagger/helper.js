@@ -79,7 +79,7 @@ describe('swagger/helper', () => {
       },
     };
 
-    it('自動生成されたパスがadminrolepathのenumにセットされる', async() => {
+    it('自動生成されたパスがadminrolepathのenumにセットされる', async () => {
       await autoGenerate(swaggerExpress)
         .then(() => {
           const list = swaggerExpress.runner.swagger.definitions.adminrolepath.properties.path.enum;
@@ -100,7 +100,7 @@ describe('swagger/helper', () => {
       ;
     });
 
-    it('swaggerオブジェクトを直接渡すこともできる', async() => {
+    it('swaggerオブジェクトを直接渡すこともできる', async () => {
       await autoGenerate(swaggerExpress.runner.swagger)
         .then(() => {
           const list = swaggerExpress.runner.swagger.definitions.adminrolepath.properties.path.enum;
