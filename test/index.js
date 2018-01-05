@@ -252,6 +252,14 @@ const options = {
   },
   audit_log: {
     audit_logs: models.AuditLogs,
+    unless: {
+      path: [
+        {
+          url: new RegExp('/stats/*'),
+          methods: ['GET'],
+        }
+      ],
+    },
   },
   auth: {
     admin_roles: models.AdminRoles,

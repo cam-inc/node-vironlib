@@ -37,7 +37,12 @@ const vironlib = new VironLib({
     expose_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
   },
   audit_log: {
-    audit_logs: {{Sequelize.Model}}
+    audit_logs: {{Sequelize.Model}},
+    unless: {
+      path: [{
+        url: '/test'
+      }],
+    },
   },
   admin_user: {
     admin_users: {{Sequelize.Model}},

@@ -1,3 +1,5 @@
+const unless = require('express-unless');
+
 const getSourceIp = req => {
   return (req.get('x-forwarded-for') || '').split(',')[0] ||
     req.connection.remoteAddress;
@@ -13,12 +15,17 @@ const getSourceIp = req => {
 module.exports = options => {
   const AuditLogs = options.audit_logs;
 
-  return (req, res, next) => {
-    // 監査ログ出力を除外するリクエスト
-    if (req.path === '/ping' || req.method === 'OPTIONS') {
-      return next();
-    }
+  // 監査ログ出力を除外するリクエスト
+  const unlessOptions = options.unless || {};
+  unlessOptions.path = unlessOptions.path || [];
+  unlessOptions.path.push({
+    url: '/ping',
+    methods: ['GET'],
+  });
+  unlessOptions.method = unlessOptions.method || [];
+  unlessOptions.method.push('OPTIONS');
 
+  const log = (req, res, next) => {
     const originalEnd = res.end;
     res.end = (data, encoding) => {
       res.end = originalEnd;
@@ -37,5 +44,11 @@ module.exports = options => {
     };
 
     next();
+  };
+
+  log.unless = unless;
+
+  return (req, res, next) => {
+    log.unless(unlessOptions)(req, res, next);
   };
 };

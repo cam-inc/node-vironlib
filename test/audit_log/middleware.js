@@ -61,4 +61,52 @@ describe('audit_log/middleware', () => {
     });
   });
 
+  it('OPTIONSは保存されない', done => {
+    const req = test.genRequest({
+      method: 'OPTIONS',
+      url: '/user',
+      connection: {
+        remoteAddress: '127.0.0.1',
+      }
+    });
+    const res = test.genResponse();
+
+    middleware(req, res, () => {
+      res.on('end', () => {
+        test.models.AuditLogs.findAll()
+          .then(list => {
+            assert(list.length === 0);
+            done();
+          })
+        ;
+      });
+
+      res.end({});
+    });
+  });
+
+  it('unlessに指定したリクエストは保存されない', done => {
+    const req = test.genRequest({
+      method: 'GET',
+      url: '/stats/dau',
+      connection: {
+        remoteAddress: '127.0.0.1',
+      }
+    });
+    const res = test.genResponse();
+
+    middleware(req, res, () => {
+      res.on('end', () => {
+        test.models.AuditLogs.findAll()
+          .then(list => {
+            assert(list.length === 0);
+            done();
+          })
+        ;
+      });
+
+      res.end({});
+    });
+  });
+
 });
