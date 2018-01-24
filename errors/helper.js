@@ -17,16 +17,18 @@ class VironLibError extends Error {
  * @param number 連番
  * @param name エラー名
  * @param message エラーメッセージ
+ * @param detail 詳細
  * @returns {Error}
  */
-const genError = (prefix, httpCode, kind, number, name, message) => {
+const genError = (prefix, httpCode, kind, number, name, message, detail) => {
   const err = new VironLibError(message);
   err.statusCode = httpCode;
   err.data = {
     id: `#${prefix}-${kind}-${number}`,
     code: httpCode,
     name: name,
-    message: message
+    message: message,
+    detail: detail,
   };
   return err;
 };

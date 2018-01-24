@@ -2,6 +2,8 @@ const get = require('mout/object/get');
 const {isFunction, isArray, isEmpty} = require('mout/lang');
 const reject = require('mout/array/reject');
 
+const errors = require('./errors');
+
 /**
  * Wrapper of default swagger_validator
  * @see swagger-node-runner/fittings/swagger_validator.js
@@ -48,8 +50,7 @@ module.exports = (fittingDef, pipes) => {
         }));
       });
       if (newErrors.length) {
-        err.results.errors = newErrors;
-        return next(err);
+        return next(errors.frontend.ValidationFailure(newErrors));
       }
       context.response.statusCode = 200;
       next();

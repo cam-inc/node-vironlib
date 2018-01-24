@@ -7,10 +7,11 @@ const helper = require('./helper');
  * @param number 連番
  * @param name エラー名
  * @param message エラーメッセージ
+ * @param detail 詳細
  * @returns {Error}
  */
-const genError = (httpCode, kind, number, name, message) => {
-  return helper.genError('F', httpCode, kind, number, name, message);
+const genError = (httpCode, kind, number, name, message, detail) => {
+  return helper.genError('F', httpCode, kind, number, name, message, detail);
 };
 
 module.exports = {
@@ -46,6 +47,10 @@ module.exports = {
    * アカウント停止エラー全般に使用する。
    */
   UnavailableForLegalReasons: () => genError(451, '0000', '0007', 'UnavailableForLegalReasons', 'Unavailable for Legal Reasons'),
+  /**
+   * バリデーションエラー
+   */
+  ValidationFailure: detail => genError(400, '0000', '0008', 'ValidationFailure', 'Validation Failure', detail),
   /**
    * サインイン失敗
    */
