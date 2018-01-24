@@ -22,8 +22,11 @@ const setResHeader = options => {
 };
 
 module.exports = options => {
+  if (options.limit) {
+    constants.DEFAULT_PAGER_LIMIT = options.limit;
+  }
   return {
     setResHeader: setResHeader(options),
-    defaultLimit: options.limit || constants.DEFAULT_PAGER_LIMIT,
+    defaultLimit: constants.DEFAULT_PAGER_LIMIT,
   };
 };
