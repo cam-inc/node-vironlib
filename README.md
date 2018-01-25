@@ -3,8 +3,8 @@ Generic library for [Viron](https://github.com/cam-inc/viron/)
 
 [![npm](https://nodei.co/npm/node-vironlib.png)](https://nodei.co/npm/node-vironlib/)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
-[![npm](https://img.shields.io/npm/dt/node-vironlib.svg)]()
-[![node](https://img.shields.io/node/v/node-vironlib.svg)]()
+[![npm](https://img.shields.io/npm/dt/node-vironlib.svg)](README.md)
+[![node](https://img.shields.io/node/v/node-vironlib.svg)](README.md)
 
 ## Description
 
@@ -22,7 +22,6 @@ That makes communicating with the Viron easy.
 - [x] [Access Control for CORS](acl)
 - [x] [Pager](pager)
 - [x] [Auto Complete](autocomplete)
-- [x] [Swagger Validator](swagger_validator)
 
 
 ## QuickStart
@@ -32,13 +31,25 @@ That makes communicating with the Viron easy.
 $ npm install node-vironlib
 ```
 
-### Configure
+### Usage
 ```
+const app = require('express')();
 const VironLib = require('node-vironlib');
-const vironlib = new VironLib({...});
-```
+const vironlib = new VironLib({...}); // @see https://cam-inc.github.io/viron-doc/docs/adv_vironlib.html
 
-@see [Documentation](https://cam-inc.github.io/viron-doc/docs/adv_vironlib.html)
+// middleware
+app.use(vironlib.swagger.middlware());
+app.use(vironlib.auditLog.middleware());
+app.use(vironlib.auth.google.middleware());
+app.use(vironlib.adminRole.middleware());
+app.use(vironlib.bodyCompletion.middleware());
+
+// controller
+app.post(vironlib.auth.controller.signIn);
+app.post(vironlib.auth.controller.signOut);
+app.get(vironlib.swagger.controller.show);
+...
+```
 
 ## Test
 ```
