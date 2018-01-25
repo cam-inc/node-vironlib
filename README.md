@@ -1,105 +1,54 @@
 # node-vironlib
-Generic library for Viron
+Generic library for [Viron](https://github.com/cam-inc/viron/)
 
-# Description
+[![npm](https://nodei.co/npm/node-vironlib.png)](https://nodei.co/npm/node-vironlib/)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![npm](https://img.shields.io/npm/dt/node-vironlib.svg)]()
+[![node](https://img.shields.io/node/v/node-vironlib.svg)]()
 
-Viron用のNode.jsライブラリです
+## Description
 
-# Features
+node-vironlib is a helper library of Viron API Server.
+That makes communicating with the Viron easy.
 
-- [x] 認証
+## Features
+
+- [x] [Authentication](auth)
   - [x] GoogleOAuth
   - [x] email/password
-- [x] 管理権限
-- [x] 管理ユーザー
-- [x] 監査ログ
-- [x] CORS
-- [x] Pagination
+- [x] [Admin Role](admin_role)
+- [x] [Admin User](admin_user)
+- [x] [Audit Log](audit_log)
+- [x] [Access Control for CORS](acl)
+- [x] [Pager](pager)
+- [x] [Auto Complete](autocomplete)
+- [x] [Swagger Validator](swagger_validator)
 
 
-# QuickStart
+## QuickStart
 
-## Install
+### Install
 ```
 $ npm install node-vironlib
 ```
 
-## Configure
+### Configure
 ```
 const VironLib = require('node-vironlib');
-const vironlib = new VironLib({
-  account: {
-    admin_users: {{Sequelize.Model}},
-  },
-  acl: {
-    allow_origin: '*',
-    allow_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
-    expose_headers: 'X-Requested-With, Origin, Content-Type, Accept, Authorization, X-Pagination-Limit, X-Pagination-Total-Pages, X-Pagination-Current-Page',
-  },
-  audit_log: {
-    audit_logs: {{Sequelize.Model}},
-    unless: {
-      path: [{
-        url: '/test'
-      }],
-    },
-  },
-  admin_user: {
-    admin_users: {{Sequelize.Model}},
-    default_role: 'viewer',
-  },
-  admin_role: {
-    admin_roles: {{Sequelize.Model}},
-    admin_users: {{Sequelize.Model}},
-    store: {{Sequelize}},
-    default_role: 'viewer',
-  },
-  auth: {
-    admin_users: {{Sequelize.Model}},
-    admin_roles: {{Sequelize.Model}},
-    super_role: 'super',
-    default_role: 'viewer',
-    auth_jwt: {
-      algorithm: 'RS512', // RS256,RS384,RS512,HS256,HS384,HS512
-      claims: {
-        iss: 'issuer',
-        aud: 'audience',
-      },
-      // for HMAC
-      secret: '...',
-      // for RSA
-      rsa_private_key: '...',
-      rsa_public_key: '...',
-    },
-    google_oauth: {
-      client_id: '99999999999-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.apps.googleusercontent.com',
-      client_secret: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-      redirect_url: 'https://localhost:3000/googleoauth2callback',
-      allow_email_domains: [
-        'your.organization.com',
-      ],
-    },
-  },
-  autocomplete: {
-    store: {{Sequelize}},
-  },
-  pager: {
-    limit: 100,
-  },
-  swagger: {
-    host: 'localhost:3000',
-    store: {{Sequelize}},
-    super_role: 'super',
-  },
-  logger: {{Logger}},
-  body_completion: {
-    exclude_paths: ['/user'],
-  },
-});
+const vironlib = new VironLib({...});
 ```
 
-# Tools
+@see [Documentation](https://cam-inc.github.io/viron-doc/docs/adv_vironlib.html)
 
+## Test
 ```
-npm run
+npm test
 ```
+
+## Copyright
+
+CA Mobile, Inc. All rights reserved.
+
+## LICENSE
+
+@see : [LICENSE](LICENSE)

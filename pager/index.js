@@ -1,4 +1,4 @@
-const constants = require('./constants');
+const constants = require('../constants');
 
 /**
  * レスポンスヘッダ−にpagination情報を付加する

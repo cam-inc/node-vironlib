@@ -12,8 +12,12 @@
     "prepush": "npm run lint && npm run test",
     "test": "mocha --reporter spec --ui bdd --timeout 3000 --recursive test"
   },
-  "author": "",
-  "license": "",
+  "author": "noritama",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cam-inc/viron/issues"
+  },
+  "homepage": "https://github.com/cam-inc/node-vironlib#readme",
   "main": "index.js",
   "dependencies": {
     "axios": "^0.16.2",
@@ -27,9 +31,12 @@
   "devDependencies": {
     "eslint": "^4.2.0",
     "husky": "^0.14.3",
-    "mocha": "^3.5.0",
+    "mocha": "^5.0.0",
     "node-mocks-http": "^1.6.4",
     "sequelize-mock": "^0.9.0",
     "sinon": "^3.2.1"
+  },
+  "engines": {
+    "node": ">=7.6.0"
   }
 }
