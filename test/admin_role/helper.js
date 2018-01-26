@@ -34,14 +34,14 @@ describe('admin_role/helper', () => {
 
     const getRoles = adminRole.helper.getRoles;
 
-    beforeEach(() => {
-      ['get', 'post', 'put', 'delete'].forEach(method => {
-        test.models.AdminRoles.create({
+    beforeEach(async () => {
+      for (const method of ['get', 'post', 'put', 'delete']) {
+        await test.models.AdminRoles.create({
           role_id: 'tester',
           method: method,
           resource: 'test',
         });
-      });
+      }
     });
 
     it('スーパー権限の場合はすべてワイルドカード', async () => {

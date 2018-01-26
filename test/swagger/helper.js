@@ -2,7 +2,6 @@ const assert = require('assert');
 const vironlib = require('../').vironlib;
 const swagger = vironlib.swagger;
 const test = require('../');
-const times = require('mout/function/times');
 
 describe('swagger/helper', () => {
 
@@ -38,13 +37,13 @@ describe('swagger/helper', () => {
 
   describe('autoGenerate', () => {
 
-    beforeEach(() => {
-      times(10, i => {
-        test.models.AdminRoles.create({
+    beforeEach(async () => {
+      for (let i = 0; i < 10; i++) {
+        await test.models.AdminRoles.create({
           role_id: `role${i}`,
           method: 'GET'
         });
-      });
+      }
     });
 
     const autoGenerate = swagger.helper.autoGenerate;

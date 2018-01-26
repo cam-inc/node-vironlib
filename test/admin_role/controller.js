@@ -1,5 +1,4 @@
 const assert = require('assert');
-const times = require('mout/function/times');
 
 const test = require('../');
 const vironlib = test.vironlib;
@@ -27,23 +26,23 @@ describe('admin_role/controller', () => {
       swaggerObject: {},
     };
 
-    beforeEach(() => {
-      times(110, i => {
-        times(5, j => {
-          ['get', 'post', 'put', 'delete'].forEach(method => {
-            test.models.AdminRoles.create({
+    beforeEach(async () => {
+      for (let i = 0; i < 110; i++) {
+        for (let j = 0; j < 5; j++) {
+          for (const method of ['get', 'post', 'put', 'delete']) {
+            await test.models.AdminRoles.create({
               role_id: `role${i}`,
               method: method,
               resource: `resource${j}`,
             });
-          });
-        });
-      });
+          }
+        }
+      }
     });
 
     const list = adminRole.controller.list;
 
-    it('1ページ目が取得できる', async () => {
+    it('1ページ目が取得できる', done => {
       const req = test.genRequest({swagger});
       const res = test.genResponse();
 
@@ -53,11 +52,12 @@ describe('admin_role/controller', () => {
         assert(res.get('X-Pagination-Limit') === 50);
         assert(res.get('X-Pagination-Total-Pages') === 3);
         assert(res.get('X-Pagination-Current-Page') === 1);
+        done();
       };
-      await list(req, res);
+      list(req, res);
     });
 
-    it('2ページ目が取得できる', async () => {
+    it('2ページ目が取得できる', done => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -73,11 +73,12 @@ describe('admin_role/controller', () => {
         assert(res.get('X-Pagination-Limit') === 50);
         assert(res.get('X-Pagination-Total-Pages') === 3);
         assert(res.get('X-Pagination-Current-Page') === 2);
+        done();
       };
-      await list(req, res);
+      list(req, res);
     });
 
-    it('最終ページが取得できる', async () => {
+    it('最終ページが取得できる', done => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -93,8 +94,9 @@ describe('admin_role/controller', () => {
         assert(res.get('X-Pagination-Limit') === 50);
         assert(res.get('X-Pagination-Total-Pages') === 3);
         assert(res.get('X-Pagination-Current-Page') === 3);
+        done();
       };
-      await list(req, res);
+      list(req, res);
     });
 
   });
@@ -119,8 +121,8 @@ describe('admin_role/controller', () => {
       swaggerObject: {},
     };
 
-    beforeEach(() => {
-      test.models.AdminRoles.create({
+    beforeEach(async () => {
+      await test.models.AdminRoles.create({
         role_id: 'role',
         method: 'GET',
         resource: 'resource',
@@ -129,7 +131,7 @@ describe('admin_role/controller', () => {
 
     const create = adminRole.controller.create;
 
-    it('管理ロールが作成できる', async () => {
+    it('管理ロールが作成できる', done => {
       const req = test.genRequest({
         swagger,
         body: {
@@ -144,20 +146,18 @@ describe('admin_role/controller', () => {
       });
       const res = test.genResponse();
 
-      res.json = result => {
+      res.json = async result => {
         assert(result.role_id === 'tester');
         assert(result.paths.length === 4);
 
-        return test.models.AdminRoles.findAll({where: {role_id: 'tester'}})
-          .then(roles => {
-            assert(roles.length === 4);
-          })
-        ;
+        const roles = await test.models.AdminRoles.findAll({where: {role_id: 'tester'}});
+        assert(roles.length === 4);
+        done();
       };
-      await create(req, res);
+      create(req, res);
     });
 
-    it('存在するrole_idで登録しようとした際、エラーを返す', async () => {
+    it('存在するrole_idで登録しようとした際、エラーを返す', done => {
       const req = test.genRequest({
         swagger,
         body: {
@@ -172,9 +172,10 @@ describe('admin_role/controller', () => {
       });
       const res = test.genResponse();
 
-      await create(req, res, err => {
+      create(req, res, err => {
         assert(err.statusCode === 400);
         assert(err.data.name === 'AlreadyUsedRoleID');
+        done();
       });
     });
 
@@ -200,8 +201,8 @@ describe('admin_role/controller', () => {
 
     const get = adminRole.controller.get;
 
-    beforeEach(() => {
-      test.models.AdminRoles.bulkCreate([
+    beforeEach(async () => {
+      await test.models.AdminRoles.bulkCreate([
         {role_id: 'tester', resource: 'test', method: 'GET'},
         {role_id: 'tester', resource: 'test', method: 'POST'},
         {role_id: 'tester', resource: 'test', method: 'PUT'},
@@ -209,7 +210,7 @@ describe('admin_role/controller', () => {
       ]);
     });
 
-    it('1件取得できる', async () => {
+    it('1件取得できる', done => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -232,8 +233,9 @@ describe('admin_role/controller', () => {
         assert(result.paths[2].path === 'PUT:/test');
         assert(result.paths[3].allow === true);
         assert(result.paths[3].path === 'DELETE:/test');
+        done();
       };
-      await get(req, res);
+      get(req, res);
     });
 
   });
@@ -258,21 +260,21 @@ describe('admin_role/controller', () => {
 
     const remove = adminRole.controller.remove;
 
-    beforeEach(() => {
-      test.models.AdminRoles.bulkCreate([
+    beforeEach(async () => {
+      await test.models.AdminRoles.bulkCreate([
         {role_id: 'tester', resource: 'test', method: 'GET'},
         {role_id: 'tester', resource: 'test', method: 'POST'},
         {role_id: 'tester', resource: 'test', method: 'PUT'},
         {role_id: 'tester', resource: 'test', method: 'DELETE'},
         {role_id: 'viewer', resource: 'test', method: 'DELETE'},
       ]);
-      test.models.AdminUsers.create({
+      await test.models.AdminUsers.create({
         email: 'test@viron.com',
         role_id: 'viewer',
       });
     });
 
-    it('1件削除できる', async () => {
+    it('1件削除できる', done => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -284,19 +286,17 @@ describe('admin_role/controller', () => {
       });
       const res = test.genResponse();
 
-      res.end = () => {
+      res.end = async () => {
         assert(true);
 
-        return test.models.AdminRoles.findAll()
-          .then(list => {
-            assert(list.length === 1);
-          })
-        ;
+        const list = await test.models.AdminRoles.findAll();
+        assert(list.length === 1);
+        done();
       };
-      await remove(req, res);
+      remove(req, res);
     });
 
-    it('削除対象の権限を持っているユーザがいる為、エラーを返す。', async () => {
+    it('削除対象の権限を持っているユーザがいる為、エラーを返す。', done => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -308,9 +308,10 @@ describe('admin_role/controller', () => {
       });
       const res = test.genResponse();
 
-      await remove(req, res, err => {
+      remove(req, res, err => {
         assert(err.statusCode === 400);
         assert(err.data.name === 'CurrentlyUsedAdminRole');
+        done();
       });
     });
 
@@ -346,8 +347,8 @@ describe('admin_role/controller', () => {
 
     const update = adminRole.controller.update;
 
-    beforeEach(() => {
-      test.models.AdminRoles.bulkCreate([
+    beforeEach(async () => {
+      await test.models.AdminRoles.bulkCreate([
         {role_id: 'tester', resource: 'test', method: 'GET'},
         {role_id: 'tester', resource: 'test', method: 'POST'},
         {role_id: 'tester', resource: 'test', method: 'PUT'},
@@ -355,7 +356,7 @@ describe('admin_role/controller', () => {
       ]);
     });
 
-    it('1件更新できる', async () => {
+    it('1件更新できる', done => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -376,22 +377,20 @@ describe('admin_role/controller', () => {
       });
       const res = test.genResponse();
 
-      res.json = () => {
-        return test.models.AdminRoles.findAll({where: {role_id: 'tester'}})
-          .then(result => {
-            assert(result.length === 4);
-            assert(result[0].resource === 'newtest');
-            assert(result[0].method === 'GET');
-            assert(result[1].resource === 'newtest');
-            assert(result[1].method === 'POST');
-            assert(result[2].resource === 'newtest');
-            assert(result[2].method === 'PUT');
-            assert(result[3].resource === 'newtest');
-            assert(result[3].method === 'DELETE');
-          })
-        ;
+      res.json = async () => {
+        const result = await test.models.AdminRoles.findAll({where: {role_id: 'tester'}});
+        assert(result.length === 4);
+        assert(result[0].resource === 'newtest');
+        assert(result[0].method === 'GET');
+        assert(result[1].resource === 'newtest');
+        assert(result[1].method === 'POST');
+        assert(result[2].resource === 'newtest');
+        assert(result[2].method === 'PUT');
+        assert(result[3].resource === 'newtest');
+        assert(result[3].method === 'DELETE');
+        done();
       };
-      await update(req, res);
+      update(req, res);
     });
 
   });

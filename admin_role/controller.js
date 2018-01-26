@@ -1,5 +1,6 @@
 const reduce = require('mout/object/reduce');
 
+const asyncWrapper = require('../async_wrapper');
 const logger = require('../logger');
 const errors = require('../errors');
 
@@ -37,37 +38,33 @@ const genAdminRole = (roleId, paths) => {
 const registerList = (options, pager) => {
   const AdminRoles = options.admin_roles;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
 
-    return AdminRoles.findAll()
-      .then(list => {
-        const data = reduce(reduce(list, (ret, role) => {
-          if (req.swagger.operation.responses[200].schema.items.properties.paths.type === 'array') {
-            // paths: [{"allow":true, "path":"GET:/users"}] パターン
-            ret[role.role_id] = ret[role.role_id] || [];
-            ret[role.role_id].push({allow: true, path: `${role.method}:/${role.resource}`});
-          } else {
-            // paths: {"GET:/users": true} パターン
-            ret[role.role_id] = ret[role.role_id] || {};
-            ret[role.role_id][`${role.method}:/${role.resource}`] = true;
-          }
-          return ret;
-        }, {}), (ret, paths, roleId) => {
-          ret.push({paths: paths, role_id: roleId});
-          return ret;
-        }, []);
+    const list = await AdminRoles.findAll();
+    const data = reduce(reduce(list, (ret, role) => {
+      if (req.swagger.operation.responses[200].schema.items.properties.paths.type === 'array') {
+        // paths: [{"allow":true, "path":"GET:/users"}] パターン
+        ret[role.role_id] = ret[role.role_id] || [];
+        ret[role.role_id].push({allow: true, path: `${role.method}:/${role.resource}`});
+      } else {
+        // paths: {"GET:/users": true} パターン
+        ret[role.role_id] = ret[role.role_id] || {};
+        ret[role.role_id][`${role.method}:/${role.resource}`] = true;
+      }
+      return ret;
+    }, {}), (ret, paths, roleId) => {
+      ret.push({paths: paths, role_id: roleId});
+      return ret;
+    }, []);
 
-        const count = data.length;
-        const _data = data.slice(offset, offset + limit);
-        pager.setResHeader(res, limit, offset, count);
+    const count = data.length;
+    const _data = data.slice(offset, offset + limit);
+    pager.setResHeader(res, limit, offset, count);
 
-        return res.json(_data);
-      })
-      .catch(next)
-    ;
-  };
+    return res.json(_data);
+  });
 };
 
 /**
@@ -83,23 +80,17 @@ const registerList = (options, pager) => {
 const registerCreate = options => {
   const AdminRoles = options.admin_roles;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const roleId = req.body.role_id;
     const paths = req.body.paths;
     const list = genAdminRole(roleId, paths);
-    return AdminRoles.findAll({where: {role_id: roleId}})
-      .then(data => {
-        if (data.length !== 0) {
-          return next(errors.frontend.AlreadyUsedRoleID());
-        }
-        return AdminRoles.bulkCreate(list);
-      })
-      .then(() => {
-        return res.json({role_id: roleId, paths: paths});
-      })
-      .catch(next)
-    ;
-  };
+    const data = await AdminRoles.findAll({where: {role_id: roleId}});
+    if (data.length !== 0) {
+      throw errors.frontend.AlreadyUsedRoleID();
+    }
+    await AdminRoles.bulkCreate(list);
+    return res.json({role_id: roleId, paths: paths});
+  });
 };
 
 /**
@@ -114,28 +105,24 @@ const registerCreate = options => {
 const registerGet = options => {
   const AdminRoles = options.admin_roles;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const roleId = req.swagger.params.role_id.value;
-    return AdminRoles.findAll({where: {role_id: roleId}})
-      .then(list => {
-        let paths;
-        if (req.swagger.operation.responses[200].schema.properties.paths.type === 'array') {
-          // paths: [{"allow":true, "path":"GET:/users"}] パターン
-          paths = list.map(role => {
-            return {allow: true, path: `${role.method}:/${role.resource}`};
-          });
-        } else {
-          // paths: {"GET:/users": true} パターン
-          paths = reduce(list, (obj, role) => {
-            obj[`${role.method}:/${role.resource}`] = true;
-            return obj;
-          }, {});
-        }
-        return res.json({paths: paths, role_id: roleId});
-      })
-      .catch(next)
-    ;
-  };
+    const list = await AdminRoles.findAll({where: {role_id: roleId}});
+    let paths;
+    if (req.swagger.operation.responses[200].schema.properties.paths.type === 'array') {
+      // paths: [{"allow":true, "path":"GET:/users"}] パターン
+      paths = list.map(role => {
+        return {allow: true, path: `${role.method}:/${role.resource}`};
+      });
+    } else {
+      // paths: {"GET:/users": true} パターン
+      paths = reduce(list, (obj, role) => {
+        obj[`${role.method}:/${role.resource}`] = true;
+        return obj;
+      }, {});
+    }
+    return res.json({paths: paths, role_id: roleId});
+  });
 };
 
 /**
@@ -151,22 +138,16 @@ const registerGet = options => {
 const registerRemove = options => {
   const AdminRoles = options.admin_roles;
   const AdminUsers = options.admin_users;
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const roleId = req.swagger.params.role_id.value;
-    return AdminUsers.findAll({where: {role_id: roleId}})
-      .then(list => {
-        // 削除対象の権限を持っているユーザがいたら、エラーを返す。
-        if (list.length !== 0) {
-          return next(errors.frontend.CurrentlyUsedAdminRole());
-        }
-        return AdminRoles.destroy({where: {role_id: roleId}, force: true});
-      })
-      .then(() => {
-        return res.status(204).end();
-      })
-      .catch(next)
-    ;
-  };
+    const list = await AdminUsers.findAll({where: {role_id: roleId}});
+    // 削除対象の権限を持っているユーザがいたら、エラーを返す。
+    if (list.length !== 0) {
+      throw errors.frontend.CurrentlyUsedAdminRole();
+    }
+    await AdminRoles.destroy({where: {role_id: roleId}, force: true});
+    return res.status(204).end();
+  });
 };
 
 /**
@@ -183,35 +164,24 @@ const registerUpdate = options => {
   const AdminRoles = options.admin_roles;
   const store = options.store;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const roleId = req.swagger.params.role_id.value;
     const paths = req.body.paths;
     const list = genAdminRole(roleId, paths);
 
-    return Promise.resolve()
-      .then(() => {
-        return store.transaction();
-      })
-      .then(t => {
-        return AdminRoles.destroy({where: {role_id: roleId}, force: true, transaction: t})
-          .then(() => {
-            return AdminRoles.bulkCreate(list, {transaction: t});
-          })
-          .then(() => {
-            return t.commit();
-          })
-          .catch(err => {
-            logger.error(err);
-            return t.rollback();
-          })
-        ;
-      })
-      .then(() => {
-        return res.json({role_id: roleId, paths: paths});
-      })
-      .catch(next)
-    ;
-  };
+    const t = await store.transaction();
+    try {
+      await AdminRoles.destroy({where: {role_id: roleId}, force: true, transaction: t});
+      await AdminRoles.bulkCreate(list, {transaction: t});
+      await t.commit();
+    } catch (err) {
+      logger.error(err);
+      await t.rollback();
+      throw err;
+    }
+
+    return res.json({role_id: roleId, paths: paths});
+  });
 };
 
 module.exports = (options, pager, adminUserOption) => {

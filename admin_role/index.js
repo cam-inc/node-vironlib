@@ -9,38 +9,32 @@ const logger = require('../logger');
  * @param {Sequelize.Model} options.admin_roles
  * @param {string} options.default_role
  */
-const init = options => {
+const init = async options => {
   const AdminRoles = options.admin_roles;
   const defaultRole = options.default_role;
 
-  return Promise.resolve()
-    .then(() => {
-      return AdminRoles.count({where: {role_id: defaultRole}});
-    })
-    .then(count => {
-      if (count >= 1) {
-        // あれば何もしない
-        return;
-      }
+  const count = await AdminRoles.count({where: {role_id: defaultRole}});
+  if (count >= 1) {
+    // あれば何もしない
+    return;
+  }
 
-      const tasks = [
-        // 全参照権限
-        AdminRoles.create({
-          role_id: defaultRole,
-          method: 'GET',
-          resource: '*',
-        }),
-        // 自分のアカウント情報を更新するための権限
-        AdminRoles.create({
-          role_id: defaultRole,
-          method: 'PUT',
-          resource: 'account',
-        }),
-      ];
+  const tasks = [
+    // 全参照権限
+    AdminRoles.create({
+      role_id: defaultRole,
+      method: 'GET',
+      resource: '*',
+    }),
+    // 自分のアカウント情報を更新するための権限
+    AdminRoles.create({
+      role_id: defaultRole,
+      method: 'PUT',
+      resource: 'account',
+    }),
+  ];
 
-      return Promise.all(tasks);
-    })
-  ;
+  await Promise.all(tasks);
 };
 
 module.exports = (options, pager) => {

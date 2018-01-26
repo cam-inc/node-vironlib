@@ -17,7 +17,7 @@ describe('auth/controller', () => {
     const signIn = controller.signIn;
     const helperEMail = vironlib.auth.email.helper;
 
-    it('1人目はスーパーユーザーとして登録される', async () => {
+    it('1人目はスーパーユーザーとして登録される', done => {
       const req = test.genRequest({
         body: {
           email: 'test@viron.com',
@@ -26,119 +26,111 @@ describe('auth/controller', () => {
       });
       const res = test.genResponse();
 
-      res.end = () => {
+      res.end = async () => {
         assert(res.get('Authorization').startsWith('Bearer '));
 
-        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
-          .then(m => {
-            assert(m.role_id === 'super');
-            assert(m.password);
-            assert(m.salt);
-          })
-        ;
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}});
+        assert(m.role_id === 'super');
+        assert(m.password);
+        assert(m.salt);
+        done();
       };
-      await signIn(req, res);
+      signIn(req, res);
     });
 
-    it('存在すればログインできる', async () => {
+    it('存在すればログインできる', done => {
       const salt = helperEMail.genSalt();
-      await helperEMail.genHash('aaaaaaaa', salt)
-        .then(hash => {
-          return test.models.AdminUsers.create({
+
+      Promise.resolve().then(async () => {
+        const hash = await helperEMail.genHash('aaaaaaaa', salt);
+        await test.models.AdminUsers.create({
+          email: 'test2@viron.com',
+          role_id: 'viewer',
+          password: hash,
+          salt: salt,
+        });
+
+        const req = test.genRequest({
+          body: {
             email: 'test2@viron.com',
-            role_id: 'viewer',
-            password: hash,
-            salt: salt,
-          });
-        })
-        .then(() => {
-          const req = test.genRequest({
-            body: {
-              email: 'test2@viron.com',
-              password: 'aaaaaaaa',
-            },
-          });
-          const res = test.genResponse();
+            password: 'aaaaaaaa',
+          },
+        });
+        const res = test.genResponse();
 
-          res.end = () => {
-            const token = res.get('Authorization').split(' ')[1];
-            assert(token);
-            const decoded = jwt.decode(token);
-            assert(decoded);
-            assert(decoded.sub === 'test2@viron.com');
-          };
+        res.end = () => {
+          const token = res.get('Authorization').split(' ')[1];
+          assert(token);
+          const decoded = jwt.decode(token);
+          assert(decoded);
+          assert(decoded.sub === 'test2@viron.com');
+          done();
+        };
 
-          return signIn(req, res);
-        })
-      ;
+        signIn(req, res);
+      });
     });
 
-    it('存在しないユーザーはAdminUserNotFoundエラー', async () => {
+    it('存在しないユーザーはAdminUserNotFoundエラー', done => {
       const salt = helperEMail.genSalt();
-      await helperEMail.genHash('aaaaaaaa', salt)
-        .then(hash => {
-          return test.models.AdminUsers.create({
-            email: 'super@viron.com',
-            role_id: 'super',
-            password: hash,
-            salt: salt,
-          });
-        })
-        .then(() => {
-          const req = test.genRequest({
-            body: {
-              email: 'test@viron.com',
-              password: 'bbbbbbbb',
-            },
-          });
-          const res = test.genResponse();
 
-          res.end = () => {
-            assert.fail('don\'t reach here.');
-          };
+      Promise.resolve().then(async () => {
+        const hash = await helperEMail.genHash('aaaaaaaa', salt);
+        await test.models.AdminUsers.create({
+          email: 'super@viron.com',
+          role_id: 'super',
+          password: hash,
+          salt: salt,
+        });
 
-          return signIn(req, res)
-            .catch(err => {
-              assert(err.statusCode === 404);
-              assert(err.data.name === 'AdminUserNotFound');
-            })
-          ;
-        })
-      ;
-    });
-
-    it('パスワード入力ミスはSigninFailedエラー', async () => {
-      const salt = helperEMail.genSalt();
-      await helperEMail.genHash('aaaaaaaa', salt)
-        .then(hash => {
-          return test.models.AdminUsers.create({
+        const req = test.genRequest({
+          body: {
             email: 'test@viron.com',
-            role_id: 'viewer',
-            password: hash,
-            salt: salt,
-          });
-        })
-        .then(() => {
-          const req = test.genRequest({
-            body: {
-              email: 'test@viron.com',
-              password: 'bbbbbbbb',
-            },
-          });
-          const res = test.genResponse();
+            password: 'bbbbbbbb',
+          },
+        });
+        const res = test.genResponse();
 
-          res.end = () => {
-            assert.fail('don\'t reach here.');
-          };
+        res.end = () => {
+          assert.fail('don\'t reach here.');
+        };
 
-          return signIn(req, res)
-            .catch(err => {
-              assert(err.statusCode === 400);
-              assert(err.data.name === 'SigninFailed');
-            })
-          ;
-        })
-      ;
+        signIn(req, res, err => {
+          assert(err.statusCode === 404);
+          assert(err.data.name === 'AdminUserNotFound');
+          done();
+        });
+      });
+    });
+
+    it('パスワード入力ミスはSigninFailedエラー', done => {
+      const salt = helperEMail.genSalt();
+
+      Promise.resolve().then(async () => {
+        const hash = await helperEMail.genHash('aaaaaaaa', salt);
+        await test.models.AdminUsers.create({
+          email: 'test@viron.com',
+          role_id: 'viewer',
+          password: hash,
+          salt: salt,
+        });
+
+        const req = test.genRequest({
+          body: {
+            email: 'test@viron.com',
+            password: 'bbbbbbbb',
+          },
+        });
+        const res = test.genResponse();
+
+        res.json = err => {
+          assert(err.statusCode === 400);
+          assert(err.data.name === 'SigninFailed');
+          done();
+        };
+
+        signIn(req, res);
+      });
     });
 
   });
@@ -147,15 +139,16 @@ describe('auth/controller', () => {
 
     const signOut = controller.signOut;
 
-    it('叩ければOK', async () => {
+    it('叩ければOK', done => {
       const req = test.genRequest();
       const res = test.genResponse();
 
       res.end = () => {
         assert(true);
+        done();
       };
 
-      await signOut(req, res);
+      signOut(req, res);
     });
 
   });
@@ -164,18 +157,19 @@ describe('auth/controller', () => {
 
     const googleSignIn = controller.googleSignIn;
 
-    it('Googleの認証URLにリダイレクトされる', async () => {
+    it('Googleの認証URLにリダイレクトされる', done => {
       const req = test.genRequest();
       const res = test.genResponse();
 
       res.redirect = url => {
         assert(url);
+        done();
       };
 
-      await googleSignIn(req, res);
+      googleSignIn(req, res);
     });
 
-    it('redirect_urlを渡せばそのURLがstateに含まれたURLにリダイレクトされる', async () => {
+    it('redirect_urlを渡せばそのURLがstateに含まれたURLにリダイレクトされる', done => {
       const req = test.genRequest({
         query: {
           redirect_url: 'http://viron.com/test',
@@ -188,9 +182,10 @@ describe('auth/controller', () => {
         const parsed = url.parse(redirectUrl);
         const query = qs.parse(parsed.query);
         assert(query.state === 'http://viron.com/test');
+        done();
       };
 
-      await googleSignIn(req, res);
+      googleSignIn(req, res);
     });
 
   });
@@ -212,7 +207,7 @@ describe('auth/controller', () => {
       allowMailDomainStub.restore();
     });
 
-    it('1人目はスーパーユーザーとして登録される', async () => {
+    it('1人目はスーパーユーザーとして登録される', done => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
       allowMailDomainStub.resolves('test@viron.com');
 
@@ -224,88 +219,91 @@ describe('auth/controller', () => {
       });
       const res = test.genResponse();
 
-      res.redirect = redirectUrl => {
+      res.redirect = async redirectUrl => {
         const parsed = url.parse(redirectUrl);
         assert(parsed.host === 'localhost');
         assert(parsed.pathname === '/redirect');
         const query = qs.parse(parsed.query);
         assert(query.token.startsWith('Bearer '));
 
-        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
-          .then(m => {
-            assert(m.role_id === 'super');
-          })
-        ;
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}});
+        assert(m.role_id === 'super');
+        done();
       };
 
-      await googleOAuth2Callback(req, res);
+      googleOAuth2Callback(req, res);
     });
 
-    it('存在すればログインできる', async () => {
+    it('存在すればログインできる', done => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
       allowMailDomainStub.resolves('test2@viron.com');
-      test.models.AdminUsers.create({
-        email: 'test2@viron.com',
-        role_id: 'viewer',
+
+      Promise.resolve().then(() => {
+        return test.models.AdminUsers.create({
+          email: 'test2@viron.com',
+          role_id: 'viewer',
+        });
+      }).then(() => {
+        const req = test.genRequest({
+          query: {
+            state: 'http://localhost/redirect',
+            code: 'xxxxx',
+          },
+        });
+        const res = test.genResponse();
+
+        res.redirect = redirectUrl => {
+          const parsed = url.parse(redirectUrl);
+          const query = qs.parse(parsed.query);
+          const token = query.token.split(' ')[1];
+          assert(token);
+          const decoded = jwt.decode(token);
+          assert(decoded);
+          assert(decoded.sub === 'test2@viron.com');
+          done();
+        };
+
+        googleOAuth2Callback(req, res);
       });
-
-      const req = test.genRequest({
-        query: {
-          state: 'http://localhost/redirect',
-          code: 'xxxxx',
-        },
-      });
-      const res = test.genResponse();
-
-      res.redirect = redirectUrl => {
-        const parsed = url.parse(redirectUrl);
-        const query = qs.parse(parsed.query);
-        const token = query.token.split(' ')[1];
-        assert(token);
-        const decoded = jwt.decode(token);
-        assert(decoded);
-        assert(decoded.sub === 'test2@viron.com');
-      };
-
-      await googleOAuth2Callback(req, res);
     });
 
-    it('存在しないユーザーは作成される', async () => {
+    it('存在しないユーザーは作成される', done => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
       allowMailDomainStub.resolves('test2@viron.com');
-      test.models.AdminUsers.create({
-        email: 'super@viron.com',
-        role_id: 'super',
+
+      Promise.resolve().then(() => {
+        return test.models.AdminUsers.create({
+          email: 'super@viron.com',
+          role_id: 'super',
+        });
+      }).then(() => {
+        const req = test.genRequest({
+          query: {
+            state: 'http://localhost/redirect',
+            code: 'xxxxx',
+          },
+        });
+        const res = test.genResponse();
+
+        res.redirect = async redirectUrl => {
+          const parsed = url.parse(redirectUrl);
+          const query = qs.parse(parsed.query);
+          const token = query.token.split(' ')[1];
+          assert(token);
+          const decoded = jwt.decode(token);
+          assert(decoded);
+          assert(decoded.sub === 'test2@viron.com');
+
+          const m = await test.models.AdminUsers.findOne({where: {email: 'test2@viron.com'}});
+          assert(m.role_id === 'viewer');
+          done();
+        };
+
+        googleOAuth2Callback(req, res);
       });
-
-      const req = test.genRequest({
-        query: {
-          state: 'http://localhost/redirect',
-          code: 'xxxxx',
-        },
-      });
-      const res = test.genResponse();
-
-      res.redirect = redirectUrl => {
-        const parsed = url.parse(redirectUrl);
-        const query = qs.parse(parsed.query);
-        const token = query.token.split(' ')[1];
-        assert(token);
-        const decoded = jwt.decode(token);
-        assert(decoded);
-        assert(decoded.sub === 'test2@viron.com');
-
-        return test.models.AdminUsers.findOne({where: {email: 'test2@viron.com'}})
-          .then(m => {
-            assert(m.role_id === 'viewer');
-          })
-        ;
-      };
-
-      await googleOAuth2Callback(req, res);
     });
 
-    it('許可されていないメールアドレスはログインできない', async () => {
+    it('許可されていないメールアドレスはログインできない', done => {
       getTokenStub.resolves('ttttooookkkkeeeennnn');
       allowMailDomainStub.resolves(false);
 
@@ -321,9 +319,10 @@ describe('auth/controller', () => {
         const parsed = url.parse(redirectUrl);
         const query = qs.parse(parsed.query);
         assert(!query.token);
+        done();
       };
 
-      await googleOAuth2Callback(req, res);
+      googleOAuth2Callback(req, res);
     });
 
   });

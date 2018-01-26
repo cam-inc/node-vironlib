@@ -1,5 +1,4 @@
 const assert = require('assert');
-const times = require('mout/function/times');
 
 const test = require('../');
 const vironlib = test.vironlib;
@@ -9,9 +8,9 @@ describe('audit_log/controller', () => {
 
   describe('list', () => {
 
-    beforeEach(() => {
-      times(110, i => {
-        test.models.AuditLogs.create({
+    beforeEach(async () => {
+      for (let i = 0; i < 110; i++) {
+        await test.models.AuditLogs.create({
           request_method: 'GET',
           request_uri: `/test/${i}`,
           user_id: `user_${i}`,
@@ -19,7 +18,7 @@ describe('audit_log/controller', () => {
           status_code: 200,
           source_ip: '127.0.0.1',
         });
-      });
+      }
     });
 
     const list = auditLog.controller.list;
@@ -45,7 +44,7 @@ describe('audit_log/controller', () => {
       },
     };
 
-    it('1ページ目が取得できる', async () => {
+    it('1ページ目が取得できる', done => {
       const req = test.genRequest({swagger});
       const res = test.genResponse();
 
@@ -55,11 +54,12 @@ describe('audit_log/controller', () => {
         assert(res.get('X-Pagination-Limit') === 50);
         assert(res.get('X-Pagination-Total-Pages') === 3);
         assert(res.get('X-Pagination-Current-Page') === 1);
+        done();
       };
-      await list(req, res);
+      list(req, res);
     });
 
-    it('2ページ目が取得できる', async () => {
+    it('2ページ目が取得できる', done => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -75,11 +75,12 @@ describe('audit_log/controller', () => {
         assert(res.get('X-Pagination-Limit') === 50);
         assert(res.get('X-Pagination-Total-Pages') === 3);
         assert(res.get('X-Pagination-Current-Page') === 2);
+        done();
       };
-      await list(req, res);
+      list(req, res);
     });
 
-    it('最終ページが取得できる', async () => {
+    it('最終ページが取得できる', done => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -95,11 +96,12 @@ describe('audit_log/controller', () => {
         assert(res.get('X-Pagination-Limit') === 50);
         assert(res.get('X-Pagination-Total-Pages') === 3);
         assert(res.get('X-Pagination-Current-Page') === 3);
+        done();
       };
-      await list(req, res);
+      list(req, res);
     });
 
-    it('user_id,response_method,response_uriで検索できる', async () => {
+    it('user_id,response_method,response_uriで検索できる', done => {
       const req = test.genRequest({
         swagger,
         query: {
@@ -113,8 +115,9 @@ describe('audit_log/controller', () => {
       res.json = result => {
         assert(result.length === 1);
         assert(result[0].user_id === 'user_107');
+        done();
       };
-      await list(req, res);
+      list(req, res);
     });
 
   });

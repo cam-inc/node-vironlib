@@ -1,3 +1,4 @@
+const asyncWrapper = require('../async_wrapper');
 const helperEMail = require('../auth/email/helper');
 
 /**
@@ -13,26 +14,20 @@ const helperEMail = require('../auth/email/helper');
 const registerList = (options, pager) => {
   const AdminUsers = options.admin_users;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
-    return Promise.resolve()
-      .then(() => {
-        const options = {
-          attributes,
-          limit,
-          offset,
-        };
-        return AdminUsers.findAndCountAll(options);
-      })
-      .then(result => {
-        pager.setResHeader(res, limit, offset, result.count);
-        return res.json(result.rows);
-      })
-      .catch(next)
-    ;
-  };
+    const options = {
+      attributes,
+      limit,
+      offset,
+    };
+    const result = await AdminUsers.findAndCountAll(options);
+
+    pager.setResHeader(res, limit, offset, result.count);
+    return res.json(result.rows);
+  });
 };
 
 /**
@@ -49,29 +44,22 @@ const registerCreate = options => {
   const AdminUsers = options.admin_users;
   const defaultRole = options.default_role;
 
-  return (req, res, next) => {
-    return Promise.resolve()
-      .then(() => {
-        // パスワードをハッシュ化
-        const salt = helperEMail.genSalt();
-        return helperEMail.genHash(req.body.password, salt)
-          .then(hashedPassword => {
-            return {password: hashedPassword, salt};
-          });
-      })
-      .then(data => {
-        data.email = req.body.email;
-        data.role_id = defaultRole;
-        return AdminUsers.create(data);
-      })
-      .then(data => {
-        delete data.password;
-        delete data.salt;
-        return res.json(data);
-      })
-      .catch(next)
-    ;
-  };
+  return asyncWrapper(async (req, res) => {
+    // パスワードをハッシュ化
+    const salt = helperEMail.genSalt();
+    const hashedPassword = await helperEMail.genHash(req.body.password, salt);
+
+    const data = {
+      password: hashedPassword,
+      salt: salt,
+      email: req.body.email,
+      role_id: defaultRole,
+    };
+    const result = await AdminUsers.create(data);
+    delete result.password;
+    delete result.salt;
+    return res.json(data);
+  });
 };
 
 /**
@@ -86,16 +74,12 @@ const registerCreate = options => {
 const registerGet = options => {
   const AdminUsers = options.admin_users;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const id = req.swagger.params.id.value;
-    return AdminUsers.findById(id, {attributes})
-      .then(data => {
-        return res.json(data);
-      })
-      .catch(next)
-    ;
-  };
+    const data = await AdminUsers.findById(id, {attributes});
+    return res.json(data);
+  });
 };
 
 /**
@@ -110,15 +94,11 @@ const registerGet = options => {
 const registerRemove = options => {
   const AdminUsers = options.admin_users;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const id = req.swagger.params.id.value;
-    return AdminUsers.destroy({where: {id}, force: true})
-      .then(() => {
-        return res.status(204).end();
-      })
-      .catch(next)
-    ;
-  };
+    await AdminUsers.destroy({where: {id}, force: true});
+    return res.status(204).end();
+  });
 };
 
 /**
@@ -133,33 +113,25 @@ const registerRemove = options => {
 const registerUpdate = options => {
   const AdminUsers = options.admin_users;
 
-  return (req, res, next) => {
-    return Promise.resolve()
-      .then(() => {
-        const password = req.body.password;
-        if (!password) {
-          return {};
-        }
+  return asyncWrapper(async (req, res) => {
+    const password = req.body.password;
+    if (!password) {
+      return res.json({});
+    }
 
-        // パスワードをハッシュ化
-        const salt = helperEMail.genSalt();
-        return helperEMail.genHash(req.body.password, salt)
-          .then(hashedPassword => {
-            return {password: hashedPassword, salt};
-          })
-        ;
-      })
-      .then(data => {
-        data.role_id = req.body.role_id;
-        const id = req.swagger.params.id.value;
-        return AdminUsers.update(data, {where: {id}});
-      })
-      .then(data => {
-        return res.json(data);
-      })
-      .catch(next)
-    ;
-  };
+    // パスワードをハッシュ化
+    const salt = helperEMail.genSalt();
+    const hashedPassword = await helperEMail.genHash(req.body.password, salt);
+
+    const id = req.swagger.params.id.value;
+    const data = {
+      password: hashedPassword,
+      salt: salt,
+      role_id: req.body.role_id,
+    };
+    const result = await AdminUsers.update(data, {where: {id}});
+    return res.json(result);
+  });
 };
 
 module.exports = (options, pager) => {

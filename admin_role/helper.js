@@ -1,5 +1,5 @@
-const contains = require('mout/array/contains');
-const reduce = require('mout/object/reduce');
+const {contains} = require('mout/array');
+const {reduce} = require('mout/object');
 
 // 常にアクセスOKなリソース
 const whiteList = [
@@ -32,29 +32,24 @@ const canAccess = (path, method, roles) => {
  * @param {String} roleId
  * @param {String} superRole
  */
-const getRoles = (AdminRoles, roleId, superRole) => {
+const getRoles = async (AdminRoles, roleId, superRole) => {
   if (roleId === superRole) {
-    return new Promise(resolve => {
-      resolve({
-        get: ['*'],
-        post: ['*'],
-        put: ['*'],
-        delete: ['*'],
-        patch: ['*'],
-      });
-    });
+    return {
+      get: ['*'],
+      post: ['*'],
+      put: ['*'],
+      delete: ['*'],
+      patch: ['*'],
+    };
   }
 
-  return AdminRoles.findAll({where: {role_id: roleId}})
-    .then(roles => {
-      return reduce(roles, (ret, role) => {
-        const method = role.method.toLowerCase();
-        ret[method] = ret[method] || [];
-        ret[method].push(role.resource);
-        return ret;
-      }, {});
-    })
-  ;
+  const roles = await AdminRoles.findAll({where: {role_id: roleId}});
+  return reduce(roles, (ret, role) => {
+    const method = role.method.toLowerCase();
+    ret[method] = ret[method] || [];
+    ret[method].push(role.resource);
+    return ret;
+  }, {});
 };
 
 module.exports = {

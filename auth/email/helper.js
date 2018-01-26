@@ -29,12 +29,8 @@ const genSalt = () => {
  * @param {string} currentPassword
  * @param {string} currentSalt
  */
-const verify = (password, currentPassword, currentSalt) => {
-  return genHash(password, currentSalt)
-    .then(hashedPassword => {
-      return currentPassword === hashedPassword;
-    })
-  ;
+const verify = async (password, currentPassword, currentSalt) => {
+  return currentPassword === await genHash(password, currentSalt);
 };
 
 module.exports = {

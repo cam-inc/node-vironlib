@@ -41,32 +41,27 @@ const getToken = (code, options) => {
   });
 };
 
-const getMailAddress = token => {
+const getMailAddress = async token => {
   const url = 'https://www.googleapis.com/oauth2/v2/userinfo';
-  return axios.get(url, {
-    headers: {
-      Authorization: `OAuth ${token.access_token}`,
-    },
-  })
-    .then(res => {
-      return res.data.email;
-    })
-    .catch(err => {
-      const status = get(err, 'response.status');
-      const e = errors.external.ExternalServerError(status);
-      e.orig_error = err;
-      throw e;
-    })
-  ;
+  try {
+    const res = await axios.get(url, {
+      headers: {
+        Authorization: `OAuth ${token.access_token}`,
+      },
+    });
+    return res.data.email;
+  } catch (err) {
+    const status = get(err, 'response.status');
+    const e = errors.external.ExternalServerError(status);
+    e.orig_error = err;
+    throw e;
+  }
 };
 
-const allowMailDomain = (token, options) => {
-  return getMailAddress(token)
-    .then(email => {
-      const domain = email.split('@')[1];
-      return contains(options.allow_email_domains, domain) && email;
-    })
-  ;
+const allowMailDomain = async (token, options) => {
+  const email = await getMailAddress(token);
+  const domain = email.split('@')[1];
+  return contains(options.allow_email_domains, domain) && email;
 };
 
 const refreshToken = (token, options) => {

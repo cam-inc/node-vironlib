@@ -54,14 +54,10 @@ const defineModel = name => {
   m.create = obj => {
     const instance = new m.Instance(obj);
     m.__values__.push(instance);
-    return instance;
+    return Promise.resolve().then(() => instance);
   };
   m.count = () => {
-    return Promise.resolve()
-      .then(() => {
-        return m.__values__.length;
-      })
-    ;
+    return Promise.resolve().then(() => m.__values__.length);
   };
   m.findAndCountAll = options => {
     const attributes = options.attributes;
@@ -99,11 +95,7 @@ const defineModel = name => {
       });
     }
     result.rows = values;
-    return Promise.resolve()
-      .then(() => {
-        return result;
-      })
-    ;
+    return Promise.resolve().then(() => result);
   };
 
   m.$queryInterface.$useHandler((query, queryOptions) => {
@@ -312,3 +304,5 @@ module.exports = {
   genResponse,
   models,
 };
+
+process.on('unhandledRejection', console.dir);

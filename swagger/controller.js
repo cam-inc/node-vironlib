@@ -1,3 +1,4 @@
+const asyncWrapper = require('../async_wrapper');
 const deepClone = require('mout/lang/deepClone');
 const {find, has, merge, set} = require('mout/object');
 const {isEmpty, isArray, isPlainObject} = require('mout/lang');
@@ -117,50 +118,44 @@ const transform = async (def, store, cache) => {
 const registerShow = options => {
   options = options || {};
 
-  return (req, res, next) => {
-    return Promise.resolve()
-      .then(() => {
-        if (!req.swagger.swaggerObject.definitions) {
-          return;
-        }
-        const cache = {};
-        const tasks = Object.keys(req.swagger.swaggerObject.definitions).map(key => {
-          return transform(req.swagger.swaggerObject.definitions[key], options.store, cache)
-            .then(result => {
-              return {[key]: result};
-            });
-        });
-        return Promise.all(tasks).then(results => merge(...results));
-      })
-      .then(() => {
-        if (options.host) {
-          req.swagger.swaggerObject.host = options.host;
-        }
-        if (!req.swagger.operation.security) {
-          // swagger.json自体が非認証の場合はそのまま返す
-          return res.json(req.swagger.swaggerObject);
-        }
+  return asyncWrapper(async (req, res) => {
+    if (req.swagger.swaggerObject.definitions) {
+      // definitionsの動的変換を行う
+      const cache = {};
+      const tasks = Object.keys(req.swagger.swaggerObject.definitions).map(key => {
+        return transform(req.swagger.swaggerObject.definitions[key], options.store, cache)
+          .then(result => {
+            return {[key]: result};
+          });
+      });
+      await Promise.all(tasks).then(results => merge(...results));
+    }
 
-        // 権限がないパスをswagger.jsonから消して返す
-        const swaggerObject = deepClone(req.swagger.swaggerObject);
-        const roles = req.auth.roles;
-        for (let path in swaggerObject.paths) {
-          for (let m in swaggerObject.paths[path]) {
-            if (!helperAdminRole.canAccess(path, m, roles)) {
-              // 権限がないパスをswaggerから削除
-              delete swaggerObject.paths[path][m];
-            }
-          }
-          if (isEmpty(swaggerObject.paths[path])) {
-            // pathが空になった場合はキー自体を削除
-            delete swaggerObject.paths[path];
-          }
+    if (options.host) {
+      req.swagger.swaggerObject.host = options.host;
+    }
+    if (!req.swagger.operation.security) {
+      // swagger.json自体が非認証の場合はそのまま返す
+      return res.json(req.swagger.swaggerObject);
+    }
+
+    // 権限がないパスをswagger.jsonから消して返す
+    const swaggerObject = deepClone(req.swagger.swaggerObject);
+    const roles = req.auth.roles;
+    for (let path in swaggerObject.paths) {
+      for (let m in swaggerObject.paths[path]) {
+        if (!helperAdminRole.canAccess(path, m, roles)) {
+          // 権限がないパスをswaggerから削除
+          delete swaggerObject.paths[path][m];
         }
-        return res.json(swaggerObject);
-      })
-      .catch(next)
-    ;
-  };
+      }
+      if (isEmpty(swaggerObject.paths[path])) {
+        // pathが空になった場合はキー自体を削除
+        delete swaggerObject.paths[path];
+      }
+    }
+    return res.json(swaggerObject);
+  });
 };
 
 module.exports = options => {

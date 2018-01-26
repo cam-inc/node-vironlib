@@ -1,7 +1,7 @@
 /**
  * create
  * @param {Object} store
- * @param {Sequelize.Model} model
+ * @param {*} model
  * @param {Object} data
  */
 const create = (store, ...args) => {
@@ -11,7 +11,7 @@ const create = (store, ...args) => {
 /**
  * list
  * @param {Object} store
- * @param {Sequelize.Model} model
+ * @param {*} model
  * @param {Object} query - {name: 'AAA'}
  * @param {Object} options
  * @param {Array} options.attributes - ['id', 'name', 'age']
@@ -19,25 +19,18 @@ const create = (store, ...args) => {
  * @param {number} options.offset
  * @param {Array} options.order - [['name', 'DESC']]
  */
-const list = (store, ...args) => {
-  return Promise.resolve()
-    .then(() => {
-      return store.helper.find(...args);
-    })
-    .then(list => {
-      return store.helper.count(...args)
-        .then(count => {
-          return {count, list};
-        })
-      ;
-    })
-  ;
+const list = async (store, ...args) => {
+  const results = await Promise.all([
+    store.helper.find(...args),
+    store.helper.count(...args),
+  ]);
+  return {list: results[0], count: results[1]};
 };
 
 /**
  * remove
  * @param {Object} store
- * @param {Sequelize.Model} model
+ * @param {*} model
  * @param {Object} query - {name: 'AAA'}
  * @param {Object} options
  */
@@ -48,7 +41,7 @@ const remove = (store, ...args) => {
 /**
  * get
  * @param {Object} store
- * @param {Sequelize.Model} model
+ * @param {*} model
  * @param {Object} query - {name: 'AAA'}
  * @param {Object} options
  * @param {Array} options.attributes - ['id', 'name', 'age']
@@ -60,7 +53,7 @@ const findOne = (store, ...args) => {
 /**
  * update
  * @param {Object} store
- * @param {Sequelize.Model} model
+ * @param {*} model
  * @param {Object} query - {name: 'AAA'}
  * @param {Object} data
  * @param {Object} options

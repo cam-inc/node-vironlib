@@ -1,3 +1,4 @@
+const asyncWrapper = require('../async_wrapper');
 const logger = require('../logger');
 const helperGoogle = require('./google/helper');
 const helperJwt = require('./jwt/helper');
@@ -24,75 +25,46 @@ const registerSignIn = options => {
   const superRole = options.super_role;
   const authJwt = options.auth_jwt;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
 
     // メアドでユーザ検索
-    return AdminUsers.findOne({where: {email}})
-      .then(adminUser => {
-        if (adminUser) {
-          return adminUser;
-        }
+    let adminUser = await AdminUsers.findOne({where: {email}});
+    if (!adminUser) {
+      // 1人目かどうか
+      const cnt = await AdminUsers.count();
+      if (cnt > 0) {
+        // 1人目じゃなければエラー（管理者がユーザー作成してあげる）
+        throw errors.frontend.AdminUserNotFound();
+      }
+      // 1人目の場合はスーパーユーザーとして登録する
+      // - パスワードソルトの生成
+      const salt = await helperEMail.genSalt();
+      // - パスワードのハッシュ化
+      const hashedPassword = await helperEMail.genHash(password, salt);
+      adminUser = await AdminUsers.create({
+        salt,
+        email,
+        password: hashedPassword,
+        role_id: superRole,
+      });
+    }
 
-        // 1人目かどうか
-        return AdminUsers.count()
-          .then(cnt => {
-            if (cnt > 0) {
-              // 1人目じゃなければエラー（管理者がユーザー作成してあげる）
-              return Promise.reject(errors.frontend.AdminUserNotFound());
-            }
-          })
-          .then(() => {
-            // 1人目の場合はスーパーユーザーとして登録する
-            // - パスワードソルトの生成
-            return helperEMail.genSalt();
-          })
-          .then(salt => {
-            // - パスワードのハッシュ化
-            return helperEMail.genHash(password, salt)
-              .then(password => {
-                return {password, salt};
-              })
-            ;
-          })
-          .then(data => {
-            data.email = email;
-            data.role_id = superRole;
-            return AdminUsers.create(data);
-          })
-        ;
-      })
-      .then(adminUser => {
-        // パスワード検証
-        return helperEMail.verify(password, adminUser.password, adminUser.salt)
-          .then(result => {
-            if (!result) {
-              return Promise.reject(errors.frontend.SigninFailed());
-            }
-            return adminUser;
-          })
-        ;
-      })
-      .then(adminUser => {
-        // ロールを取得
-        return helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
-      })
-      .then(roles => {
-        // JWTを生成
-        const claims = {
-          sub: email,
-          roles: roles,
-        };
-        return helperJwt.sign(claims, authJwt);
-      })
-      .then(token => {
-        res.setHeader(authJwt.header_key, `Bearer ${token}`);
-        return res.end();
-      })
-      .catch(next)
-    ;
-  };
+    // パスワード検証
+    const verified = await helperEMail.verify(password, adminUser.password, adminUser.salt);
+    if (!verified) {
+      return res.json(errors.frontend.SigninFailed());
+    }
+
+    // ロールを取得
+    const roles = await helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
+    // JWTを生成
+    const claims = {sub: email, roles: roles};
+    const token = await helperJwt.sign(claims, authJwt);
+    res.setHeader(authJwt.header_key, `Bearer ${token}`);
+    return res.end();
+  });
 };
 
 /**
@@ -103,14 +75,9 @@ const registerSignIn = options => {
  * @returns {function(*, *, *)}
  */
 const registerSignOut = () => {
-  return (req, res, next) => {
-    return Promise.resolve()
-      .then(() => {
-        return res.end();
-      })
-      .catch(next)
-    ;
-  };
+  return asyncWrapper(async (req, res) => {
+    return res.end();
+  });
 };
 
 /**
@@ -126,27 +93,17 @@ const registerGoogleSignIn = options => {
   const googleOAuth = options.google_oauth;
   if (!googleOAuth) {
     logger.info('[VIRONLIB] auth /googlesignin skip.');
-    return (req, res, next) => {
-      return Promise.resolve()
-        .then(() => {
-          logger.error('[VIRONLIB] auth /googlesignin is not registered.');
-          return res.json(errors.frontend.NotFound());
-        })
-        .catch(next)
-      ;
-    };
+    return asyncWrapper(async (req, res) => {
+      logger.error('[VIRONLIB] auth /googlesignin is not registered.');
+      return res.json(errors.frontend.NotFound());
+    });
   }
 
-  return (req, res, next) => {
-    return Promise.resolve()
-      .then(() => {
-        // Googleの認証画面にリダイレクト
-        const authUrl = helperGoogle.genAuthUrl(googleOAuth, req.query.redirect_url || req.get('referer'));
-        return res.redirect(authUrl); // 301
-      })
-      .catch(next)
-    ;
-  };
+  return asyncWrapper(async (req, res) => {
+    // Googleの認証画面にリダイレクト
+    const authUrl = helperGoogle.genAuthUrl(googleOAuth, req.query.redirect_url || req.get('referer'));
+    return res.redirect(authUrl); // 301
+  });
 };
 
 /**
@@ -171,76 +128,51 @@ const registerGoogleOAuth2Callback = options => {
 
   if (!googleOAuth) {
     logger.info('[VIRONLIB] auth /googleoauth2callback skip.');
-    return (req, res, next) => {
-      return Promise.resolve()
-        .then(() => {
-          logger.error('[VIRONLIB] auth /googleoauth2callback is not registered.');
-          return res.json(errors.frontend.NotFound());
-        })
-        .catch(next)
-      ;
-    };
+    return asyncWrapper(async (req, res) => {
+      logger.error('[VIRONLIB] auth /googleoauth2callback is not registered.');
+      return res.json(errors.frontend.NotFound());
+    });
   }
 
-  return (req, res) => {
+  return asyncWrapper(async (req, res) => {
     const redirectUrl = req.query.state;
 
-    // アクセストークンを取得
-    return helperGoogle.getToken(req.query.code, googleOAuth)
-      .then(token => {
-        // メールアドレスを検証
-        return helperGoogle.allowMailDomain(token, googleOAuth)
-          .then(email => {
-            if (!email) {
-              return Promise.reject(errors.frontend.Forbidden());
-            }
-            return {token, email};
-          })
-        ;
-      })
-      .then(data => {
-        // メアドでユーザ検索
-        return AdminUsers.findOne({where: {email: data.email}})
-          .then(adminUser => {
-            if (adminUser) {
-              return adminUser;
-            }
+    try {
+      // アクセストークンを取得
+      const token = await helperGoogle.getToken(req.query.code, googleOAuth);
+      // メールアドレスを検証
+      const email = await helperGoogle.allowMailDomain(token, googleOAuth);
+      if (!email) {
+        throw errors.frontend.Forbidden();
+      }
 
-            // 1人目かどうか
-            return AdminUsers.count()
-              .then(cnt => {
-                // 1人目の場合はスーパーユーザー、2人目以降はデフォルトロールで登録する
-                const roleId = cnt > 0 ? defaultRole : superRole;
-                return AdminUsers.create({email: data.email, role_id: roleId});
-              })
-            ;
-          })
-          .then(adminUser => {
-            // ロールを取得
-            return helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
-          })
-          .then(roles => {
-            // JWTを生成
-            const claims = {
-              sub: data.email,
-              roles: roles,
-              googleOAuthToken: data.token,
-            };
-            return helperJwt.sign(claims, authJwt);
-          })
-        ;
-      })
-      .then(token => {
-        const authToken = `Bearer ${token}`;
-        res.setHeader(authJwt.header_key, authToken);
-        return res.redirect(`${redirectUrl}?token=${authToken}`);
-      })
-      .catch(e => {
-        logger.error(e);
-        return res.redirect(redirectUrl);
-      })
-    ;
-  };
+      // メアドでユーザ検索
+      let adminUser = await AdminUsers.findOne({where: {email}});
+      if (!adminUser) {
+        // 1人目かどうか
+        const cnt = await AdminUsers.count();
+        // 1人目の場合はスーパーユーザー、2人目以降はデフォルトロールで登録する
+        const roleId = cnt > 0 ? defaultRole : superRole;
+        adminUser = await AdminUsers.create({email: email, role_id: roleId});
+      }
+
+      // ロールを取得
+      const roles = await helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
+      // JWTを生成
+      const claims = {
+        sub: email,
+        roles: roles,
+        googleOAuthToken: token,
+      };
+      const jwt = await helperJwt.sign(claims, authJwt);
+      const authToken = `Bearer ${jwt}`;
+      res.setHeader(authJwt.header_key, authToken);
+      return res.redirect(`${redirectUrl}?token=${authToken}`);
+    } catch (e) {
+      logger.error(e);
+      return res.redirect(redirectUrl);
+    }
+  });
 };
 
 module.exports = options => {

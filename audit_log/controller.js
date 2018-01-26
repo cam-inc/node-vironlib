@@ -1,3 +1,5 @@
+const asyncWrapper = require('../async_wrapper');
+
 /**
  * Controller : List Audit Log
  * HTTP Method : GET
@@ -11,38 +13,32 @@
 const registerList = (options, pager) => {
   const AuditLogs = options.audit_logs;
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
     const where = {};
-    return Promise.resolve()
-      .then(() => {
-        if (req.query.user_id) {
-          where.user_id = {$like: `${req.query.user_id}%`};
-        }
-        if (req.query.request_method) {
-          where.request_method = req.query.request_method;
-        }
-        if (req.query.request_uri) {
-          where.request_uri = {$like: `${req.query.request_uri}%`};
-        }
-        const options = {
-          attributes,
-          where,
-          limit,
-          offset,
-          order: [['createdAt', 'DESC']],
-        };
-        return AuditLogs.findAndCountAll(options);
-      })
-      .then(result => {
-        pager.setResHeader(res, limit, offset, result.count);
-        return res.json(result.rows);
-      })
-      .catch(next)
-    ;
-  };
+
+    if (req.query.user_id) {
+      where.user_id = {$like: `${req.query.user_id}%`};
+    }
+    if (req.query.request_method) {
+      where.request_method = req.query.request_method;
+    }
+    if (req.query.request_uri) {
+      where.request_uri = {$like: `${req.query.request_uri}%`};
+    }
+    const options = {
+      attributes,
+      where,
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+    };
+    const result = await AuditLogs.findAndCountAll(options);
+    pager.setResHeader(res, limit, offset, result.count);
+    return res.json(result.rows);
+  });
 };
 
 module.exports = (options, pager) => {

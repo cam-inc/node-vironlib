@@ -26,8 +26,8 @@ describe('account/controller', () => {
 
   describe('list', () => {
 
-    beforeEach(() => {
-      test.models.AdminUsers.create({
+    beforeEach(async () => {
+      await test.models.AdminUsers.create({
         email: 'test@viron.com',
         role_id: 'viewer',
       });
@@ -35,7 +35,7 @@ describe('account/controller', () => {
 
     const list = account.controller.list;
 
-    it('1件取得できる', async () => {
+    it('1件取得できる', done => {
       const req = test.genRequest({
         swagger,
         auth: {
@@ -48,8 +48,9 @@ describe('account/controller', () => {
         assert(result.length === 1);
         assert(result[0].email === 'test@viron.com');
         assert(result[0].role_id === 'viewer');
+        done();
       };
-      await list(req, res);
+      list(req, res);
     });
 
   });
@@ -59,14 +60,14 @@ describe('account/controller', () => {
     const get = account.controller.get;
     let data;
 
-    beforeEach(() => {
-      data = test.models.AdminUsers.create({
+    beforeEach(async () => {
+      data = await test.models.AdminUsers.create({
         email: 'test@viron.com',
         role_id: 'viewer',
       });
     });
 
-    it('1件取得できる', async () => {
+    it('1件取得できる', done => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -84,8 +85,9 @@ describe('account/controller', () => {
       res.json = result => {
         assert(result.email === 'test@viron.com');
         assert(result.role_id === 'viewer');
+        done();
       };
-      await get(req, res);
+      get(req, res);
     });
 
   });
@@ -95,15 +97,15 @@ describe('account/controller', () => {
     const update = account.controller.update;
     let data;
 
-    beforeEach(() => {
-      data = test.models.AdminUsers.create({
+    beforeEach(async () => {
+      data = await test.models.AdminUsers.create({
         email: 'test@viron.com',
         role_id: 'viewer',
         password: 'aaaaaaaaaaaaaaaa',
       });
     });
 
-    it('1件更新できる', async () => {
+    it('1件更新できる', done => {
       const req = test.genRequest({
         swagger: Object.assign({
           params: {
@@ -121,14 +123,12 @@ describe('account/controller', () => {
       });
       const res = test.genResponse();
 
-      res.json = () => {
-        return test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}})
-          .then(m => {
-            assert(m.password !== 'aaaaaaaaaaaaaaaa');
-          })
-        ;
+      res.json = async () => {
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}});
+        assert(m.password !== 'aaaaaaaaaaaaaaaa');
+        done();
       };
-      await update(req, res);
+      update(req, res);
     });
 
   });

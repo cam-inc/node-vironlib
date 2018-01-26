@@ -14,21 +14,14 @@ const initModel = model => {
   });
 };
 
-const initModels = sequelize => {
-  return new Promise((resolve, reject) => {
-    const tasks = Object.keys(models).map(name => {
-      if (typeof models[name] !== 'function') {
-        return Promise.resolve();
-      }
-      return initModel(models[name](sequelize));
-    });
-    return Promise.all(tasks)
-      .then(() => {
-        resolve(sequelize);
-      })
-      .catch(reject)
-    ;
+const initModels = async sequelize => {
+  const tasks = Object.keys(models).map(name => {
+    if (typeof models[name] !== 'function') {
+      return Promise.resolve();
+    }
+    return initModel(models[name](sequelize));
   });
+  return await Promise.all(tasks).then(() => sequelize);
 };
 
 module.exports = {
@@ -46,15 +39,8 @@ module.exports = {
    * 初期化
    * @param sequelize Sequelize instance
    */
-  init: sequelize => {
-    return Promise.resolve()
-      .then(() => {
-        return sequelize;
-      })
-      .then(sequelize => {
-        return initModels(sequelize);
-      })
-    ;
+  init: async sequelize => {
+    return await initModels(sequelize);
   },
 
 };

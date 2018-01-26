@@ -27,7 +27,7 @@ NlrJmlrk7qtxetnuwJsoueEt7PXQ/2476xfReebSPuGvbqSpP/JK5CcCAwEAAQ==
 -----END PUBLIC KEY-----`;
 
 
-      await helper.sign({
+      const token = helper.sign({
         sub: 'test',
       }, {
         claims: {
@@ -37,32 +37,27 @@ NlrJmlrk7qtxetnuwJsoueEt7PXQ/2476xfReebSPuGvbqSpP/JK5CcCAwEAAQ==
         token_expire: 10000,
         rsa_private_key: privateKey,
         algorithm: 'RS256',
-      })
-        .then(token => {
-          assert(token);
+      });
+      assert(token);
 
-          return new Promise((resolve, reject) => {
-            jwt.verify(token, publicKey, (err, decoded) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(decoded);
-            });
-          });
-        })
-        .then(decoded => {
-          assert(decoded);
-          assert(decoded.sub === 'test');
-          assert(decoded.iss === 'issuer');
-          assert(decoded.aud === 'audience');
-        })
-      ;
+      const decoded = await new Promise((resolve, reject) => {
+        jwt.verify(token, publicKey, (err, decoded) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(decoded);
+        });
+      });
+      assert(decoded);
+      assert(decoded.sub === 'test');
+      assert(decoded.iss === 'issuer');
+      assert(decoded.aud === 'audience');
     });
 
     it('HMACで署名できる', async () => {
       const secret = '===secret===';
 
-      await helper.sign({
+      const token = helper.sign({
         sub: 'test',
       }, {
         claims: {
@@ -72,26 +67,21 @@ NlrJmlrk7qtxetnuwJsoueEt7PXQ/2476xfReebSPuGvbqSpP/JK5CcCAwEAAQ==
         token_expire: 10000,
         secret: secret,
         algorithm: 'HS256',
-      })
-        .then(token => {
-          assert(token);
+      });
+      assert(token);
 
-          return new Promise((resolve, reject) => {
-            jwt.verify(token, secret, (err, decoded) => {
-              if (err) {
-                return reject(err);
-              }
-              resolve(decoded);
-            });
-          });
-        })
-        .then(decoded => {
-          assert(decoded);
-          assert(decoded.sub === 'test');
-          assert(decoded.iss === 'issuer');
-          assert(decoded.aud === 'audience');
-        })
-      ;
+      const decoded = await new Promise((resolve, reject) => {
+        jwt.verify(token, secret, (err, decoded) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(decoded);
+        });
+      });
+      assert(decoded);
+      assert(decoded.sub === 'test');
+      assert(decoded.iss === 'issuer');
+      assert(decoded.aud === 'audience');
     });
 
   });

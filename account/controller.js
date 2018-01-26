@@ -1,3 +1,4 @@
+const asyncWrapper = require('../async_wrapper');
 const logger = require('../logger');
 const helperEMail = require('../auth/email/helper');
 const errors = require('../errors');
@@ -15,26 +16,17 @@ const registerList = options => {
   const AdminUsers = options.admin_users;
 
   if (!AdminUsers) {
-    return (req, res, next) => {
-      return Promise.resolve()
-        .then(() => {
-          logger.error('[VIRONLIB] account /account is not registered.');
-          return res.json(errors.frontend.NotFound());
-        })
-        .catch(next)
-      ;
-    };
+    return asyncWrapper(async (req, res) => {
+      logger.error('[VIRONLIB] account /account is not registered.');
+      return res.json(errors.frontend.NotFound());
+    });
   }
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-    return AdminUsers.findOne({where: {email: req.auth.sub}, attributes})
-      .then(data => {
-        return res.json([data]);
-      })
-      .catch(next)
-    ;
-  };
+    const data = await AdminUsers.findOne({where: {email: req.auth.sub}, attributes});
+    return res.json([data]);
+  });
 };
 
 /**
@@ -50,31 +42,22 @@ const registerGet = options => {
   const AdminUsers = options.admin_users;
 
   if (!AdminUsers) {
-    return (req, res, next) => {
-      return Promise.resolve()
-        .then(() => {
-          logger.error('[VIRONLIB] account /account/:id is not registered.');
-          return res.json(errors.frontend.NotFound());
-        })
-        .catch(next)
-      ;
-    };
+    return asyncWrapper(async (req, res) => {
+      logger.error('[VIRONLIB] account /account/:id is not registered.');
+      return res.json(errors.frontend.NotFound());
+    });
   }
 
-  return (req, res, next) => {
+  return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const id = req.swagger.params.id.value;
-    return AdminUsers.findById(id, {attributes})
-      .then(data => {
-        if (data.email !== req.auth.sub) {
-          // 自分以外へのアクセスは認めない
-          throw errors.frontend.Forbidden();
-        }
-        return res.json(data);
-      })
-      .catch(next)
-    ;
-  };
+    const data = await AdminUsers.findById(id, {attributes});
+    if (data.email !== req.auth.sub) {
+      // 自分以外へのアクセスは認めない
+      throw errors.frontend.Forbidden();
+    }
+    return res.json(data);
+  });
 };
 
 /**
@@ -90,49 +73,31 @@ const registerUpdate = options => {
   const AdminUsers = options.admin_users;
 
   if (!AdminUsers) {
-    return (req, res, next) => {
-      return Promise.resolve()
-        .then(() => {
-          logger.error('[VIRONLIB] account /account/:id is not registered.');
-          return res.json(errors.frontend.NotFound());
-        })
-        .catch(next)
-      ;
-    };
+    return asyncWrapper(async (req, res) => {
+      logger.error('[VIRONLIB] account /account/:id is not registered.');
+      return res.json(errors.frontend.NotFound());
+    });
   }
 
-  return (req, res, next) => {
-    return Promise.resolve()
-      .then(() => {
-        const id = req.swagger.params.id.value;
-        return AdminUsers.findById(id)
-          .then(data => {
-            if (data.email !== req.auth.sub) {
-              // 自分以外へのアクセスは認めない
-              throw errors.frontend.Forbidden();
-            }
-          })
-        ;
-      })
-      .then(() => {
-        // パスワードをハッシュ化
-        const salt = helperEMail.genSalt();
-        return helperEMail.genHash(req.body.password, salt)
-          .then(hashedPassword => {
-            return {password: hashedPassword, salt};
-          })
-        ;
-      })
-      .then(data => {
-        const id = req.swagger.params.id.value;
-        return AdminUsers.update(data, {where: {id}});
-      })
-      .then(data => {
-        return res.json(data);
-      })
-      .catch(next)
-    ;
-  };
+  return asyncWrapper(async (req, res) => {
+    const id = req.swagger.params.id.value;
+    const user = await AdminUsers.findById(id);
+    if (user.email !== req.auth.sub) {
+      // 自分以外へのアクセスは認めない
+      throw errors.frontend.Forbidden();
+    }
+
+    // パスワードをハッシュ化
+    const salt = helperEMail.genSalt();
+    const hashedPassword = await helperEMail.genHash(req.body.password, salt);
+
+    const result = await AdminUsers.update({
+      password: hashedPassword,
+      salt: salt,
+    }, {where: {id}});
+
+    return res.json(result);
+  });
 };
 
 module.exports = options => {

@@ -19,38 +19,35 @@ const getPort = (swaggerExpress, defaultValue) => {
  * @returns {Promise.<TResult>}
  */
 const genAdminRolePaths = swaggerExpress => {
-  return new Promise(resolve => {
-    const swagger = swaggerExpress.runner ? swaggerExpress.runner.swagger : swaggerExpress;
-    const paths = swagger.paths;
-    const enums = new Set();
-    for (let path in paths) {
-      for (let method in paths[path]) {
-        const resource = path.split('/')[1];
-        // ワイルドカード
-        enums.add(`${method.toUpperCase()}:/*`);
-        // ホワイトリストに入っているリソースは無視
-        if (resource && !contains(adminRoleHelper.whiteList, resource)) {
-          enums.add(`${method.toUpperCase()}:/${resource}`);
-        }
+  const swagger = swaggerExpress.runner ? swaggerExpress.runner.swagger : swaggerExpress;
+  const paths = swagger.paths;
+  const enums = new Set();
+  for (let path in paths) {
+    for (let method in paths[path]) {
+      const resource = path.split('/')[1];
+      // ワイルドカード
+      enums.add(`${method.toUpperCase()}:/*`);
+      // ホワイトリストに入っているリソースは無視
+      if (resource && !contains(adminRoleHelper.whiteList, resource)) {
+        enums.add(`${method.toUpperCase()}:/${resource}`);
       }
     }
-    const def = swagger.definitions.adminrolepath || swagger.definitions.AdminRolePath || {type: 'object'};
-    if (def.properties && def.properties.allow) {
-      // paths: [{"allow":true, "path":"GET:/users"}] パターン
-      def.properties.path.enum = Array.from(enums);
-    } else {
-      // paths: {"GET:/users": true} パターン
-      const map = {};
-      Array.from(enums).forEach(path => {
-        map[path] = {
-          type: 'boolean',
-          default: false
-        };
-      });
-      def.properties = map;
-    }
-    resolve();
-  });
+  }
+  const def = swagger.definitions.adminrolepath || swagger.definitions.AdminRolePath || {type: 'object'};
+  if (def.properties && def.properties.allow) {
+    // paths: [{"allow":true, "path":"GET:/users"}] パターン
+    def.properties.path.enum = Array.from(enums);
+  } else {
+    // paths: {"GET:/users": true} パターン
+    const map = {};
+    Array.from(enums).forEach(path => {
+      map[path] = {
+        type: 'boolean',
+        default: false
+      };
+    });
+    def.properties = map;
+  }
 };
 
 /**
