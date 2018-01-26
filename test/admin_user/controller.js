@@ -29,7 +29,7 @@ describe('admin_user/controller', () => {
     beforeEach(async () => {
       for (let i = 0; i < 110; i++) {
         await test.models.AdminUsers.create({
-          email: `test${i}@viron.com`,
+          email: `test${i}@example.com`,
           role_id: 'viewer',
         });
       }
@@ -104,17 +104,17 @@ describe('admin_user/controller', () => {
       const req = test.genRequest({
         swagger,
         body: {
-          email: 'test@viron.com',
+          email: 'test@example.com',
           password: 'aaaaaaaa',
         },
       });
       const res = test.genResponse();
 
       res.json = async result => {
-        assert(result.email === 'test@viron.com');
+        assert(result.email === 'test@example.com');
         assert(result.role_id === 'viewer');
 
-        const m = await test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}});
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@example.com'}});
         assert(m.role_id === 'viewer');
         assert(m.password);
         assert(m.salt);
@@ -132,7 +132,7 @@ describe('admin_user/controller', () => {
 
     beforeEach(async () => {
       data = await test.models.AdminUsers.create({
-        email: 'test@viron.com',
+        email: 'test@example.com',
         role_id: 'viewer',
       });
     });
@@ -150,7 +150,7 @@ describe('admin_user/controller', () => {
       const res = test.genResponse();
 
       res.json = result => {
-        assert(result.email === 'test@viron.com');
+        assert(result.email === 'test@example.com');
         assert(result.role_id === 'viewer');
         done();
       };
@@ -166,7 +166,7 @@ describe('admin_user/controller', () => {
 
     beforeEach(async () => {
       data = await test.models.AdminUsers.create({
-        email: 'test@viron.com',
+        email: 'test@example.com',
         role_id: 'viewer',
       });
     });
@@ -186,7 +186,7 @@ describe('admin_user/controller', () => {
       res.end = async () => {
         assert(true);
 
-        const m = await test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}});
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@example.com'}});
         assert(!m);
         done();
       };
@@ -203,7 +203,7 @@ describe('admin_user/controller', () => {
 
     beforeEach(async () => {
       data = await test.models.AdminUsers.create({
-        email: 'test@viron.com',
+        email: 'test@example.com',
         role_id: 'viewer',
         password: 'aaaaaaaaaaaaaaaa',
       });
@@ -226,7 +226,7 @@ describe('admin_user/controller', () => {
       const res = test.genResponse();
 
       res.json = async () => {
-        const m = await test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}});
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@example.com'}});
         assert(m.role_id === 'tester');
         assert(m.password !== 'aaaaaaaaaaaaaaaa');
         done();
@@ -252,7 +252,7 @@ describe('admin_user/controller', () => {
       const res = test.genResponse();
 
       res.json = async () => {
-        const m = await test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}});
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@example.com'}});
         assert(m.role_id === 'viewer');
         assert(m.password === 'aaaaaaaaaaaaaaaa');
         done();

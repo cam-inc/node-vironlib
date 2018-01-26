@@ -269,7 +269,7 @@ describe('admin_role/controller', () => {
         {role_id: 'viewer', resource: 'test', method: 'DELETE'},
       ]);
       await test.models.AdminUsers.create({
-        email: 'test@viron.com',
+        email: 'test@example.com',
         role_id: 'viewer',
       });
     });

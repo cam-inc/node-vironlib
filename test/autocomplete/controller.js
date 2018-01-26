@@ -10,7 +10,7 @@ describe('autocomplete/controller', () => {
     beforeEach(async () => {
       for (let i = 0; i < 101; i++) {
         await test.models.AdminUsers.create({
-          email: `test${i}@viron.com`,
+          email: `test${i}@example.com`,
           role_id: 'viewer',
         });
       }
@@ -32,8 +32,8 @@ describe('autocomplete/controller', () => {
         // 1, 10〜19, 100
         assert(result.length === 12);
         assert(result[0].value !== result[0].name);
-        assert(result[0].name === 'test1@viron.com');
-        assert(result[1].name === 'test10@viron.com');
+        assert(result[0].name === 'test1@example.com');
+        assert(result[1].name === 'test10@example.com');
         done();
       };
       list(req, res);
@@ -42,7 +42,7 @@ describe('autocomplete/controller', () => {
     it('model未指定時は空配列', done => {
       const req = test.genRequest({
         query: {
-          email: '0@viron.com',
+          email: '0@example.com',
           value: 'id',
         },
       });
@@ -59,7 +59,7 @@ describe('autocomplete/controller', () => {
       const req = test.genRequest({
         query: {
           model: '__dummy__',
-          email: '0@viron.com',
+          email: '0@example.com',
           value: 'id',
         },
       });

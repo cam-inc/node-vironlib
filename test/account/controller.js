@@ -28,7 +28,7 @@ describe('account/controller', () => {
 
     beforeEach(async () => {
       await test.models.AdminUsers.create({
-        email: 'test@viron.com',
+        email: 'test@example.com',
         role_id: 'viewer',
       });
     });
@@ -39,14 +39,14 @@ describe('account/controller', () => {
       const req = test.genRequest({
         swagger,
         auth: {
-          sub: 'test@viron.com',
+          sub: 'test@example.com',
         },
       });
       const res = test.genResponse();
 
       res.json = result => {
         assert(result.length === 1);
-        assert(result[0].email === 'test@viron.com');
+        assert(result[0].email === 'test@example.com');
         assert(result[0].role_id === 'viewer');
         done();
       };
@@ -62,7 +62,7 @@ describe('account/controller', () => {
 
     beforeEach(async () => {
       data = await test.models.AdminUsers.create({
-        email: 'test@viron.com',
+        email: 'test@example.com',
         role_id: 'viewer',
       });
     });
@@ -77,13 +77,13 @@ describe('account/controller', () => {
           },
         }, swagger),
         auth: {
-          sub: 'test@viron.com',
+          sub: 'test@example.com',
         },
       });
       const res = test.genResponse();
 
       res.json = result => {
-        assert(result.email === 'test@viron.com');
+        assert(result.email === 'test@example.com');
         assert(result.role_id === 'viewer');
         done();
       };
@@ -99,7 +99,7 @@ describe('account/controller', () => {
 
     beforeEach(async () => {
       data = await test.models.AdminUsers.create({
-        email: 'test@viron.com',
+        email: 'test@example.com',
         role_id: 'viewer',
         password: 'aaaaaaaaaaaaaaaa',
       });
@@ -118,13 +118,13 @@ describe('account/controller', () => {
           password: 'bbbbbbbbbbbbbbbbbbb',
         },
         auth: {
-          sub: 'test@viron.com',
+          sub: 'test@example.com',
         },
       });
       const res = test.genResponse();
 
       res.json = async () => {
-        const m = await test.models.AdminUsers.findOne({where: {email: 'test@viron.com'}});
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@example.com'}});
         assert(m.password !== 'aaaaaaaaaaaaaaaa');
         done();
       };

@@ -22,7 +22,7 @@ describe('auth/google/middleware', () => {
 
   it('トークンリフレッシュを行いメアドを取得できた場合はAuthorizationヘッダを更新する', async () => {
     stubHelperGoogle.getMailAddress.onCall(0).resolves();
-    stubHelperGoogle.getMailAddress.onCall(1).resolves('test@viron.com');
+    stubHelperGoogle.getMailAddress.onCall(1).resolves('test@example.com');
     stubHelperGoogle.refreshToken.resolves({
       access_token: 'new_atoken',
       refresh_token: 'new_rtoken',
@@ -30,7 +30,7 @@ describe('auth/google/middleware', () => {
 
     await Promise.all([
       test.models.AdminUsers.create({
-        email: 'test@viron.com',
+        email: 'test@example.com',
         role_id: 'tester',
       }),
       test.models.AdminRoles.create({
