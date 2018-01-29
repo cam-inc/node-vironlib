@@ -7,7 +7,7 @@ Generic library for [Viron](https://github.com/cam-inc/viron/)
 [![node](https://img.shields.io/node/v/node-vironlib.svg)](README.md)
 
 
-[日本語](README.ja.md)
+[日本語 README](README.ja.md)
 
 ## Description
 
