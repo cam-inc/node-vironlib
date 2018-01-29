@@ -6,10 +6,12 @@ Generic library for [Viron](https://github.com/cam-inc/viron/)
 [![npm](https://img.shields.io/npm/dt/node-vironlib.svg)](README.md)
 [![node](https://img.shields.io/node/v/node-vironlib.svg)](README.md)
 
+
+[日本語](README.ja.md)
+
 ## Description
 
-node-vironlib is a helper library of Viron API Server.
-That makes communicating with the Viron easy.
+node-vironlib is a helper library that makes it easy to implement functions that would normally be needed with Viron API Server.
 
 ## Features
 
