@@ -1,11 +1,13 @@
 const assert = require('assert');
 const test = require('../');
-const vironlib = test.vironlib;
-const adminRole = vironlib.adminRole;
 
-describe('admin_role/middleware', () => {
+describe('admin_role/middlewareAdminRole', () => {
+  let middlewareAdminRole;
 
-  const middleware = adminRole.middleware();
+  before(() => {
+    const vironlib = test.vironlib;
+    middlewareAdminRole = vironlib.adminRole.middleware();
+  });
 
   it('認証不要なリクエストなのでOK', done => {
     const swagger = {
@@ -20,7 +22,7 @@ describe('admin_role/middleware', () => {
     });
     const res = test.genResponse();
 
-    middleware(req, res, err => {
+    middlewareAdminRole(req, res, err => {
       assert(!err);
       done();
     });
@@ -46,7 +48,7 @@ describe('admin_role/middleware', () => {
     });
     const res = test.genResponse();
 
-    middleware(req, res, err => {
+    middlewareAdminRole(req, res, err => {
       assert(!err);
       done();
     });
@@ -72,7 +74,7 @@ describe('admin_role/middleware', () => {
     });
     const res = test.genResponse();
 
-    middleware(req, res, err => {
+    middlewareAdminRole(req, res, err => {
       assert(err.data.name === 'Forbidden');
       done();
     });

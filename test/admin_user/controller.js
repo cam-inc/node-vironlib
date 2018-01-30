@@ -1,10 +1,14 @@
 const assert = require('assert');
 
 const test = require('../');
-const vironlib = test.vironlib;
-const adminUser = vironlib.adminUser;
 
 describe('admin_user/controller', () => {
+  let controllerAdminUser;
+
+  before(() => {
+    const vironlib = test.vironlib;
+    controllerAdminUser = vironlib.adminUser.controller;
+  });
 
   const swagger = {
     operation: {
@@ -27,15 +31,15 @@ describe('admin_user/controller', () => {
   describe('list', () => {
 
     beforeEach(async () => {
+      const list = [];
       for (let i = 0; i < 110; i++) {
-        await test.models.AdminUsers.create({
+        list.push({
           email: `test${i}@example.com`,
           role_id: 'viewer',
         });
       }
+      await test.models.AdminUsers.bulkCreate(list);
     });
-
-    const list = adminUser.controller.list;
 
     it('1ページ目が取得できる', done => {
       const req = test.genRequest({swagger});
@@ -49,7 +53,7 @@ describe('admin_user/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 1);
         done();
       };
-      list(req, res);
+      controllerAdminUser.list(req, res);
     });
 
     it('2ページ目が取得できる', done => {
@@ -70,7 +74,7 @@ describe('admin_user/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 2);
         done();
       };
-      list(req, res);
+      controllerAdminUser.list(req, res);
     });
 
     it('最終ページが取得できる', done => {
@@ -91,14 +95,12 @@ describe('admin_user/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 3);
         done();
       };
-      list(req, res);
+      controllerAdminUser.list(req, res);
     });
 
   });
 
   describe('create', () => {
-
-    const create = adminUser.controller.create;
 
     it('管理ユーザーが作成できる', done => {
       const req = test.genRequest({
@@ -120,14 +122,13 @@ describe('admin_user/controller', () => {
         assert(m.salt);
         done();
       };
-      create(req, res);
+      controllerAdminUser.create(req, res);
     });
 
   });
 
   describe('get', () => {
 
-    const get = adminUser.controller.get;
     let data;
 
     beforeEach(async () => {
@@ -154,14 +155,13 @@ describe('admin_user/controller', () => {
         assert(result.role_id === 'viewer');
         done();
       };
-      get(req, res);
+      controllerAdminUser.get(req, res);
     });
 
   });
 
   describe('remove', () => {
 
-    const remove = adminUser.controller.remove;
     let data;
 
     beforeEach(async () => {
@@ -191,14 +191,13 @@ describe('admin_user/controller', () => {
         done();
       };
 
-      remove(req, res);
+      controllerAdminUser.remove(req, res);
     });
 
   });
 
   describe('update', () => {
 
-    const update = adminUser.controller.update;
     let data;
 
     beforeEach(async () => {
@@ -232,7 +231,7 @@ describe('admin_user/controller', () => {
         done();
       };
 
-      update(req, res);
+      controllerAdminUser.update(req, res);
     });
 
     it('パスワードがnullだった場合、パスワードを更新しない', done => {
@@ -258,7 +257,7 @@ describe('admin_user/controller', () => {
         done();
       };
 
-      update(req, res);
+      controllerAdminUser.update(req, res);
     });
 
   });

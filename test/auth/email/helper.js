@@ -1,16 +1,19 @@
 const assert = require('assert');
 
 const test = require('../../');
-const vironlib = test.vironlib;
 
 describe('auth/email/helper', () => {
+  let helperEMail;
 
-  const helper = vironlib.auth.email.helper;
+  before(() => {
+    const vironlib = test.vironlib;
+    helperEMail = vironlib.auth.email.helper;
+  });
 
   describe('genSalt', () => {
 
     it('ソルトが生成される', async () => {
-      const salt = helper.genSalt();
+      const salt = helperEMail.genSalt();
       assert(salt);
       assert(typeof salt === 'string');
     });
@@ -20,24 +23,22 @@ describe('auth/email/helper', () => {
   describe('genHash', () => {
 
     it('パスワードハッシュが生成される', async () => {
-      await helper.genHash('test', 'salt')
-        .then(hash => {
-          assert(hash);
-          assert(typeof hash === 'string');
-          assert(hash.length === 1024);
-        });
+      const hash = await helperEMail.genHash('test', 'salt');
+      assert(hash);
+      assert(typeof hash === 'string');
+      assert(hash.length === 1024);
     });
 
     it('同一のパスワード/ソルトからは同一のハッシュが生成される', async () => {
       const results = [];
 
-      await helper.genHash('test', 'salt')
+      await helperEMail.genHash('test', 'salt')
         .then(hash => results.push(hash));
-      await helper.genHash('test', 'salt')
+      await helperEMail.genHash('test', 'salt')
         .then(hash => results.push(hash));
-      await helper.genHash('test', 'fake')
+      await helperEMail.genHash('test', 'fake')
         .then(hash => results.push(hash));
-      await helper.genHash('fake', 'salt')
+      await helperEMail.genHash('fake', 'salt')
         .then(hash => results.push(hash));
 
       assert(results[0] === results[1]);
@@ -52,16 +53,16 @@ describe('auth/email/helper', () => {
 
     before(async () => {
       salt = 'salt';
-      password = await helper.genHash('test', salt);
+      password = await helperEMail.genHash('test', salt);
     });
 
     it('パスワード認証に成功する', async () => {
-      const result = await helper.verify('test', password, salt);
+      const result = await helperEMail.verify('test', password, salt);
       assert(result === true);
     });
 
     it('パスワード認証に失敗する', async () => {
-      const result = await helper.verify('fake', password, salt);
+      const result = await helperEMail.verify('fake', password, salt);
       assert(result === false);
     });
 

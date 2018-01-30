@@ -1,10 +1,14 @@
 const assert = require('assert');
 
 const test = require('../');
-const vironlib = test.vironlib;
-const auditLog = vironlib.auditLog;
 
 describe('audit_log/controller', () => {
+  let controllerAuditLog;
+
+  before(() => {
+    const vironlib = test.vironlib;
+    controllerAuditLog = vironlib.auditLog.controller;
+  });
 
   describe('list', () => {
 
@@ -21,7 +25,6 @@ describe('audit_log/controller', () => {
       }
     });
 
-    const list = auditLog.controller.list;
     const swagger = {
       operation: {
         responses: {
@@ -56,7 +59,7 @@ describe('audit_log/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 1);
         done();
       };
-      list(req, res);
+      controllerAuditLog.list(req, res);
     });
 
     it('2ページ目が取得できる', done => {
@@ -77,7 +80,7 @@ describe('audit_log/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 2);
         done();
       };
-      list(req, res);
+      controllerAuditLog.list(req, res);
     });
 
     it('最終ページが取得できる', done => {
@@ -98,7 +101,7 @@ describe('audit_log/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 3);
         done();
       };
-      list(req, res);
+      controllerAuditLog.list(req, res);
     });
 
     it('user_id,response_method,response_uriで検索できる', done => {
@@ -117,7 +120,7 @@ describe('audit_log/controller', () => {
         assert(result[0].user_id === 'user_107');
         done();
       };
-      list(req, res);
+      controllerAuditLog.list(req, res);
     });
 
   });

@@ -2,11 +2,14 @@ const assert = require('assert');
 const jwt = require('jsonwebtoken');
 
 const test = require('../../');
-const vironlib = test.vironlib;
 
 describe('auth/jwt/helper', () => {
+  let helperJwt;
 
-  const helper = vironlib.auth.jwt.helper;
+  before(() => {
+    const vironlib = test.vironlib;
+    helperJwt = vironlib.auth.jwt.helper;
+  });
 
   describe('sign', () => {
 
@@ -27,7 +30,7 @@ NlrJmlrk7qtxetnuwJsoueEt7PXQ/2476xfReebSPuGvbqSpP/JK5CcCAwEAAQ==
 -----END PUBLIC KEY-----`;
 
 
-      const token = helper.sign({
+      const token = helperJwt.sign({
         sub: 'test',
       }, {
         claims: {
@@ -57,7 +60,7 @@ NlrJmlrk7qtxetnuwJsoueEt7PXQ/2476xfReebSPuGvbqSpP/JK5CcCAwEAAQ==
     it('HMACで署名できる', async () => {
       const secret = '===secret===';
 
-      const token = helper.sign({
+      const token = helperJwt.sign({
         sub: 'test',
       }, {
         claims: {

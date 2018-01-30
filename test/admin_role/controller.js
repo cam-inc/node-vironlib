@@ -1,13 +1,16 @@
 const assert = require('assert');
 
 const test = require('../');
-const vironlib = test.vironlib;
-const adminRole = vironlib.adminRole;
 
 describe('admin_role/controller', () => {
+  let controllerAdminRole;
+
+  before(() => {
+    const vironlib = test.vironlib;
+    controllerAdminRole = vironlib.adminRole.controller;
+  });
 
   describe('list', () => {
-
     const swagger = {
       operation: {
         responses: {
@@ -27,10 +30,11 @@ describe('admin_role/controller', () => {
     };
 
     beforeEach(async () => {
+      const list = [];
       for (let i = 0; i < 110; i++) {
         for (let j = 0; j < 5; j++) {
           for (const method of ['get', 'post', 'put', 'delete']) {
-            await test.models.AdminRoles.create({
+            list.push({
               role_id: `role${i}`,
               method: method,
               resource: `resource${j}`,
@@ -38,9 +42,8 @@ describe('admin_role/controller', () => {
           }
         }
       }
+      await test.models.AdminRoles.bulkCreate(list);
     });
-
-    const list = adminRole.controller.list;
 
     it('1ページ目が取得できる', done => {
       const req = test.genRequest({swagger});
@@ -54,7 +57,7 @@ describe('admin_role/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 1);
         done();
       };
-      list(req, res);
+      controllerAdminRole.list(req, res);
     });
 
     it('2ページ目が取得できる', done => {
@@ -75,7 +78,7 @@ describe('admin_role/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 2);
         done();
       };
-      list(req, res);
+      controllerAdminRole.list(req, res);
     });
 
     it('最終ページが取得できる', done => {
@@ -96,7 +99,7 @@ describe('admin_role/controller', () => {
         assert(res.get('X-Pagination-Current-Page') === 3);
         done();
       };
-      list(req, res);
+      controllerAdminRole.list(req, res);
     });
 
   });
@@ -129,8 +132,6 @@ describe('admin_role/controller', () => {
       });
     });
 
-    const create = adminRole.controller.create;
-
     it('管理ロールが作成できる', done => {
       const req = test.genRequest({
         swagger,
@@ -154,7 +155,7 @@ describe('admin_role/controller', () => {
         assert(roles.length === 4);
         done();
       };
-      create(req, res);
+      controllerAdminRole.create(req, res);
     });
 
     it('存在するrole_idで登録しようとした際、エラーを返す', done => {
@@ -172,7 +173,7 @@ describe('admin_role/controller', () => {
       });
       const res = test.genResponse();
 
-      create(req, res, err => {
+      controllerAdminRole.create(req, res, err => {
         assert(err.statusCode === 400);
         assert(err.data.name === 'AlreadyUsedRoleID');
         done();
@@ -198,8 +199,6 @@ describe('admin_role/controller', () => {
       },
       swaggerObject: {},
     };
-
-    const get = adminRole.controller.get;
 
     beforeEach(async () => {
       await test.models.AdminRoles.bulkCreate([
@@ -235,7 +234,7 @@ describe('admin_role/controller', () => {
         assert(result.paths[3].path === 'DELETE:/test');
         done();
       };
-      get(req, res);
+      controllerAdminRole.get(req, res);
     });
 
   });
@@ -257,8 +256,6 @@ describe('admin_role/controller', () => {
       },
       swaggerObject: {},
     };
-
-    const remove = adminRole.controller.remove;
 
     beforeEach(async () => {
       await test.models.AdminRoles.bulkCreate([
@@ -293,7 +290,7 @@ describe('admin_role/controller', () => {
         assert(list.length === 1);
         done();
       };
-      remove(req, res);
+      controllerAdminRole.remove(req, res);
     });
 
     it('削除対象の権限を持っているユーザがいる為、エラーを返す。', done => {
@@ -308,7 +305,7 @@ describe('admin_role/controller', () => {
       });
       const res = test.genResponse();
 
-      remove(req, res, err => {
+      controllerAdminRole.remove(req, res, err => {
         assert(err.statusCode === 400);
         assert(err.data.name === 'CurrentlyUsedAdminRole');
         done();
@@ -344,8 +341,6 @@ describe('admin_role/controller', () => {
         },
       },
     };
-
-    const update = adminRole.controller.update;
 
     beforeEach(async () => {
       await test.models.AdminRoles.bulkCreate([
@@ -390,7 +385,8 @@ describe('admin_role/controller', () => {
         assert(result[3].method === 'DELETE');
         done();
       };
-      update(req, res);
+
+      controllerAdminRole.update(req, res);
     });
 
   });

@@ -2,13 +2,15 @@ const assert = require('assert');
 const sinon = require('sinon');
 
 const test = require('../../');
-const vironlib = test.vironlib;
 
 describe('auth/google/middleware', () => {
-  let stubHelperGoogle;
+  let helperGoogle, middlewareGoogle, stubHelperGoogle;
 
-  const middleware = vironlib.auth.google.middleware();
-  const helperGoogle = vironlib.auth.google.helper;
+  before(() => {
+    const vironlib = test.vironlib;
+    helperGoogle = vironlib.auth.google.helper;
+    middlewareGoogle = vironlib.auth.google.middleware();
+  });
 
   beforeEach(() => {
     stubHelperGoogle = sinon.stub(helperGoogle);
@@ -56,7 +58,7 @@ describe('auth/google/middleware', () => {
         const res = test.genResponse();
 
         return new Promise(resolve => {
-          middleware(req, res, err => {
+          middlewareGoogle(req, res, err => {
             assert(!err);
             assert(res.get('Authorization'));
             assert(req.auth.googleOAuthToken.access_token === 'new_atoken');
@@ -91,7 +93,7 @@ describe('auth/google/middleware', () => {
     const res = test.genResponse();
 
     await new Promise(resolve => {
-      middleware(req, res, err => {
+      middlewareGoogle(req, res, err => {
         assert(err.data.name === 'Unauthorized');
         resolve();
       });
@@ -119,7 +121,7 @@ describe('auth/google/middleware', () => {
     const res = test.genResponse();
 
     await new Promise(resolve => {
-      middleware(req, res, err => {
+      middlewareGoogle(req, res, err => {
         assert(err === e);
         resolve();
       });
@@ -139,7 +141,7 @@ describe('auth/google/middleware', () => {
     const res = test.genResponse();
 
     await new Promise(resolve => {
-      middleware(req, res, err => {
+      middlewareGoogle(req, res, err => {
         assert(!err);
         resolve();
       });
@@ -151,7 +153,7 @@ describe('auth/google/middleware', () => {
     const res = test.genResponse();
 
     await new Promise(resolve => {
-      middleware(req, res, err => {
+      middlewareGoogle(req, res, err => {
         assert(!err);
         resolve();
       });

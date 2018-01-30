@@ -1,22 +1,27 @@
 const assert = require('assert');
 
 const test = require('../');
-const autocomplete = test.vironlib.autocomplete;
 
 describe('autocomplete/controller', () => {
+  let controllerAutocomplete;
+
+  before(() => {
+    const vironlib = test.vironlib;
+    controllerAutocomplete = vironlib.autocomplete.controller;
+  });
 
   describe('list', () => {
 
     beforeEach(async () => {
+      const list = [];
       for (let i = 0; i < 101; i++) {
-        await test.models.AdminUsers.create({
+        list.push({
           email: `test${i}@example.com`,
           role_id: 'viewer',
         });
       }
+      await test.models.AdminUsers.bulkCreate(list);
     });
-
-    const list = autocomplete.controller.list;
 
     it('emailで部分一致検索した結果が取得できる', done => {
       const req = test.genRequest({
@@ -36,7 +41,7 @@ describe('autocomplete/controller', () => {
         assert(result[1].name === 'test10@example.com');
         done();
       };
-      list(req, res);
+      controllerAutocomplete.list(req, res);
     });
 
     it('model未指定時は空配列', done => {
@@ -52,7 +57,7 @@ describe('autocomplete/controller', () => {
         assert(result.length === 0);
         done();
       };
-      list(req, res);
+      controllerAutocomplete.list(req, res);
     });
 
     it('modelに一致するテーブルがない場合は空配列', done => {
@@ -69,7 +74,7 @@ describe('autocomplete/controller', () => {
         assert(result.length === 0);
         done();
       };
-      list(req, res);
+      controllerAutocomplete.list(req, res);
     });
 
   });

@@ -1,13 +1,15 @@
 const assert = require('assert');
 const test = require('../');
-const vironlib = test.vironlib;
-const swagger = vironlib.swagger;
 
 describe('swagger/controller', () => {
+  let controllerSwagger;
+
+  before(() => {
+    const vironlib = test.vironlib;
+    controllerSwagger = vironlib.swagger.controller;
+  });
 
   describe('show', () => {
-
-    const show = swagger.controller.show;
 
     it('swagger.jsonが取得できる', done => {
       const swagger = {
@@ -38,7 +40,7 @@ describe('swagger/controller', () => {
         assert(result.paths['/adminrole'].post);
         done();
       };
-      show(req, res);
+      controllerSwagger.show(req, res);
     });
 
     it('権限のないパスはswagger.jsonから削除される', done => {
@@ -78,7 +80,7 @@ describe('swagger/controller', () => {
         assert(!result.paths['/adminrole']);
         done();
       };
-      show(req, res);
+      controllerSwagger.show(req, res);
     });
 
     it('hostの書き換えができる', done => {
@@ -98,15 +100,16 @@ describe('swagger/controller', () => {
         assert(result.host === 'localhost:3000');
         done();
       };
-      show(req, res);
+      controllerSwagger.show(req, res);
     });
 
     it('role_idのenum変更に成功', done => {
       Promise.resolve().then(async () => {
+        const list = [];
         for (let i = 0; i < 5; i++) {
           for (let j = 0; j < 5; j++) {
             for (const method of ['get', 'post', 'put', 'delete']) {
-              await test.models.AdminRoles.create({
+              list.push({
                 role_id: `role${i}`,
                 method: method,
                 resource: `resource${j}`,
@@ -114,6 +117,7 @@ describe('swagger/controller', () => {
             }
           }
         }
+        await test.models.AdminRoles.bulkCreate(list);
       }).then(() => {
         const swagger = {
           operation: {
@@ -156,7 +160,7 @@ describe('swagger/controller', () => {
           assert(!result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('tester'));
           done();
         };
-        show(req, res);
+        controllerSwagger.show(req, res);
       });
     });
 
@@ -200,20 +204,22 @@ describe('swagger/controller', () => {
         assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum[0] === 'super');
         done();
       };
-      show(req, res);
+      controllerSwagger.show(req, res);
     });
 
     it('checklistの自動生成ができる', done => {
       Promise.resolve().then(async () => {
+        const list = [];
         for (let i = 0; i < 5; i++) {
           for (const method of ['get', 'post', 'put', 'delete']) {
-            await test.models.AdminRoles.create({
+            list.push({
               role_id: `role${i}`,
               method: method,
               resource: 'r1',
             });
           }
         }
+        await test.models.AdminRoles.bulkCreate(list);
       }).then(() => {
         const swagger = {
           operation: {
@@ -257,7 +263,7 @@ describe('swagger/controller', () => {
           assert(result.definitions.TestPayload.properties.check_list.properties.super.default === false);
           done();
         };
-        show(req, res);
+        controllerSwagger.show(req, res);
       });
     });
 

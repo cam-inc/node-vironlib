@@ -1,14 +1,17 @@
 const assert = require('assert');
 const test = require('../../');
-const vironlib = test.vironlib;
 
 describe('auth/jwt/middleware', () => {
+  let helperJwt, middlewareJwt;
 
-  const middleware = vironlib.auth.jwt.middleware();
-  const helper = vironlib.auth.jwt.helper;
+  before(() => {
+    const vironlib = test.vironlib;
+    helperJwt = vironlib.auth.jwt.helper;
+    middlewareJwt = vironlib.auth.jwt.middleware();
+  });
 
   it('検証に成功する', async () => {
-    const token = helper.sign({
+    const token = helperJwt.sign({
       sub: 'test',
     }, {
       claims: {
@@ -29,7 +32,7 @@ describe('auth/jwt/middleware', () => {
     const res = test.genResponse();
 
     return new Promise(resolve => {
-      middleware(req, res, err => {
+      middlewareJwt(req, res, err => {
         assert(!err);
         assert(res.get('Authorization') === `Bearer ${token}`);
         resolve();
@@ -38,7 +41,7 @@ describe('auth/jwt/middleware', () => {
   });
 
   it('検証に失敗する', async () => {
-    const token = helper.sign({
+    const token = helperJwt.sign({
       sub: 'test',
     }, {
       claims: {
@@ -59,7 +62,7 @@ describe('auth/jwt/middleware', () => {
     const res = test.genResponse();
 
     return new Promise(resolve => {
-      middleware(req, res, err => {
+      middlewareJwt(req, res, err => {
         assert(err);
         assert(err.statusCode === 401);
         resolve();

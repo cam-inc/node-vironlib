@@ -1,11 +1,13 @@
 const assert = require('assert');
 const test = require('../');
-const vironlib = test.vironlib;
-const auditLog = vironlib.auditLog;
 
 describe('audit_log/middleware', () => {
+  let middlewareAuditLog;
 
-  const middleware = auditLog.middleware();
+  before(() => {
+    const vironlib = test.vironlib;
+    middlewareAuditLog = vironlib.auditLog.middleware();
+  });
 
   it('AuditLogがDBに保存される', done => {
     const req = test.genRequest({
@@ -17,20 +19,17 @@ describe('audit_log/middleware', () => {
     });
     const res = test.genResponse();
 
-    middleware(req, res, () => {
-      res.on('end', () => {
-        test.models.AuditLogs.findAll()
-          .then(list => {
-            assert(list.length === 1);
-            const data = list[0].dataValues;
-            assert(data.request_method === 'GET');
-            assert(data.request_uri === '/swagger.json');
-            assert(data.status_code === 200);
-            assert(data.source_ip === '127.0.0.1');
-            assert(data.request_body === '{}');
-            done();
-          })
-        ;
+    middlewareAuditLog(req, res, () => {
+      res.on('end', async () => {
+        const list = await test.models.AuditLogs.findAll();
+        assert(list.length === 1);
+        const data = list[0].dataValues;
+        assert(data.request_method === 'GET');
+        assert(data.request_uri === '/swagger.json');
+        assert(data.status_code === 200);
+        assert(data.source_ip === '127.0.0.1');
+        assert(data.request_body === '{}');
+        done();
       });
 
       res.end({});
@@ -47,14 +46,11 @@ describe('audit_log/middleware', () => {
     });
     const res = test.genResponse();
 
-    middleware(req, res, () => {
-      res.on('end', () => {
-        test.models.AuditLogs.findAll()
-          .then(list => {
-            assert(list.length === 0);
-            done();
-          })
-        ;
+    middlewareAuditLog(req, res, () => {
+      res.on('end', async () => {
+        const list = await test.models.AuditLogs.findAll();
+        assert(list.length === 0);
+        done();
       });
 
       res.end({});
@@ -71,14 +67,11 @@ describe('audit_log/middleware', () => {
     });
     const res = test.genResponse();
 
-    middleware(req, res, () => {
-      res.on('end', () => {
-        test.models.AuditLogs.findAll()
-          .then(list => {
-            assert(list.length === 0);
-            done();
-          })
-        ;
+    middlewareAuditLog(req, res, () => {
+      res.on('end', async () => {
+        const list = await test.models.AuditLogs.findAll();
+        assert(list.length === 0);
+        done();
       });
 
       res.end({});
@@ -95,14 +88,11 @@ describe('audit_log/middleware', () => {
     });
     const res = test.genResponse();
 
-    middleware(req, res, () => {
-      res.on('end', () => {
-        test.models.AuditLogs.findAll()
-          .then(list => {
-            assert(list.length === 0);
-            done();
-          })
-        ;
+    middlewareAuditLog(req, res, () => {
+      res.on('end', async () => {
+        const list = await test.models.AuditLogs.findAll();
+        assert(list.length === 0);
+        done();
       });
 
       res.end({});

@@ -1,10 +1,14 @@
 const assert = require('assert');
 
 const test = require('../');
-const vironlib = test.vironlib;
-const account = vironlib.account;
 
 describe('account/controller', () => {
+  let controllerAccount;
+
+  before(() => {
+    const vironlib = test.vironlib;
+    controllerAccount = vironlib.account.controller;
+  });
 
   const swagger = {
     operation: {
@@ -33,8 +37,6 @@ describe('account/controller', () => {
       });
     });
 
-    const list = account.controller.list;
-
     it('1件取得できる', done => {
       const req = test.genRequest({
         swagger,
@@ -50,14 +52,13 @@ describe('account/controller', () => {
         assert(result[0].role_id === 'viewer');
         done();
       };
-      list(req, res);
+      controllerAccount.list(req, res);
     });
 
   });
 
   describe('get', () => {
 
-    const get = account.controller.get;
     let data;
 
     beforeEach(async () => {
@@ -87,14 +88,13 @@ describe('account/controller', () => {
         assert(result.role_id === 'viewer');
         done();
       };
-      get(req, res);
+      controllerAccount.get(req, res);
     });
 
   });
 
   describe('update', () => {
 
-    const update = account.controller.update;
     let data;
 
     beforeEach(async () => {
@@ -128,7 +128,7 @@ describe('account/controller', () => {
         assert(m.password !== 'aaaaaaaaaaaaaaaa');
         done();
       };
-      update(req, res);
+      controllerAccount.update(req, res);
     });
 
   });

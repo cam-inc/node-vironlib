@@ -7,16 +7,19 @@ const gapi = require('googleapis');
 const sinon = require('sinon');
 
 const test = require('../../');
-const vironlib = test.vironlib;
 
 describe('auth/google/helper', () => {
+  let helperGoogle;
 
-  const helper = vironlib.auth.google.helper;
+  before(() => {
+    const vironlib = test.vironlib;
+    helperGoogle = vironlib.auth.google.helper;
+  });
 
   describe('getClient', () => {
 
     it('OAuth2クライアントを取得できる', () => {
-      const result = helper.getClient({
+      const result = helperGoogle.getClient({
         client_id: 'xxxxxxxxxxxxxxxxxxxx',
         client_secret: 'zzzzzzzzzzzzzzzzzzzz',
         redirect_url: 'http://localhost/redirect'
@@ -29,7 +32,7 @@ describe('auth/google/helper', () => {
   describe('getAuthUrl', () => {
 
     it('認証ページのURLを取得できる', () => {
-      const result = helper.genAuthUrl({
+      const result = helperGoogle.genAuthUrl({
         client_id: 'xxxxxxxxxxxxxxxxxxxx',
         client_secret: 'zzzzzzzzzzzzzzzzzzzz',
         redirect_url: 'http://localhost/redirect',
@@ -63,11 +66,8 @@ describe('auth/google/helper', () => {
     });
 
     it('アクセストークンを取得できる', async () => {
-      await helper.getToken('ccccooooddddeeee', {})
-        .then(token => {
-          assert(token.access_token === 'token:ccccooooddddeeee');
-        })
-      ;
+      const token = await helperGoogle.getToken('ccccooooddddeeee', {});
+      assert(token.access_token === 'token:ccccooooddddeeee');
     });
   });
 
@@ -84,17 +84,14 @@ describe('auth/google/helper', () => {
     });
 
     it('メールアドレスを取得できる', async () => {
-      await helper.getMailAddress({access_token: 'xxxxx'})
-        .then(email => {
-          assert(email === 'test@example.com');
+      const email = await helperGoogle.getMailAddress({access_token: 'xxxxx'});
+      assert(email === 'test@example.com');
 
-          assert(stubGet.calledWith('https://www.googleapis.com/oauth2/v2/userinfo', {
-            headers: {
-              Authorization: 'OAuth xxxxx',
-            },
-          }));
-        })
-      ;
+      assert(stubGet.calledWith('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          Authorization: 'OAuth xxxxx',
+        },
+      }));
     });
   });
 
@@ -111,23 +108,17 @@ describe('auth/google/helper', () => {
     });
 
     it('許可されているドメインの場合はメールアドレスが取得できる', async () => {
-      await helper.allowMailDomain({access_token: 'xxxxx'}, {
+      const email = await helperGoogle.allowMailDomain({access_token: 'xxxxx'}, {
         allow_email_domains: ['example.com'],
-      })
-        .then(email => {
-          assert(email === 'test@example.com');
-        })
-      ;
+      });
+      assert(email === 'test@example.com');
     });
 
     it('許可されていないドメインの場合はfalse', async () => {
-      await helper.allowMailDomain({access_token: 'xxxxx'}, {
+      const email = await helperGoogle.allowMailDomain({access_token: 'xxxxx'}, {
         allow_email_domains: ['dummy.com'],
-      })
-        .then(email => {
-          assert(email === false);
-        })
-      ;
+      });
+      assert(email === false);
     });
   });
 

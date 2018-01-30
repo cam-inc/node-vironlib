@@ -1,30 +1,33 @@
 const assert = require('assert');
 const test = require('../');
-const adminRole = test.vironlib.adminRole;
 
 describe('admin_role/helper', () => {
+  let helperAdminRole;
+
+  before(() => {
+    const vironlib = test.vironlib;
+    helperAdminRole = vironlib.adminRole.helper;
+  });
 
   describe('canAccess', () => {
 
-    const canAccess = adminRole.helper.canAccess;
-
     it('WhiteListにあるのでOK', () => {
-      const result = canAccess('/ping', 'GET', {});
+      const result = helperAdminRole.canAccess('/ping', 'GET', {});
       assert(result === true);
     });
 
     it('ワイルドカードなのでOK', () => {
-      const result = canAccess('/user', 'GET', {get: ['*']});
+      const result = helperAdminRole.canAccess('/user', 'GET', {get: ['*']});
       assert(result === true);
     });
 
     it('roleに対象のリソースの権限があるのでOK', () => {
-      const result = canAccess('/user', 'GET', {get: ['user']});
+      const result = helperAdminRole.canAccess('/user', 'GET', {get: ['user']});
       assert(result === true);
     });
 
     it('roleに対象のリソースの権限がないのでNG', () => {
-      const result = canAccess('/user', 'GET', {get: ['hoge']});
+      const result = helperAdminRole.canAccess('/user', 'GET', {get: ['hoge']});
       assert(result === false);
     });
 
@@ -32,20 +35,19 @@ describe('admin_role/helper', () => {
 
   describe('getRoles', () => {
 
-    const getRoles = adminRole.helper.getRoles;
-
     beforeEach(async () => {
-      for (const method of ['get', 'post', 'put', 'delete']) {
-        await test.models.AdminRoles.create({
+      const list = ['get', 'post', 'put', 'delete'].map(method => {
+        return {
           role_id: 'tester',
           method: method,
           resource: 'test',
-        });
-      }
+        };
+      });
+      await test.models.AdminRoles.bulkCreate(list);
     });
 
     it('スーパー権限の場合はすべてワイルドカード', async () => {
-      await getRoles(test.models.AdminRoles, 'super', 'super')
+      await helperAdminRole.getRoles(test.models.AdminRoles, 'super', 'super')
         .then(roles => {
           assert(roles.get[0] === '*');
           assert(roles.post[0] === '*');
@@ -57,7 +59,7 @@ describe('admin_role/helper', () => {
     });
 
     it('所持している権限のみ取得できる', async () => {
-      await getRoles(test.models.AdminRoles, 'tester', 'super')
+      await helperAdminRole.getRoles(test.models.AdminRoles, 'tester', 'super')
         .then(roles => {
           assert(roles.get.length === 1);
           assert(roles.post.length === 1);

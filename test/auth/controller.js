@@ -6,16 +6,18 @@ const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
 
 const test = require('../');
-const vironlib = test.vironlib;
 
 describe('auth/controller', () => {
+  let controllerAuth, helperEMail, helperGoogle;
 
-  const controller = vironlib.auth.controller;
+  before(() => {
+    const vironlib = test.vironlib;
+    controllerAuth = vironlib.auth.controller;
+    helperEMail = vironlib.auth.email.helper;
+    helperGoogle = vironlib.auth.google.helper;
+  });
 
   describe('signIn', () => {
-
-    const signIn = controller.signIn;
-    const helperEMail = vironlib.auth.email.helper;
 
     it('1人目はスーパーユーザーとして登録される', done => {
       const req = test.genRequest({
@@ -35,7 +37,7 @@ describe('auth/controller', () => {
         assert(m.salt);
         done();
       };
-      signIn(req, res);
+      controllerAuth.signIn(req, res);
     });
 
     it('存在すればログインできる', done => {
@@ -67,7 +69,7 @@ describe('auth/controller', () => {
           done();
         };
 
-        signIn(req, res);
+        controllerAuth.signIn(req, res);
       });
     });
 
@@ -95,7 +97,7 @@ describe('auth/controller', () => {
           assert.fail('don\'t reach here.');
         };
 
-        signIn(req, res, err => {
+        controllerAuth.signIn(req, res, err => {
           assert(err.statusCode === 404);
           assert(err.data.name === 'AdminUserNotFound');
           done();
@@ -129,15 +131,13 @@ describe('auth/controller', () => {
           done();
         };
 
-        signIn(req, res);
+        controllerAuth.signIn(req, res);
       });
     });
 
   });
 
   describe('signOut', () => {
-
-    const signOut = controller.signOut;
 
     it('叩ければOK', done => {
       const req = test.genRequest();
@@ -148,14 +148,12 @@ describe('auth/controller', () => {
         done();
       };
 
-      signOut(req, res);
+      controllerAuth.signOut(req, res);
     });
 
   });
 
   describe('googleSignIn', () => {
-
-    const googleSignIn = controller.googleSignIn;
 
     it('Googleの認証URLにリダイレクトされる', done => {
       const req = test.genRequest();
@@ -166,7 +164,7 @@ describe('auth/controller', () => {
         done();
       };
 
-      googleSignIn(req, res);
+      controllerAuth.googleSignIn(req, res);
     });
 
     it('redirect_urlを渡せばそのURLがstateに含まれたURLにリダイレクトされる', done => {
@@ -185,15 +183,12 @@ describe('auth/controller', () => {
         done();
       };
 
-      googleSignIn(req, res);
+      controllerAuth.googleSignIn(req, res);
     });
 
   });
 
   describe('googleOAuth2Callback', () => {
-
-    const googleOAuth2Callback = controller.googleOAuth2Callback;
-    const helperGoogle = vironlib.auth.google.helper;
 
     let getTokenStub, allowMailDomainStub;
 
@@ -231,7 +226,7 @@ describe('auth/controller', () => {
         done();
       };
 
-      googleOAuth2Callback(req, res);
+      controllerAuth.googleOAuth2Callback(req, res);
     });
 
     it('存在すればログインできる', done => {
@@ -263,7 +258,7 @@ describe('auth/controller', () => {
           done();
         };
 
-        googleOAuth2Callback(req, res);
+        controllerAuth.googleOAuth2Callback(req, res);
       });
     });
 
@@ -299,7 +294,7 @@ describe('auth/controller', () => {
           done();
         };
 
-        googleOAuth2Callback(req, res);
+        controllerAuth.googleOAuth2Callback(req, res);
       });
     });
 
@@ -322,7 +317,7 @@ describe('auth/controller', () => {
         done();
       };
 
-      googleOAuth2Callback(req, res);
+      controllerAuth.googleOAuth2Callback(req, res);
     });
 
   });

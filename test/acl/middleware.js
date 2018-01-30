@@ -1,17 +1,18 @@
 const assert = require('assert');
 const test = require('../');
-const vironlib = test.vironlib;
-const acl = vironlib.acl;
 
 describe('acl/middleware', () => {
+  let middlewareAcl;
 
-  const middleware = acl.middleware();
+  before(() => {
+    middlewareAcl = test.vironlib.acl.middleware();
+  });
 
   it('レスポンスヘッダにACLの情報が付加される', done => {
     const req = test.genRequest();
     const res = test.genResponse();
 
-    middleware(req, res, () => {
+    middlewareAcl(req, res, () => {
       assert(res.get('Access-Control-Allow-Origin') === 'http://localhost:3000');
       assert(res.get('Access-Control-Allow-Credentials') === true);
       assert(res.get('Access-Control-Allow-Methods') === 'GET, PUT, POST, DELETE, HEAD, OPTIONS');

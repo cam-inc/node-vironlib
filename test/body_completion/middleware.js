@@ -1,11 +1,13 @@
 const assert = require('assert');
 const test = require('../');
-const vironlib = test.vironlib;
-const bodyCompletion = vironlib.bodyCompletion;
 
 describe('body_completion/middleware', () => {
+  let middlewareBodyCompletion;
 
-  const middleware = bodyCompletion.middleware();
+  before(() => {
+    const vironlib = test.vironlib;
+    middlewareBodyCompletion = vironlib.bodyCompletion.middleware();
+  });
 
   it('リクエストbody内で足りないキーを補完する', done => {
     const req = test.genRequest({
@@ -56,7 +58,7 @@ describe('body_completion/middleware', () => {
       }
     });
     const res = test.genResponse();
-    middleware(req, res, () => {
+    middlewareBodyCompletion(req, res, () => {
       assert(req.body.name === null);
       done();
     });
@@ -111,7 +113,7 @@ describe('body_completion/middleware', () => {
       }
     });
     const res = test.genResponse();
-    middleware(req, res, () => {
+    middlewareBodyCompletion(req, res, () => {
       assert(req.body.name === undefined);
       done();
     });
@@ -166,7 +168,7 @@ describe('body_completion/middleware', () => {
       }
     });
     const res = test.genResponse();
-    middleware(req, res, () => {
+    middlewareBodyCompletion(req, res, () => {
       assert(req.body.name === undefined);
       done();
     });
@@ -222,7 +224,7 @@ describe('body_completion/middleware', () => {
       }
     });
     const res = test.genResponse();
-    middleware(req, res, () => {
+    middlewareBodyCompletion(req, res, () => {
       assert(req.body.name === '');
       done();
     });

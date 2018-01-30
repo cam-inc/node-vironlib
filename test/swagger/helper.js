@@ -1,13 +1,15 @@
 const assert = require('assert');
-const vironlib = require('../').vironlib;
-const swagger = vironlib.swagger;
 const test = require('../');
 
 describe('swagger/helper', () => {
+  let helperSwagger;
+
+  before(() => {
+    const vironlib = test.vironlib;
+    helperSwagger = vironlib.swagger.helper;
+  });
 
   describe('getPort', () => {
-
-    const getPort = swagger.helper.getPort;
 
     it('swaggerに記述されたhostからportを取得できる', () => {
       const swaggerExpress = {
@@ -18,7 +20,7 @@ describe('swagger/helper', () => {
         },
       };
 
-      const result = getPort(swaggerExpress, 8080);
+      const result = helperSwagger.getPort(swaggerExpress, 8080);
       assert(result === 3000);
     });
 
@@ -30,7 +32,7 @@ describe('swagger/helper', () => {
         },
       };
 
-      const result = getPort(swaggerExpress, 8080);
+      const result = helperSwagger.getPort(swaggerExpress, 8080);
       assert(result === 8080);
     });
   });
@@ -38,15 +40,16 @@ describe('swagger/helper', () => {
   describe('autoGenerate', () => {
 
     beforeEach(async () => {
+      const list = [];
       for (let i = 0; i < 10; i++) {
-        await test.models.AdminRoles.create({
+        list.push({
           role_id: `role${i}`,
           method: 'GET'
         });
       }
+      await test.models.AdminRoles.bulkCreate(list);
     });
 
-    const autoGenerate = swagger.helper.autoGenerate;
     const swaggerExpress = {
       runner: {
         swagger: {
@@ -79,7 +82,7 @@ describe('swagger/helper', () => {
     };
 
     it('自動生成されたパスがadminrolepathのenumにセットされる', async () => {
-      await autoGenerate(swaggerExpress)
+      await helperSwagger.autoGenerate(swaggerExpress)
         .then(() => {
           const list = swaggerExpress.runner.swagger.definitions.adminrolepath.properties.path.enum;
           assert(list.length === 12);
@@ -100,7 +103,7 @@ describe('swagger/helper', () => {
     });
 
     it('swaggerオブジェクトを直接渡すこともできる', async () => {
-      await autoGenerate(swaggerExpress.runner.swagger)
+      await helperSwagger.autoGenerate(swaggerExpress.runner.swagger)
         .then(() => {
           const list = swaggerExpress.runner.swagger.definitions.adminrolepath.properties.path.enum;
           assert(list.length === 12);
