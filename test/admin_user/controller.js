@@ -245,7 +245,6 @@ describe('admin_user/controller', () => {
         }, swagger),
         body: {
           password: null,
-          role_id: 'tester',
         },
       });
       const res = test.genResponse();
@@ -253,6 +252,32 @@ describe('admin_user/controller', () => {
       res.json = async () => {
         const m = await test.models.AdminUsers.findOne({where: {email: 'test@example.com'}});
         assert(m.role_id === 'viewer');
+        assert(m.password === 'aaaaaaaaaaaaaaaa');
+        done();
+      };
+
+      controllerAdminUser.update(req, res);
+    });
+
+    it('ロールIDのみ更新できる', done => {
+      const req = test.genRequest({
+        swagger: Object.assign({
+          params: {
+            id: {
+              value: data.id,
+            },
+          },
+        }, swagger),
+        body: {
+          password: null,
+          role_id: 'tester',
+        },
+      });
+      const res = test.genResponse();
+
+      res.json = async () => {
+        const m = await test.models.AdminUsers.findOne({where: {email: 'test@example.com'}});
+        assert(m.role_id === 'tester');
         assert(m.password === 'aaaaaaaaaaaaaaaa');
         done();
       };

@@ -115,20 +115,29 @@ const registerUpdate = options => {
 
   return asyncWrapper(async (req, res) => {
     const password = req.body.password;
-    if (!password) {
+    const roleId = req.body.role_id;
+
+    if (!password && !roleId) {
       return res.json({});
     }
 
-    // パスワードをハッシュ化
-    const salt = helperEMail.genSalt();
-    const hashedPassword = await helperEMail.genHash(req.body.password, salt);
+    const data = {};
+
+    if (password) {
+      // パスワードをハッシュ化
+      const salt = helperEMail.genSalt();
+      const hashedPassword = await helperEMail.genHash(req.body.password, salt);
+      Object.assign(data, {
+        password: hashedPassword,
+        salt: salt,
+      });
+    }
+
+    if (roleId) {
+      Object.assign(data, {role_id: roleId});
+    }
 
     const id = req.swagger.params.id.value;
-    const data = {
-      password: hashedPassword,
-      salt: salt,
-      role_id: req.body.role_id,
-    };
     const result = await AdminUsers.update(data, {where: {id}});
     return res.json(result);
   });
