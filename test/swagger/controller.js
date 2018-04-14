@@ -139,6 +139,16 @@ describe('swagger/controller', () => {
                       defaults: ['super'],
                     }
                   },
+                  tags: {
+                    type: 'array',
+                    items: {
+                      'x-autogen-enum': {
+                        model: 'admin_roles',
+                        field: 'role_id',
+                        defaults: ['super'],
+                      }
+                    }
+                  }
                 },
               },
             },
@@ -158,6 +168,8 @@ describe('swagger/controller', () => {
           assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('role0'));
           assert(result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('super'));
           assert(!result.definitions.UpdateAdminUserPayload.properties.role_id.enum.includes('tester'));
+
+          assert(result.definitions.UpdateAdminUserPayload.properties.tags.items.enum.length === 6);
           done();
         };
         controllerSwagger.show(req, res);

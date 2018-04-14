@@ -68,6 +68,7 @@ const transform = async (def, store, cache) => {
         .then(results => merge(...results));
     }
   } else if (def.type === 'array' && def.items) {
+    def.items = await transform(def.items, store, cache);
     const tasks = Object.keys(def.items).map(key => {
       return transform(def.items[key], store, cache)
         .then(_def => {
