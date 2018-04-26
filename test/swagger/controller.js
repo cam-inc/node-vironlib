@@ -219,7 +219,7 @@ describe('swagger/controller', () => {
       controllerSwagger.show(req, res);
     });
 
-    it.only('checklistの自動生成ができる', done => {
+    it('checklistの自動生成ができる', done => {
       Promise.resolve().then(async () => {
         const list = [];
         for (let i = 0; i < 5; i++) {
