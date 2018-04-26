@@ -219,7 +219,7 @@ describe('swagger/controller', () => {
       controllerSwagger.show(req, res);
     });
 
-    it('checklistの自動生成ができる', done => {
+    it.only('checklistの自動生成ができる', done => {
       Promise.resolve().then(async () => {
         const list = [];
         for (let i = 0; i < 5; i++) {
@@ -252,6 +252,7 @@ describe('swagger/controller', () => {
                       field: 'role_id',
                       defaults: ['super'],
                       default: false,
+                      order: [['role_id', 'DESC']],
                     }
                   },
                 },
@@ -271,6 +272,7 @@ describe('swagger/controller', () => {
         res.json = result => {
           assert(result.definitions.TestPayload.properties.check_list.type === 'object');
           assert(Object.keys(result.definitions.TestPayload.properties.check_list.properties).length === 6);
+          assert(Object.keys(result.definitions.TestPayload.properties.check_list.properties)[0] === 'role4'); // ソートできてる
           assert(result.definitions.TestPayload.properties.check_list.properties.super.type === 'boolean');
           assert(result.definitions.TestPayload.properties.check_list.properties.super.default === false);
           done();

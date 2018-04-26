@@ -1,3 +1,5 @@
+const {createHmac} = require('crypto');
+
 const asyncWrapper = require('../async_wrapper');
 const deepClone = require('mout/lang/deepClone');
 const {find, has, merge, set} = require('mout/object');
@@ -5,15 +7,30 @@ const {isEmpty, isArray, isPlainObject} = require('mout/lang');
 
 const helperAdminRole = require('../admin_role/helper');
 
+const genHash = (prefix, def) => {
+  const hmac = createHmac('sha256', 'cache');
+  hmac.update(prefix);
+  hmac.update(JSON.stringify(def));
+  return hmac.digest('hex');
+};
+
 const genEnum = async (def, store, cache) => {
   const defEnum = def['x-autogen-enum'];
   const Model = find(store.models, mdl => mdl.tableName === defEnum.model);
+  const hashKey = genHash('enum', defEnum);
   const field = defEnum.field;
   let list;
-  if (has(cache, `${defEnum.model}.${field}`)) {
+  if (has(cache, hashKey)) {
     list = cache[defEnum.model][field];
   } else {
-    list = await Model.findAll({attributes: [field]});
+    const options = {attributes: [field]};
+    if (defEnum.order) {
+      options.order = defEnum.order;
+    }
+    if (defEnum.where) {
+      options.where = defEnum.where;
+    }
+    list = await Model.findAll(options);
     set(cache, `${defEnum.model}.${field}`, list);
   }
   const enums = new Set(defEnum.defaults);
@@ -24,12 +41,20 @@ const genEnum = async (def, store, cache) => {
 const genCheckList = async (def, store, cache) => {
   const defCheckList = def['x-autogen-checklist'];
   const Model = find(store.models, mdl => mdl.tableName === defCheckList.model);
+  const hashKey = genHash('checklist', defCheckList);
   const field = defCheckList.field;
   let list;
-  if (has(cache, `${defCheckList.model}.${field}`)) {
+  if (has(cache, hashKey)) {
     list = cache[defCheckList.model][field];
   } else {
-    list = await Model.findAll({attributes: [field]});
+    const options = {attributes: [field]};
+    if (defCheckList.order) {
+      options.order = defCheckList.order;
+    }
+    if (defCheckList.where) {
+      options.where = defCheckList.where;
+    }
+    list = await Model.findAll(options);
     set(cache, `${defCheckList.model}.${field}`, list);
   }
   const map = {};
