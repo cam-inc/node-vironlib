@@ -53,6 +53,7 @@ const count = (model, query, options={}) => {
   if (!isEmpty(query)) {
     opts.where = query;
   }
+  delete opts.attributes;
   return model.count(opts);
 };
 
