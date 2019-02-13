@@ -16,11 +16,11 @@ module.exports = ({ Schema, SchemaTypes }) => {
       },
       method: {
         type: SchemaTypes.String,
-        required: true
+        required: false
       },
       resource: {
         type: SchemaTypes.String,
-        required: true
+        required: false
       },
       createdAt: {
         type: SchemaTypes.Number

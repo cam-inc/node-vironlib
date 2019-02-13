@@ -11,27 +11,27 @@ module.exports = ({ Schema, SchemaTypes }) => {
       // },
       request_method: {
         type: SchemaTypes.String,
-        required: true
+        required: false
       },
       request_uri: {
         type: SchemaTypes.String,
-        required: true
+        required: false
       },
       source_ip: {
         type: SchemaTypes.String,
-        required: true
+        required: false
       },
       user_id: {
         type: SchemaTypes.String,
-        required: true
+        required: false
       },
       request_body: {
         type: SchemaTypes.String,
-        required: true
+        required: false
       },
       status_code: {
         type: SchemaTypes.Number,
-        required: true
+        required: false
       },
       createdAt: {
         type: SchemaTypes.Number
