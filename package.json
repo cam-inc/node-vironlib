@@ -25,6 +25,7 @@
     "express-unless": "^0.3.1",
     "googleapis": "^20.1.0",
     "jsonwebtoken": "^7.4.2",
+    "mongoose": "^5.4.7",
     "mout": "^1.0.0",
     "sequelize": "^4.32.2"
   },
