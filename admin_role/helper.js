@@ -1,6 +1,8 @@
 const {contains} = require('mout/array');
 const {reduce} = require('mout/object');
 
+const {isMongoDB} = require('../helper');
+
 // 常にアクセスOKなリソース
 const whiteList = [
   'viron',
@@ -43,7 +45,13 @@ const getRoles = async (AdminRoles, roleId, superRole) => {
     };
   }
 
-  const roles = await AdminRoles.findAll({where: {role_id: roleId}});
+  let roles;
+  if (isMongoDB(AdminRoles)) {
+    roles = await AdminRoles.find({role_id: roleId});
+  } else {
+    roles = await AdminRoles.findAll({where: {role_id: roleId}});
+  }
+
   return reduce(roles, (ret, role) => {
     const method = role.method.toLowerCase();
     ret[method] = ret[method] || [];

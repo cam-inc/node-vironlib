@@ -14,6 +14,7 @@ const constants = require('../../constants');
  * @param {Array} options.order - [['id', 'ASC'], ['name', 'DESC']]
  */
 const find = (model, query, options={}) => {
+  debugger;
   // const opts = Object.assign({}, options);
   // if (!isEmpty(query)) {
   //   opts.where = query;
@@ -35,6 +36,7 @@ const find = (model, query, options={}) => {
  * @param {Array} options.attributes - ['id', 'name', 'age']
  */
 const findOne = (model, query, options={}) => {
+  debugger;
   // const opts = Object.assign({}, options);
   // if (!isEmpty(query)) {
   //   opts.where = query;
@@ -49,6 +51,7 @@ const findOne = (model, query, options={}) => {
  * @param {Object} options
  */
 const count = (model, query, options={}) => {
+  debugger;
   // const opts = Object.assign({}, options);
   // if (!isEmpty(query)) {
   //   opts.where = query;
@@ -63,6 +66,7 @@ const count = (model, query, options={}) => {
  * @param {Object} data
  */
 const create = (model, data) => {
+  debugger;
   return model.create(data);
 };
 
@@ -74,6 +78,7 @@ const create = (model, data) => {
  * @param {boolean} options.force
  */
 const remove = (model, query, options={}) => {
+  debugger;
   // const opts = Object.assign({}, options);
   // if (!isEmpty(query)) {
   //   opts.where = query;
@@ -89,6 +94,7 @@ const remove = (model, query, options={}) => {
  * @param {Object} options
  */
 const update = (model, query, data, options={}) => {
+  debugger;
   // const opts = Object.assign({}, options);
   // if (!isEmpty(query)) {
   //   opts.where = query;

@@ -1,4 +1,4 @@
-const COLLECTION_NAME = 'adminusers';
+const COLLECTION_NAME = 'admin_users';
 
 module.exports = ({ Schema, SchemaTypes }) => {
   const schema = new Schema(

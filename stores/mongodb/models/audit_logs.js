@@ -1,4 +1,4 @@
-const COLLECTION_NAME = 'auditlogs';
+const COLLECTION_NAME = 'audit_logs';
 
 module.exports = ({ Schema, SchemaTypes }) => {
   const schema = new Schema(
