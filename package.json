@@ -1,6 +1,6 @@
 {
   "name": "node-vironlib",
-  "version": "1.5.17",
+  "version": "1.5.19",
   "description": "Generic library for Viron",
   "keywords": [
     "viron",
@@ -21,19 +21,19 @@
   "main": "index.js",
   "dependencies": {
     "axios": "^0.16.2",
-    "express-jwt": "^5.3.0",
+    "express-jwt": "^5.3.1",
     "express-unless": "^0.3.1",
-    "googleapis": "^20.1.0",
-    "jsonwebtoken": "^7.4.2",
+    "googleapis": "^39.2.0",
+    "jsonwebtoken": "^8.5.1",
     "mout": "^1.0.0",
-    "sequelize": "^4.32.2"
+    "sequelize": "^5.7.1"
   },
   "devDependencies": {
     "eslint": "^4.2.0",
     "husky": "^0.14.3",
     "mocha": "^5.0.0",
-    "node-mocks-http": "^1.6.4",
-    "sequelize-mock": "^0.9.0",
+    "node-mocks-http": "^1.7.3",
+    "sequelize-mock": "^0.10.2",
     "sinon": "^3.2.1"
   },
   "engines": {
