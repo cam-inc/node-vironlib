@@ -2,6 +2,7 @@ const controller = require('./controller');
 const helper = require('./helper');
 const middleware = require('./middleware');
 const logger = require('../logger');
+const {isMongoDB} = require('../helper');
 
 /**
  * AdminRole init
@@ -13,7 +14,9 @@ const init = async options => {
   const AdminRoles = options.admin_roles;
   const defaultRole = options.default_role;
 
-  const count = await AdminRoles.count({where: {role_id: defaultRole}});
+  const count = isMongoDB(AdminRoles) ?
+    await AdminRoles.countDocuments({role_id: defaultRole}) :
+    await AdminRoles.count({where: {role_id: defaultRole}});
   if (count >= 1) {
     // あれば何もしない
     return;

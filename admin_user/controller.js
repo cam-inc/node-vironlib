@@ -1,6 +1,6 @@
 const asyncWrapper = require('../async_wrapper');
 const helperEMail = require('../auth/email/helper');
-const { isMongoDB } = require('../helper');
+const {isMongoDB} = require('../helper');
 
 /**
  * Controller : List Admin User

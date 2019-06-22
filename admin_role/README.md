@@ -21,3 +21,4 @@ const vironlib = new VironLib({admin_role: {...}});
 | admin_role.admin_users | Sequelize#Model | yes | `admin_users` モデル |
 | admin_role.store | Sequelize | yes | `sequelize` インスタンス |
 | admin_role.default_role | String | yes | 管理ユーザーが追加された際に付与される初期権限ID |
+| admin_role.super_role | String | no | スーパーユーザーの権限ID |

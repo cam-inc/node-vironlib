@@ -1,5 +1,5 @@
 const asyncWrapper = require('../async_wrapper');
-const { isMongoDB } = require('../helper');
+const {isMongoDB} = require('../helper');
 
 /**
  * Controller : List Audit Log

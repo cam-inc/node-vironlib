@@ -1,7 +1,6 @@
 const get = require('mout/object/get');
 const helperGoogle = require('./helper');
 const helperJwt = require('../jwt/helper');
-const helperAdminRole = require('../../admin_role/helper');
 const {isMongoDB} = require('../../helper');
 const errors = require('../../errors');
 
@@ -12,10 +11,8 @@ const errors = require('../../errors');
  */
 module.exports = options => {
   const AdminUsers = options.admin_users;
-  const AdminRoles = options.admin_roles;
   const authJwt = options.auth_jwt;
   const googleOAuth = options.google_oauth;
-  const superRole = options.super_role;
 
   return (req, res, next) => {
     if (!get(req, 'swagger.operation.security')) {
@@ -69,18 +66,11 @@ module.exports = options => {
 
           })
           .then(data => {
-            return helperAdminRole.getRoles(AdminRoles, data.adminUser.role_id, superRole)
-              .then(roles => {
-                const claims = {
-                  sub: data.adminUser.email,
-                  roles: roles,
-                  googleOAuthToken: data.token,
-                };
-                return helperJwt.sign(claims, authJwt);
-              })
-            ;
-          })
-          .then(token => {
+            const claims = {
+              sub: data.adminUser.email,
+              googleOAuthToken: data.token,
+            };
+            const token = helperJwt.sign(claims, authJwt);
             // レスポンスヘッダを更新
             res.setHeader(authJwt.header_key, `Bearer ${token}`);
             // 認証情報も更新

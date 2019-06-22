@@ -8,9 +8,6 @@ module.exports = options => {
   if (!options.admin_users) {
     return logger.warn('[VIRONLIB] auth options.admin_users required.');
   }
-  if (!options.admin_roles) {
-    return logger.warn('[VIRONLIB] auth options.admin_roles required.');
-  }
   if (!options.super_role) {
     return logger.warn('[VIRONLIB] auth options.super_role required.');
   }

@@ -28,7 +28,7 @@ const list = async (store, ...args) => {
     store.helper.find(...args),
     store.helper.count(...args)
   ]);
-  return { list: results[0], count: results[1] };
+  return {list: results[0], count: results[1]};
 };
 
 /**

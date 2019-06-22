@@ -1,15 +1,15 @@
 const models = require('./models');
 const helper = require('./helper');
 
-const initModels = async mongoose => {
-  const tasks = Object.keys(models).map(k => {
+const initModels = mongoose => {
+  Object.keys(models).forEach(k => {
     if (typeof models[k] !== 'function') {
-      return Promise.resolve();
+      return;
     }
-    const { name, schema } = models[k](mongoose.base);
+    const {name, schema} = models[k](mongoose.base);
     mongoose.model(name, schema);
   });
-  return await Promise.all(tasks).then(() => mongoose);
+  return mongoose;
 };
 
 module.exports = {
@@ -28,6 +28,6 @@ module.exports = {
    * @param mongoose Mongoose instance
    */
   init: async mongoose => {
-    return await initModels(mongoose);
+    return initModels(mongoose);
   }
 };

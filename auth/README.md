@@ -22,7 +22,6 @@ const vironlib = new VironLib({auth: {...}});
 | property name | type | required | description |
 | ------------- | ---- | -------- | ----------- |
 | auth | Object | no | メール認証、GoogleOAuth認証に必要なミドルウェア、コントローラ |
-| auth.admin_roles | Sequelize#Model | yes | `admin_roles` モデル |
 | auth.admin_users | Sequelize#Model | yes | `admin_users` モデル |
 | auth.super_role | String | yes | スーパーユーザーの権限ID |
 | auth.default_role | String | yes | 管理ユーザーが追加された際に付与される初期権限ID |

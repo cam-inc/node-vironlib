@@ -132,7 +132,7 @@ const registerGet = options => {
     if (isMongoDB(AdminRoles)) { // MongoDB
       list = await AdminRoles.find({role_id: roleId});
     } else { //MySQL
-      list = AdminRoles.findAll({where: {role_id: roleId}});
+      list = await AdminRoles.findAll({where: {role_id: roleId}});
     }
 
     let paths;

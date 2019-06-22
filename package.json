@@ -1,6 +1,6 @@
 {
   "name": "node-vironlib",
-  "version": "1.5.19",
+  "version": "1.6.0",
   "description": "Generic library for Viron",
   "keywords": [
     "viron",
@@ -20,7 +20,7 @@
   "homepage": "https://github.com/cam-inc/node-vironlib#readme",
   "main": "index.js",
   "dependencies": {
-    "axios": "^0.16.2",
+    "axios": "^0.18.1",
     "express-jwt": "^5.3.1",
     "express-unless": "^0.3.1",
     "googleapis": "^39.2.0",

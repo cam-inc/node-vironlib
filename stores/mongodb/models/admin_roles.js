@@ -1,6 +1,6 @@
 const COLLECTION_NAME = 'admin_roles';
 
-module.exports = ({ Schema, SchemaTypes }) => {
+module.exports = ({Schema, SchemaTypes}) => {
   const schema = new Schema(
     {
       // id: {

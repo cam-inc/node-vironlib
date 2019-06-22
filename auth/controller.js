@@ -3,7 +3,6 @@ const logger = require('../logger');
 const helperGoogle = require('./google/helper');
 const helperJwt = require('./jwt/helper');
 const helperEMail = require('./email/helper');
-const helperAdminRole = require('../admin_role/helper');
 const {isMongoDB}= require('../helper');
 
 const errors = require('../errors');
@@ -15,14 +14,12 @@ const errors = require('../errors');
  *
  * @param {Object} options
  * @param {Sequelize.model} options.admin_users
- * @param {Sequelize.model} options.admin_roles
  * @param {String} options.super_role
  * @param {Object} options.auth_jwt
  * @returns {function(*, *, *)}
  */
 const registerSignIn = options => {
   const AdminUsers = options.admin_users;
-  const AdminRoles = options.admin_roles;
   const superRole = options.super_role;
   const authJwt = options.auth_jwt;
 
@@ -64,11 +61,8 @@ const registerSignIn = options => {
       return res.json(errors.frontend.SigninFailed());
     }
 
-    // ロールを取得
-    const roles = await helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
-
     // JWTを生成
-    const claims = {sub: email, roles: roles};
+    const claims = {sub: email};
     const token = await helperJwt.sign(claims, authJwt);
     res.setHeader(authJwt.header_key, `Bearer ${token}`);
     return res.end();
@@ -121,14 +115,12 @@ const registerGoogleSignIn = options => {
  *
  * @param {Object} options
  * @param {Sequelize.model} options.admin_users
- * @param {Sequelize.model} options.admin_roles
  * @param {Object} options.google_oauth
  * @param {Object} options.auth_jwt
  * @returns {function(*, *, *)}
  */
 const registerGoogleOAuth2Callback = options => {
   const AdminUsers = options.admin_users;
-  const AdminRoles = options.admin_roles;
   const googleOAuth = options.google_oauth;
   const authJwt = options.auth_jwt;
   const superRole = options.super_role;
@@ -170,12 +162,9 @@ const registerGoogleOAuth2Callback = options => {
         adminUser = await AdminUsers.create({email: email, role_id: roleId});
       }
 
-      // ロールを取得
-      const roles = await helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
       // JWTを生成
       const claims = {
         sub: email,
-        roles: roles,
         googleOAuthToken: token,
       };
       const jwt = await helperJwt.sign(claims, authJwt);
