@@ -20,6 +20,7 @@ class VironLib {
     this.stores = require('./stores');
     this.swagger = require('./swagger')(options.swagger);
     this.swaggerValidator = require('./swagger_validator');
+    this.helper = require('./helper');
   }
 }
 

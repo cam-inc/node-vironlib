@@ -1,4 +1,8 @@
 /**
+ * MySQL only support!!!
+ * @deprecated このヘルパーは、非推奨APIです。
+ */
+/**
  * create
  * @param {Object} store
  * @param {*} model
@@ -22,9 +26,9 @@ const create = (store, ...args) => {
 const list = async (store, ...args) => {
   const results = await Promise.all([
     store.helper.find(...args),
-    store.helper.count(...args),
+    store.helper.count(...args)
   ]);
-  return {list: results[0], count: results[1]};
+  return { list: results[0], count: results[1] };
 };
 
 /**
@@ -67,5 +71,5 @@ module.exports = {
   findOne,
   create,
   remove,
-  update,
+  update
 };

@@ -2,7 +2,7 @@ const get = require('mout/object/get');
 const helperGoogle = require('./helper');
 const helperJwt = require('../jwt/helper');
 const helperAdminRole = require('../../admin_role/helper');
-
+const {isMongoDB} = require('../../helper');
 const errors = require('../../errors');
 
 /**
@@ -56,12 +56,17 @@ module.exports = options => {
               throw errors.frontend.Unauthorized();
             }
             // AdminUserを取得
-            return AdminUsers.findOne({where: {email: data.email}})
-              .then(adminUser => {
-                data.adminUser = adminUser;
-                return data;
-              })
-            ;
+            let p;
+            if (isMongoDB(AdminUsers)) {
+              p = AdminUsers.findOne({email: data.email});
+            } else {
+              p = AdminUsers.findOne({where: {email: data.email}});
+            }
+            return p.then(adminUser => {
+              data.adminUser = adminUser;
+              return data;
+            });
+
           })
           .then(data => {
             return helperAdminRole.getRoles(AdminRoles, data.adminUser.role_id, superRole)

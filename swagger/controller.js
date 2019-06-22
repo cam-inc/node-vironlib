@@ -1,11 +1,13 @@
 const {createHmac} = require('crypto');
 
 const asyncWrapper = require('../async_wrapper');
+const {isMongoDB}= require('../helper');
 const deepClone = require('mout/lang/deepClone');
 const {find, has, merge, set} = require('mout/object');
 const {isEmpty, isArray, isPlainObject} = require('mout/lang');
 
 const helperAdminRole = require('../admin_role/helper');
+const logger = require('../logger');
 
 const genHash = (prefix, def) => {
   const hmac = createHmac('sha256', 'cache');
@@ -16,13 +18,26 @@ const genHash = (prefix, def) => {
 
 const genEnum = async (def, store, cache) => {
   const defEnum = def['x-autogen-enum'];
-  const Model = find(store.models, mdl => mdl.tableName === defEnum.model);
-  const hashKey = genHash('enum', defEnum);
   const field = defEnum.field;
+  const hashKey = genHash('enum', defEnum);
+
+  let Model;
   let list;
-  if (has(cache, hashKey)) {
+  if (has(cache, hashKey)) { // cache
     list = cache[defEnum.model][field];
-  } else {
+  } else if (isMongoDB(store)) { // MongoDB
+    Model = find(store.models, mdl => mdl.modelName === defEnum.model);
+    if (!defEnum.order) {
+      logger.warn('generate enum order not support.');
+    }
+    if (!defEnum.where) {
+      logger.warn('generate enum where not support.');
+    }
+    list = await Model.find({}, {[field]: 1});
+    set(cache, `${defEnum.model}.${field}`, list);
+
+  } else { // MySQL
+    Model = find(store.models, mdl => mdl.tableName === defEnum.model);
     const options = {attributes: [field]};
     if (defEnum.order) {
       options.order = defEnum.order;
@@ -32,7 +47,9 @@ const genEnum = async (def, store, cache) => {
     }
     list = await Model.findAll(options);
     set(cache, `${defEnum.model}.${field}`, list);
+
   }
+
   const enums = new Set(defEnum.defaults);
   list.forEach(rec => enums.add(rec[field]));
   return Array.from(enums);

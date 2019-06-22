@@ -1,5 +1,6 @@
 const asyncWrapper = require('../async_wrapper');
 const helperEMail = require('../auth/email/helper');
+const { isMongoDB } = require('../helper');
 
 /**
  * Controller : List Admin User
@@ -18,15 +19,49 @@ const registerList = (options, pager) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
-    const options = {
-      attributes,
-      limit,
-      offset,
-    };
-    const result = await AdminUsers.findAndCountAll(options);
 
-    pager.setResHeader(res, limit, offset, result.count);
-    return res.json(result.rows);
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      const options = {
+        limit,
+        offset,
+        sort: {
+          createdAt: 'desc'
+        },
+      };
+
+      const projection = {
+        _id: 0,
+      };
+
+      attributes.forEach(k => {
+        projection[k] = 1;
+      });
+
+      const results = await AdminUsers.find({}, projection, options);
+      const total = await AdminUsers.countDocuments({});
+      pager.setResHeader(res, limit, offset, total);
+      const json = [];
+
+      results.forEach(k => {
+        json.push(k.toJSON());
+      });
+
+      return res.json(json);
+
+
+    } else { // MySQL
+
+      const options = {
+        attributes,
+        limit,
+        offset,
+      };
+      const result = await AdminUsers.findAndCountAll(options);
+
+      pager.setResHeader(res, limit, offset, result.count);
+      return res.json(result.rows);
+
+    }
   });
 };
 
@@ -55,10 +90,22 @@ const registerCreate = options => {
       email: req.body.email,
       role_id: defaultRole,
     };
-    const result = await AdminUsers.create(data);
-    delete result.password;
-    delete result.salt;
-    return res.json(data);
+
+    let result;
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      result = await (new AdminUsers(data)).save();
+      const safeRes = result.toJSON();
+      delete safeRes.password;
+      delete safeRes.salt;
+      return res.json(safeRes);
+
+    } else { // MySQL
+      result = await AdminUsers.create(data);
+      delete result.password;
+      delete result.salt;
+      return res.json(data);
+
+    }
   });
 };
 
@@ -76,8 +123,23 @@ const registerGet = options => {
 
   return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-    const id = req.swagger.params.id.value;
-    const data = await AdminUsers.findById(id, {attributes});
+
+    let data;
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      const projection = {
+        _id: 0,
+      };
+      attributes.forEach(k => {
+        projection[k] = 1;
+      });
+
+      const _id = req.swagger.params._id.value;
+      data = await AdminUsers.find({_id: _id}, projection);
+    } else { //MySQL
+      const id = req.swagger.params.id.value;
+      data = await AdminUsers.findById(id, {attributes});
+    }
+
     return res.json(data);
   });
 };
@@ -95,8 +157,15 @@ const registerRemove = options => {
   const AdminUsers = options.admin_users;
 
   return asyncWrapper(async (req, res) => {
-    const id = req.swagger.params.id.value;
-    await AdminUsers.destroy({where: {id}, force: true});
+
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      const _id = req.swagger.params._id.value;
+      await AdminUsers.deleteOne({_id: _id});
+    } else { //MySQL
+      const id = req.swagger.params.id.value;
+      await AdminUsers.destroy({where: {id}, force: true});
+    }
+
     return res.status(204).end();
   });
 };
@@ -137,9 +206,18 @@ const registerUpdate = options => {
       Object.assign(data, {role_id: roleId});
     }
 
-    const id = req.swagger.params.id.value;
-    const result = await AdminUsers.update(data, {where: {id}});
+
+    let result;
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      const _id = req.swagger.params._id.value;
+      result = await AdminUsers.update({_id: _id}, data);
+    } else { // MySQL
+      const id = req.swagger.params.id.value;
+      result = await AdminUsers.update(data, {where: {id}});
+    }
     return res.json(result);
+
+
   });
 };
 

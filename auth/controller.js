@@ -4,6 +4,7 @@ const helperGoogle = require('./google/helper');
 const helperJwt = require('./jwt/helper');
 const helperEMail = require('./email/helper');
 const helperAdminRole = require('../admin_role/helper');
+const {isMongoDB}= require('../helper');
 
 const errors = require('../errors');
 
@@ -30,7 +31,13 @@ const registerSignIn = options => {
     const password = req.body.password;
 
     // メアドでユーザ検索
-    let adminUser = await AdminUsers.findOne({where: {email}});
+    let adminUser;
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      adminUser = await AdminUsers.findOne({email: email});
+    } else { // MySQL
+      adminUser = await AdminUsers.findOne({where: {email}});
+    }
+
     if (!adminUser) {
       // 1人目かどうか
       const cnt = await AdminUsers.count();
@@ -59,6 +66,7 @@ const registerSignIn = options => {
 
     // ロールを取得
     const roles = await helperAdminRole.getRoles(AdminRoles, adminUser.role_id, superRole);
+
     // JWTを生成
     const claims = {sub: email, roles: roles};
     const token = await helperJwt.sign(claims, authJwt);
@@ -147,7 +155,13 @@ const registerGoogleOAuth2Callback = options => {
       }
 
       // メアドでユーザ検索
-      let adminUser = await AdminUsers.findOne({where: {email}});
+      let adminUser;
+      if (isMongoDB(AdminUsers)) { // MongoDB
+        adminUser = await AdminUsers.findOne({email: email});
+      } else { // MySQL
+        adminUser = await AdminUsers.findOne({where: {email}});
+      }
+
       if (!adminUser) {
         // 1人目かどうか
         const cnt = await AdminUsers.count();

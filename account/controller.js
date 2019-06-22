@@ -1,4 +1,5 @@
 const asyncWrapper = require('../async_wrapper');
+const { isMongoDB } = require('../helper');
 const logger = require('../logger');
 const helperEMail = require('../auth/email/helper');
 const errors = require('../errors');
@@ -24,8 +25,22 @@ const registerList = options => {
 
   return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-    const data = await AdminUsers.findOne({where: {email: req.auth.sub}, attributes});
-    return res.json([data]);
+    if (isMongoDB(AdminUsers)) {
+      const projection = {};
+      attributes.forEach(k => {
+        projection[k] = 1;
+      });
+      const data = await AdminUsers.findOne({email: req.auth.sub}, projection);
+      const json = {};
+      attributes.forEach(k => {
+        json[k] = data[k];
+      });
+      return res.json([json]);
+
+    } else { // MySQL
+      const data = await AdminUsers.findOne({where: {email: req.auth.sub}, attributes});
+      return res.json([data]);
+    }
   });
 };
 
@@ -51,12 +66,33 @@ const registerGet = options => {
   return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const id = req.swagger.params.id.value;
-    const data = await AdminUsers.findById(id, {attributes});
-    if (data.email !== req.auth.sub) {
-      // 自分以外へのアクセスは認めない
-      throw errors.frontend.Forbidden();
+
+    let data;
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      const projection = {};
+      attributes.forEach(k => {
+        projection[k] = 1;
+      });
+      data = await AdminUsers.findById({_id: id}, projection);
+      if (data.email !== req.auth.sub) {
+        // 自分以外へのアクセスは認めない
+        throw errors.frontend.Forbidden();
+      }
+      const json = {};
+      attributes.forEach(k => {
+        json[k] = data[k];
+      });
+      return res.json(json);
+
+    } else { // MySQL
+      data = await AdminUsers.findById(id, {attributes});
+      if (data.email !== req.auth.sub) {
+        // 自分以外へのアクセスは認めない
+        throw errors.frontend.Forbidden();
+      }
+      return res.json(data);
     }
-    return res.json(data);
+
   });
 };
 
@@ -81,7 +117,14 @@ const registerUpdate = options => {
 
   return asyncWrapper(async (req, res) => {
     const id = req.swagger.params.id.value;
-    const user = await AdminUsers.findById(id);
+
+    let user;
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      user = await AdminUsers.findById({_id: id});
+    } else {
+      user = await AdminUsers.findById(id);
+    }
+
     if (user.email !== req.auth.sub) {
       // 自分以外へのアクセスは認めない
       throw errors.frontend.Forbidden();
@@ -91,12 +134,31 @@ const registerUpdate = options => {
     const salt = helperEMail.genSalt();
     const hashedPassword = await helperEMail.genHash(req.body.password, salt);
 
-    const result = await AdminUsers.update({
-      password: hashedPassword,
-      salt: salt,
-    }, {where: {id}});
+    if (isMongoDB(AdminUsers)) { // MongoDB
 
-    return res.json(result);
+      const result = await AdminUsers.findOneAndUpdate(
+        {_id: id},
+        {
+          password: hashedPassword,
+          salt: salt,
+        });
+
+      const attributes = Object.keys(req.swagger.operation.responses['200'].schema.properties);
+
+      const json = {};
+      attributes.forEach(k => {
+        json[k] = result[k];
+      });
+      return res.json(json);
+
+    } else {
+      const result = await AdminUsers.update({
+        password: hashedPassword,
+        salt: salt,
+      }, {where: {id}});
+
+      return res.json(result);
+    }
   });
 };
 

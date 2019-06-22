@@ -1,6 +1,7 @@
 const reduce = require('mout/object/reduce');
 
 const asyncWrapper = require('../async_wrapper');
+const {isMongoDB} = require('../helper');
 const logger = require('../logger');
 const errors = require('../errors');
 
@@ -42,7 +43,13 @@ const registerList = (options, pager) => {
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
 
-    const list = await AdminRoles.findAll();
+    let list;
+    if (isMongoDB(AdminRoles)) { // MongoDB
+      list = await AdminRoles.find();
+    } else { //MySQL
+      list = await AdminRoles.findAll();
+    }
+
     const data = reduce(reduce(list, (ret, role) => {
       if (req.swagger.operation.responses[200].schema.items.properties.paths.type === 'array') {
         // paths: [{"allow":true, "path":"GET:/users"}] パターン
@@ -84,11 +91,24 @@ const registerCreate = options => {
     const roleId = req.body.role_id;
     const paths = req.body.paths;
     const list = genAdminRole(roleId, paths);
-    const data = await AdminRoles.findAll({where: {role_id: roleId}});
+
+    let data;
+    if (isMongoDB(AdminRoles)) { // MongoDB
+      data = await AdminRoles.find({role_id: roleId});
+    } else { //MySQL
+      data = await AdminRoles.findAll({where: {role_id: roleId}});
+    }
+
     if (data.length !== 0) {
       throw errors.frontend.AlreadyUsedRoleID();
     }
-    await AdminRoles.bulkCreate(list);
+
+    if (isMongoDB(AdminRoles)) { // MongoDB
+      await AdminRoles.insertMany(list);
+    } else { //MySQL
+      await AdminRoles.bulkCreate(list);
+    }
+
     return res.json({role_id: roleId, paths: paths});
   });
 };
@@ -107,7 +127,14 @@ const registerGet = options => {
 
   return asyncWrapper(async (req, res) => {
     const roleId = req.swagger.params.role_id.value;
-    const list = await AdminRoles.findAll({where: {role_id: roleId}});
+
+    let list;
+    if (isMongoDB(AdminRoles)) { // MongoDB
+      list = await AdminRoles.find({role_id: roleId});
+    } else { //MySQL
+      list = AdminRoles.findAll({where: {role_id: roleId}});
+    }
+
     let paths;
     if (req.swagger.operation.responses[200].schema.properties.paths.type === 'array') {
       // paths: [{"allow":true, "path":"GET:/users"}] パターン
@@ -140,12 +167,26 @@ const registerRemove = options => {
   const AdminUsers = options.admin_users;
   return asyncWrapper(async (req, res) => {
     const roleId = req.swagger.params.role_id.value;
-    const list = await AdminUsers.findAll({where: {role_id: roleId}});
+
+    let list;
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      list = await AdminUsers.find({role_id: roleId});
+    } else { //MySQL
+      list = await AdminUsers.findAll({where: {role_id: roleId}});
+    }
+
+
     // 削除対象の権限を持っているユーザがいたら、エラーを返す。
     if (list.length !== 0) {
       throw errors.frontend.CurrentlyUsedAdminRole();
     }
-    await AdminRoles.destroy({where: {role_id: roleId}, force: true});
+
+    if (isMongoDB(AdminRoles)) { // MongoDB
+      await AdminRoles.deleteMany({role_id: roleId});
+    } else { //MySQL
+      await AdminRoles.destroy({where: {role_id: roleId}, force: true});
+    }
+
     return res.status(204).end();
   });
 };
@@ -169,18 +210,26 @@ const registerUpdate = options => {
     const paths = req.body.paths;
     const list = genAdminRole(roleId, paths);
 
-    const t = await store.transaction();
-    try {
-      await AdminRoles.destroy({where: {role_id: roleId}, force: true, transaction: t});
-      await AdminRoles.bulkCreate(list, {transaction: t});
-      await t.commit();
-    } catch (err) {
-      logger.error(err);
-      await t.rollback();
-      throw err;
-    }
+    if (isMongoDB(AdminRoles)) { // MongoDB
+      // TODO: transaction not support!
+      await AdminRoles.deleteMany({role_id: roleId});
+      await AdminRoles.insertMany(list);
+      return res.json({role_id: roleId, paths: paths});
 
-    return res.json({role_id: roleId, paths: paths});
+    } else { // MySQL
+      const t = await store.transaction();
+      try {
+        await AdminRoles.destroy({where: {role_id: roleId}, force: true, transaction: t});
+        await AdminRoles.bulkCreate(list, {transaction: t});
+        await t.commit();
+      } catch (err) {
+        logger.error(err);
+        await t.rollback();
+        throw err;
+      }
+
+      return res.json({role_id: roleId, paths: paths});
+    }
   });
 };
 
