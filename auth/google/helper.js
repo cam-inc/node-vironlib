@@ -1,5 +1,5 @@
 const axios = require('axios');
-const gapi = require('googleapis');
+const {google} = require('googleapis');
 const contains = require('mout/array/contains');
 const get = require('mout/object/get');
 
@@ -10,7 +10,7 @@ const AUTH_SCOPES = [
 ];
 
 const getClient = options => {
-  return new gapi.auth.OAuth2(
+  return new google.auth.OAuth2(
     options.client_id,
     options.client_secret,
     options.redirect_url

@@ -3,7 +3,7 @@ const url = require('url');
 const qs = require('qs');
 
 const axios = require('axios');
-const gapi = require('googleapis');
+const {google} = require('googleapis');
 const sinon = require('sinon');
 
 const test = require('../../');
@@ -53,7 +53,7 @@ describe('auth/google/helper', () => {
     let stubOAuthClient;
 
     beforeEach(() => {
-      stubOAuthClient = sinon.stub(gapi.auth, 'OAuth2');
+      stubOAuthClient = sinon.stub(google.auth, 'OAuth2');
       stubOAuthClient.returns({
         getToken: (code, callback) => {
           callback(null, {access_token: `token:${code}`});
