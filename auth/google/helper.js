@@ -66,6 +66,22 @@ const allowMailDomain = async (token, options) => {
 
 const refreshToken = (token, options) => {
   const client = getClient(options);
+
+  if (client.refreshToken) {
+    return client.refreshToken(token.refresh_token)
+      .then(newToken => {
+        if (!newToken.refresh_token) {
+          newToken.refresh_token = token.refresh_token;
+        }
+        return newToken;
+      })
+      .catch(err => {
+        const e = errors.external.ExternalServerError(err.code);
+        e.orig_error = err;
+        throw e;
+      });
+  }
+
   return new Promise((resolve, reject) => {
     client.refreshToken_(token.refresh_token, (err, newToken) => {
       if (err) {
