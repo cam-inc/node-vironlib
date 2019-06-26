@@ -27,7 +27,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.4.7",
     "mout": "^1.0.0",
-    "sequelize": "^5.7.1"
+    "sequelize": "^5.8.12"
   },
   "devDependencies": {
     "eslint": "^4.2.0",
