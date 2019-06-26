@@ -17,14 +17,23 @@ const getClient = options => {
   );
 };
 
+const isV2AuthApi = url => {
+  return url.includes('/o/oauth2/v2/auth');
+};
+
 const genAuthUrl = (options, stateUrl) => {
   const client = getClient(options);
-  return client.generateAuthUrl({
-    approval_prompt: 'force',
+  const opts = {
     access_type: 'offline',
     scope: AUTH_SCOPES,
     state: stateUrl,
-  });
+  };
+  if (isV2AuthApi(google.auth.OAuth2.GOOGLE_OAUTH2_AUTH_BASE_URL_)) {
+    opts.prompt = 'consent';
+  } else {
+    opts.approval_prompt = 'force';
+  }
+  return client.generateAuthUrl(opts);
 };
 
 const getToken = (code, options) => {

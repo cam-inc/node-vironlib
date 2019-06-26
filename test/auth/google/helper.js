@@ -45,6 +45,7 @@ describe('auth/google/helper', () => {
       assert(query.response_type === 'code');
       assert(query.client_id === 'xxxxxxxxxxxxxxxxxxxx');
       assert(query.redirect_uri === 'http://localhost/redirect');
+      assert(query.prompt === 'consent');
     });
 
   });
