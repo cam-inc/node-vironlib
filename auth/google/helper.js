@@ -78,7 +78,8 @@ const refreshToken = (token, options) => {
 
   if (client.refreshToken) {
     return client.refreshToken(token.refresh_token)
-      .then(newToken => {
+      .then(result => {
+        const newToken = result.tokens;
         if (!newToken.refresh_token) {
           newToken.refresh_token = token.refresh_token;
         }
