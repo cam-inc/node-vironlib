@@ -23,7 +23,7 @@ const registerList = (options, pager) => {
     if (isMongoDB(AdminUsers)) { // MongoDB
       const options = {
         limit,
-        offset,
+        skip: offset,
         sort: {
           createdAt: 'desc'
         },

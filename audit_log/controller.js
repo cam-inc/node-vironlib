@@ -33,7 +33,7 @@ const registerList = (options, pager) => {
       }
       const options = {
         limit,
-        offset,
+        skip: offset,
         sort: {
           createdAt: 'desc'
         },
