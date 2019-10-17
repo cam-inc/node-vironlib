@@ -73,6 +73,7 @@ const remove = (Model, conditions) => {
 const removeOne = (Model, conditions, options = {}) => {
   return Model.findOneAndRemove(conditions, options);
 };
+
 /**
  * update
  * @param {Mongoose.Model} model
@@ -82,6 +83,17 @@ const removeOne = (Model, conditions, options = {}) => {
  */
 const updateOne = (Model, query, doc, options = {true: false}) => {
   return Model.findOneAndUpdate(query, doc, options);
+};
+
+/**
+ * update many
+ * @param {Mongoose.Model} Model
+ * @param {*} query 検索条件
+ * @param {*} doc 保存するデータ
+ * @param {*} options Mongooseオプション
+ */
+const updateMany = (Model, query, doc, options = {}) => {
+  return Model.updateMany(query, doc, options);
 };
 
 /**
@@ -128,6 +140,7 @@ module.exports = {
   remove,
   removeOne,
   updateOne,
+  updateMany,
   findWithCount,
   isObjectId
 };
