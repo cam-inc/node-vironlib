@@ -27,6 +27,23 @@ const find = (Model, conditions = {}, projection = {}, options = {}) => {
 };
 
 /**
+ * findAll
+ * @param {Mongoose.Model} Model
+ * @param {Object} conditions - {name: "a"}
+ * @param {Object} projection - ['id', 'name', 'age']
+ * @param {Object} options - {sort: {createdAt: 'desc'}}
+ */
+const findAll = (Model, conditions = {}, projection = {}, options = {}) => {
+  const opts = Object.assign({}, options);
+  if (isEmpty(options.sort)) {
+    opts.sort = {
+      createdAt: 'desc'
+    };
+  }
+  return Model.find(conditions, projection, opts).exec();
+};
+
+/**
  * findOne
  * @param {Mongoose.Model} Model
  * @param {Object} conditions 検索条件
@@ -53,6 +70,16 @@ const count = (Model, conditions = {}) => {
  */
 const create = (Model, doc) => {
   return new Model(doc).save();
+};
+
+/**
+ * create many
+ * @param {Mongoose.Model} Model
+ * @param {Array<Object>} docs 保存するデータ
+ * @param {Object} options Mongooseオプション
+ */
+const createMany = (Model, docs, options) => {
+  return Model.insertMany(docs, options);
 };
 
 /**
@@ -134,9 +161,11 @@ const isObjectId = s => {
 
 module.exports = {
   find,
+  findAll,
   findOne,
   count,
   create,
+  createMany,
   remove,
   removeOne,
   updateOne,
