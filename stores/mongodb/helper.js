@@ -1,7 +1,7 @@
 const isEmpty = require('mout/lang/isEmpty');
 const isFinite = require('mout/lang/isFinite');
+const bson = require('bson');
 const constants = require('../../constants');
-const mongoose = require('mongoose');
 
 /**
  * find
@@ -152,10 +152,7 @@ const findWithCount = async (
  * @param {*} s チェック対応データ
  */
 const isObjectId = s => {
-  if (s instanceof mongoose.Types.ObjectId) {
-    return true;
-  }
-  return false;
+  return bson.ObjectId.isValid(s);
 };
 
 
