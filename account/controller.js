@@ -130,6 +130,11 @@ const registerUpdate = options => {
       throw errors.frontend.Forbidden();
     }
 
+    if (user.auth_type !== AUTH_TYPE_EMAIL) {
+      // e-mailタイプ以外のパスワードは存在しないのでエラー
+      throw errors.frontend.BadRequest();
+    }
+
     // パスワードをハッシュ化
     const salt = helperEMail.genSalt();
     const hashedPassword = await helperEMail.genHash(req.body.password, salt);

@@ -3,9 +3,15 @@ const logger = require('../logger');
 const helperGoogle = require('./google/helper');
 const helperJwt = require('./jwt/helper');
 const helperEMail = require('./email/helper');
-const {isMongoDB}= require('../helper');
+const {
+  isMongoDB
+} = require('../helper');
 
 const errors = require('../errors');
+const {
+  AUTH_TYPE_EMAIL,
+  AUTH_TYPE_GOOGLE
+} = require('../constants');
 
 /**
  * Controller : Sing In
@@ -30,9 +36,15 @@ const registerSignIn = options => {
     // メアドでユーザ検索
     let adminUser;
     if (isMongoDB(AdminUsers)) { // MongoDB
-      adminUser = await AdminUsers.findOne({email: email});
+      adminUser = await AdminUsers.findOne({
+        email: email
+      });
     } else { // MySQL
-      adminUser = await AdminUsers.findOne({where: {email}});
+      adminUser = await AdminUsers.findOne({
+        where: {
+          email
+        }
+      });
     }
 
     if (!adminUser) {
@@ -52,6 +64,7 @@ const registerSignIn = options => {
         email,
         password: hashedPassword,
         role_id: superRole,
+        auth_type: AUTH_TYPE_EMAIL
       });
     }
 
@@ -62,7 +75,9 @@ const registerSignIn = options => {
     }
 
     // JWTを生成
-    const claims = {sub: email};
+    const claims = {
+      sub: email
+    };
     const token = await helperJwt.sign(claims, authJwt);
     res.setHeader(authJwt.header_key, `Bearer ${token}`);
     return res.end();
@@ -149,9 +164,15 @@ const registerGoogleOAuth2Callback = options => {
       // メアドでユーザ検索
       let adminUser;
       if (isMongoDB(AdminUsers)) { // MongoDB
-        adminUser = await AdminUsers.findOne({email: email});
+        adminUser = await AdminUsers.findOne({
+          email: email
+        });
       } else { // MySQL
-        adminUser = await AdminUsers.findOne({where: {email}});
+        adminUser = await AdminUsers.findOne({
+          where: {
+            email
+          }
+        });
       }
 
       if (!adminUser) {
@@ -159,7 +180,11 @@ const registerGoogleOAuth2Callback = options => {
         const cnt = await AdminUsers.count();
         // 1人目の場合はスーパーユーザー、2人目以降はデフォルトロールで登録する
         const roleId = cnt > 0 ? defaultRole : superRole;
-        adminUser = await AdminUsers.create({email: email, role_id: roleId});
+        adminUser = await AdminUsers.create({
+          email: email,
+          role_id: roleId,
+          auth_type: AUTH_TYPE_GOOGLE
+        });
       }
 
       // JWTを生成

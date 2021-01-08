@@ -23,4 +23,7 @@ module.exports = {
   VIRON_STYLE_GRAPH_STACKED_BAR: 'graph-stacked-bar',
   VIRON_STYLE_GRAPH_HORIZONTAL_STACKED_BAR: 'graph-horizontal-stacked-bar',
   VIRON_STYLE_GRAPH_STACKED_AREA: 'graph-stacked-area',
+
+  AUTH_TYPE_GOOGLE: 'google',
+  AUTH_TYPE_EMAIL: 'email',
 };

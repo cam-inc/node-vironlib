@@ -1,6 +1,8 @@
 const asyncWrapper = require('../async_wrapper');
 const helperEMail = require('../auth/email/helper');
+const { AUTH_TYPE_EMAIL } = require('../constants');
 const {isMongoDB} = require('../helper');
+const errors = require('../errors');
 
 /**
  * Controller : List Admin User
@@ -89,6 +91,7 @@ const registerCreate = options => {
       salt: salt,
       email: req.body.email,
       role_id: defaultRole,
+      auth_type: AUTH_TYPE_EMAIL
     };
 
     let result;
@@ -188,6 +191,19 @@ const registerUpdate = options => {
 
     if (!password && !roleId) {
       return res.json({});
+    }
+
+    let user;
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      const id = req.swagger.params._id.value;
+      user = await AdminUsers.findById({_id: id});
+    } else {
+      const id = req.swagger.params.id.value;
+      user = await AdminUsers.findById(id);
+    }
+    if (user.auth_type !== AUTH_TYPE_EMAIL) {
+      // e-mailタイプ以外のパスワードは存在しないのでエラー
+      throw errors.frontend.BadRequest();
     }
 
     const data = {};
