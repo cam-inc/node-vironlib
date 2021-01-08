@@ -3,6 +3,7 @@ const {isMongoDB} = require('../helper');
 const logger = require('../logger');
 const helperEMail = require('../auth/email/helper');
 const errors = require('../errors');
+const {AUTH_TYPE_EMAIL} = require('../constants');
 
 /**
  * Controller : List Account

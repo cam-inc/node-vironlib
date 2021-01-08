@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const { AUTH_TYPE_GOOGLE, AUTH_TYPE_EMAIL } = require('../../../constants');
+const {AUTH_TYPE_GOOGLE, AUTH_TYPE_EMAIL} = require('../../../constants');
 
 const TABLE = 'admin_users';
 

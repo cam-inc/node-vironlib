@@ -1,6 +1,6 @@
 const asyncWrapper = require('../async_wrapper');
 const helperEMail = require('../auth/email/helper');
-const { AUTH_TYPE_EMAIL } = require('../constants');
+const {AUTH_TYPE_EMAIL} = require('../constants');
 const {isMongoDB} = require('../helper');
 const errors = require('../errors');
 
