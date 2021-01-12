@@ -66,10 +66,10 @@ const registerGet = options => {
 
   return asyncWrapper(async (req, res) => {
     const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
-    const id = req.swagger.params.id.value;
 
     let data;
     if (isMongoDB(AdminUsers)) { // MongoDB
+      const id = req.swagger.params._id.value;
       const projection = {};
       attributes.forEach(k => {
         projection[k] = 1;
@@ -86,7 +86,8 @@ const registerGet = options => {
       return res.json(json);
 
     } else { // MySQL
-      data = await AdminUsers.findById(id, {attributes});
+      const id = req.swagger.params.id.value;
+      data = await AdminUsers.findByPk(id, {attributes});
       if (data.email !== req.auth.sub) {
         // 自分以外へのアクセスは認めない
         throw errors.frontend.Forbidden();
@@ -117,13 +118,16 @@ const registerUpdate = options => {
   }
 
   return asyncWrapper(async (req, res) => {
-    const id = req.swagger.params.id.value;
+    // TODO: mongoもmysqlも同じキーにするべき
+    const id = isMongoDB(AdminUsers) ?
+      req.swagger.params._id.value :
+      req.swagger.params.id.value;
 
     let user;
     if (isMongoDB(AdminUsers)) { // MongoDB
       user = await AdminUsers.findById({_id: id});
     } else {
-      user = await AdminUsers.findById(id);
+      user = await AdminUsers.findByPk(id);
     }
 
     if (user.email !== req.auth.sub) {

@@ -137,10 +137,10 @@ const registerGet = options => {
       });
 
       const _id = req.swagger.params._id.value;
-      data = await AdminUsers.find({_id: _id}, projection);
+      data = await AdminUsers.findOne({_id: _id}, projection);
     } else { //MySQL
       const id = req.swagger.params.id.value;
-      data = await AdminUsers.findById(id, {attributes});
+      data = await AdminUsers.findByPk(id, {attributes});
     }
 
     return res.json(data);
@@ -188,6 +188,10 @@ const registerUpdate = options => {
   return asyncWrapper(async (req, res) => {
     const password = req.body.password;
     const roleId = req.body.role_id;
+    // TODO: mongoもmysqlも同じキーにするべき
+    const id = isMongoDB(AdminUsers) ?
+      req.swagger.params._id.value :
+      req.swagger.params.id.value;
 
     if (!password && !roleId) {
       return res.json({});
@@ -195,11 +199,9 @@ const registerUpdate = options => {
 
     let user;
     if (isMongoDB(AdminUsers)) { // MongoDB
-      const id = req.swagger.params._id.value;
       user = await AdminUsers.findById({_id: id});
     } else {
-      const id = req.swagger.params.id.value;
-      user = await AdminUsers.findById(id);
+      user = await AdminUsers.findByPk(id);
     }
     if (user.auth_type !== AUTH_TYPE_EMAIL) {
       // e-mailタイプ以外のパスワードは存在しないのでエラー
@@ -225,10 +227,8 @@ const registerUpdate = options => {
 
     let result;
     if (isMongoDB(AdminUsers)) { // MongoDB
-      const _id = req.swagger.params._id.value;
-      result = await AdminUsers.update({_id: _id}, data);
+      result = await AdminUsers.update({_id: id}, data);
     } else { // MySQL
-      const id = req.swagger.params.id.value;
       result = await AdminUsers.update(data, {where: {id}});
     }
     return res.json(result);
