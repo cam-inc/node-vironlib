@@ -7,7 +7,7 @@ const initModel = model => {
       return resolve();
     }
     model
-      .sync()
+      .sync({alter: true})
       .then(resolve)
       .catch(reject)
     ;

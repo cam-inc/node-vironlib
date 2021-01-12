@@ -1,3 +1,5 @@
+const {AUTH_TYPE_GOOGLE, AUTH_TYPE_EMAIL} = require('../../../constants');
+
 const COLLECTION_NAME = 'admin_users';
 
 module.exports = ({Schema, SchemaTypes}) => {
@@ -21,6 +23,12 @@ module.exports = ({Schema, SchemaTypes}) => {
       password: {
         type: SchemaTypes.String,
         required: false
+      },
+      auth_type: {
+        type: SchemaTypes.String,
+        enum: [AUTH_TYPE_GOOGLE, AUTH_TYPE_EMAIL],
+        required: true,
+        // default: 'email'
       },
       salt: {
         type: SchemaTypes.String,

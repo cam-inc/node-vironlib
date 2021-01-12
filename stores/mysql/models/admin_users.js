@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const {AUTH_TYPE_GOOGLE, AUTH_TYPE_EMAIL} = require('../../../constants');
 
 const TABLE = 'admin_users';
 
@@ -22,6 +23,11 @@ module.exports = sequelize => {
       password: {
         type: Sequelize.STRING(1024),
         allowNull: true,
+      },
+      auth_type: {
+        type: Sequelize.ENUM(AUTH_TYPE_GOOGLE, AUTH_TYPE_EMAIL),
+        // defaultValue: 'email',
+        allowNull: false,
       },
       salt: {
         type: Sequelize.STRING(256),

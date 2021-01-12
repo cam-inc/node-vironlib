@@ -60,6 +60,11 @@ app.get(vironlib.swagger.controller.show);
 npm test
 ```
 
+## Migration
+
+- [migration.ja.md](migration.ja.md)
+  - > 1.7.0
+
 ## Copyright
 
 CA Mobile, Inc. All rights reserved.

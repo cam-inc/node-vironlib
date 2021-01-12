@@ -59,6 +59,7 @@ const defineModel = name => {
   m.count = () => {
     return Promise.resolve().then(() => m.__values__.length);
   };
+  m.findByPk = m.findById;
   m.findAndCountAll = options => {
     const attributes = options.attributes;
     const order = options.order;

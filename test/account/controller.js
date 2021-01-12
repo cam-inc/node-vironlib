@@ -1,6 +1,7 @@
 const assert = require('assert');
 
 const test = require('../');
+const {AUTH_TYPE_EMAIL} = require('../../constants');
 
 describe('account/controller', () => {
   let controllerAccount;
@@ -102,6 +103,7 @@ describe('account/controller', () => {
         email: 'test@example.com',
         role_id: 'viewer',
         password: 'aaaaaaaaaaaaaaaa',
+        auth_type: AUTH_TYPE_EMAIL
       });
     });
 

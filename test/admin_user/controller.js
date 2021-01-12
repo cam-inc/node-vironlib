@@ -1,6 +1,7 @@
 const assert = require('assert');
 
 const test = require('../');
+const {AUTH_TYPE_EMAIL} = require('../../constants');
 
 describe('admin_user/controller', () => {
   let controllerAdminUser;
@@ -205,6 +206,7 @@ describe('admin_user/controller', () => {
         email: 'test@example.com',
         role_id: 'viewer',
         password: 'aaaaaaaaaaaaaaaa',
+        auth_type: AUTH_TYPE_EMAIL
       });
     });
 
@@ -220,6 +222,7 @@ describe('admin_user/controller', () => {
         body: {
           password: 'bbbbbbbbbbbbbbbbbbb',
           role_id: 'tester',
+          auth_type: AUTH_TYPE_EMAIL
         },
       });
       const res = test.genResponse();
@@ -271,6 +274,7 @@ describe('admin_user/controller', () => {
         body: {
           password: null,
           role_id: 'tester',
+          auth_type: AUTH_TYPE_EMAIL
         },
       });
       const res = test.genResponse();
