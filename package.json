@@ -20,11 +20,11 @@
   "homepage": "https://github.com/cam-inc/node-vironlib#readme",
   "main": "index.js",
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "bson": "^4.1.0",
-    "express-jwt": "^5.3.1",
+    "express-jwt": "^6.0.0",
     "express-unless": "^0.3.1",
-    "googleapis": "^39.2.0",
+    "googleapis": "^67.0.0",
     "jsonwebtoken": "^8.5.1",
     "mout": "^1.2.2",
     "sequelize": "^5.22.0"
