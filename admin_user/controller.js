@@ -203,7 +203,7 @@ const registerUpdate = options => {
     } else {
       user = await AdminUsers.findByPk(id);
     }
-    if (user.auth_type !== AUTH_TYPE_EMAIL) {
+    if (password && user.auth_type !== AUTH_TYPE_EMAIL) {
       // e-mailタイプ以外のパスワードは存在しないのでエラー
       throw errors.frontend.BadRequest();
     }
