@@ -227,7 +227,7 @@ const registerUpdate = options => {
 
     let result;
     if (isMongoDB(AdminUsers)) { // MongoDB
-      result = await AdminUsers.update({_id: id}, data);
+      result = await AdminUsers.updateOne({_id: id}, data);
     } else { // MySQL
       result = await AdminUsers.update(data, {where: {id}});
     }
