@@ -1,8 +1,8 @@
-const asyncWrapper = require("../async_wrapper");
-const helperEMail = require("../auth/email/helper");
-const { AUTH_TYPE_EMAIL } = require("../constants");
-const { isMongoDB } = require("../helper");
-const errors = require("../errors");
+const asyncWrapper = require('../async_wrapper');
+const helperEMail = require('../auth/email/helper');
+const {AUTH_TYPE_EMAIL} = require('../constants');
+const {isMongoDB} = require('../helper');
+const errors = require('../errors');
 
 /**
  * Controller : List Admin User
@@ -18,19 +18,16 @@ const registerList = (options, pager) => {
   const AdminUsers = options.admin_users;
 
   return asyncWrapper(async (req, res) => {
-    const attributes = Object.keys(
-      req.swagger.operation.responses["200"].schema.items.properties
-    );
+    const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
     const limit = Number(req.query.limit || pager.defaultLimit);
     const offset = Number(req.query.offset || 0);
 
-    if (isMongoDB(AdminUsers)) {
-      // MongoDB
+    if (isMongoDB(AdminUsers)) { // MongoDB
       const options = {
         limit,
         skip: offset,
         sort: {
-          createdAt: "desc",
+          createdAt: 'desc'
         },
       };
 
@@ -38,7 +35,7 @@ const registerList = (options, pager) => {
         _id: 0,
       };
 
-      attributes.forEach((k) => {
+      attributes.forEach(k => {
         projection[k] = 1;
       });
 
@@ -47,13 +44,14 @@ const registerList = (options, pager) => {
       pager.setResHeader(res, limit, offset, total);
       const json = [];
 
-      results.forEach((k) => {
+      results.forEach(k => {
         json.push(k.toJSON());
       });
 
       return res.json(json);
-    } else {
-      // MySQL
+
+
+    } else { // MySQL
 
       const options = {
         attributes,
@@ -64,6 +62,7 @@ const registerList = (options, pager) => {
 
       pager.setResHeader(res, limit, offset, result.count);
       return res.json(result.rows);
+
     }
   });
 };
@@ -78,7 +77,7 @@ const registerList = (options, pager) => {
  * @param {String} options.default_role;
  * @returns {function(*, *, *)}
  */
-const registerCreate = (options) => {
+const registerCreate = options => {
   const AdminUsers = options.admin_users;
   const defaultRole = options.default_role;
 
@@ -92,23 +91,23 @@ const registerCreate = (options) => {
       salt: salt,
       email: req.body.email,
       role_id: defaultRole,
-      auth_type: AUTH_TYPE_EMAIL,
+      auth_type: AUTH_TYPE_EMAIL
     };
 
     let result;
-    if (isMongoDB(AdminUsers)) {
-      // MongoDB
-      result = await new AdminUsers(data).save();
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      result = await (new AdminUsers(data)).save();
       const safeRes = result.toJSON();
       delete safeRes.password;
       delete safeRes.salt;
       return res.json(safeRes);
-    } else {
-      // MySQL
+
+    } else { // MySQL
       result = await AdminUsers.create(data);
       delete result.password;
       delete result.salt;
       return res.json(data);
+
     }
   });
 };
@@ -122,30 +121,26 @@ const registerCreate = (options) => {
  * @param {Sequelize.model} options.admin_users
  * @returns {function(*, *, *)}
  */
-const registerGet = (options) => {
+const registerGet = options => {
   const AdminUsers = options.admin_users;
 
   return asyncWrapper(async (req, res) => {
-    const attributes = Object.keys(
-      req.swagger.operation.responses["200"].schema.items.properties
-    );
+    const attributes = Object.keys(req.swagger.operation.responses['200'].schema.items.properties);
 
     let data;
-    if (isMongoDB(AdminUsers)) {
-      // MongoDB
+    if (isMongoDB(AdminUsers)) { // MongoDB
       const projection = {
         _id: 0,
       };
-      attributes.forEach((k) => {
+      attributes.forEach(k => {
         projection[k] = 1;
       });
 
       const _id = req.swagger.params._id.value;
-      data = await AdminUsers.findOne({ _id: _id }, projection);
-    } else {
-      //MySQL
+      data = await AdminUsers.findOne({_id: _id}, projection);
+    } else { //MySQL
       const id = req.swagger.params.id.value;
-      data = await AdminUsers.findByPk(id, { attributes });
+      data = await AdminUsers.findByPk(id, {attributes});
     }
 
     return res.json(data);
@@ -161,18 +156,17 @@ const registerGet = (options) => {
  * @param {Sequelize.model} options.admin_users
  * @returns {function(*, *, *)}
  */
-const registerRemove = (options) => {
+const registerRemove = options => {
   const AdminUsers = options.admin_users;
 
   return asyncWrapper(async (req, res) => {
-    if (isMongoDB(AdminUsers)) {
-      // MongoDB
+
+    if (isMongoDB(AdminUsers)) { // MongoDB
       const _id = req.swagger.params._id.value;
-      await AdminUsers.deleteOne({ _id: _id });
-    } else {
-      //MySQL
+      await AdminUsers.deleteOne({_id: _id});
+    } else { //MySQL
       const id = req.swagger.params.id.value;
-      await AdminUsers.destroy({ where: { id }, force: true });
+      await AdminUsers.destroy({where: {id}, force: true});
     }
 
     return res.status(204).end();
@@ -188,25 +182,24 @@ const registerRemove = (options) => {
  * @param {Sequelize.model} options.admin_users
  * @returns {function(*, *, *)}
  */
-const registerUpdate = (options) => {
+const registerUpdate = options => {
   const AdminUsers = options.admin_users;
 
   return asyncWrapper(async (req, res) => {
     const password = req.body.password;
     const roleId = req.body.role_id;
     // TODO: mongoもmysqlも同じキーにするべき
-    const id = isMongoDB(AdminUsers)
-      ? req.swagger.params._id.value
-      : req.swagger.params.id.value;
+    const id = isMongoDB(AdminUsers) ?
+      req.swagger.params._id.value :
+      req.swagger.params.id.value;
 
     if (!password && !roleId) {
       return res.json({});
     }
 
     let user;
-    if (isMongoDB(AdminUsers)) {
-      // MongoDB
-      user = await AdminUsers.findById({ _id: id });
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      user = await AdminUsers.findById({_id: id});
     } else {
       user = await AdminUsers.findByPk(id);
     }
@@ -228,18 +221,19 @@ const registerUpdate = (options) => {
     }
 
     if (roleId) {
-      Object.assign(data, { role_id: roleId });
+      Object.assign(data, {role_id: roleId});
     }
 
+
     let result;
-    if (isMongoDB(AdminUsers)) {
-      // MongoDB
-      result = await AdminUsers.updateOne({ _id: id }, data);
-    } else {
-      // MySQL
-      result = await AdminUsers.update(data, { where: { id } });
+    if (isMongoDB(AdminUsers)) { // MongoDB
+      result = await AdminUsers.updateOne({_id: id}, data);
+    } else { // MySQL
+      result = await AdminUsers.update(data, {where: {id}});
     }
     return res.json(result);
+
+
   });
 };
 
