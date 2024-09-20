@@ -16,15 +16,18 @@ module.exports = () => {
     context.headers['Content-Type'] = 'application/json';
 
     const req = context.request;
-    const debug = {
-      debug: {
-        stack: err.stack && err.stack.split('\n'),
-        name: err.name,
-        message: err.message,
-      },
+    const errorResponse = {
       error: err,
       request_headers: req.headers,
     };
+    // when NODE_ENV is not production, add debug information
+    if (process.env.NODE_ENV !== 'production') {
+      errorResponse.debug = {
+        stack: err.stack && err.stack.split('\n'),
+        name: err.name,
+        message: err.message,
+      };
+    }
 
     // ステータスコードをcontextに反映
     if (!context.statusCode || context.statusCode < 400) {
@@ -38,8 +41,8 @@ module.exports = () => {
       }
     }
 
-    logger.error(util.inspect(debug));
+    logger.error(util.inspect(errorResponse));
     delete context.error; // これをしないとjsonで返せない
-    next(null, JSON.stringify(debug));
+    next(null, JSON.stringify(errorResponse));
   };
 };
